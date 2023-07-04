@@ -2,6 +2,16 @@ import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 import { TensorflowModule } from './TensorflowModule';
 
+type TypedArray =
+  | Float32Array
+  | Float64Array
+  | Int8Array
+  | Int16Array
+  | Int32Array
+  | Uint8Array
+  | Uint16Array
+  | Uint32Array;
+
 declare global {
   /**
    * Loads the Model into memory. Path is fetchable resource, e.g.:
@@ -57,7 +67,7 @@ export interface TensorflowModel {
    * Run the Tensorflow Model with the given input buffer.
    * The input buffer has to match the input tensor's shape.
    */
-  run(input: Uint8Array[]): Uint8Array[];
+  run(input: TypedArray[]): TypedArray[];
 
   /**
    * All input tensors of this Tensorflow Model.
