@@ -1,5 +1,5 @@
 //
-//  JSITypedArray.cpp
+//  TypedArray.cpp
 //  VisionCamera
 //
 //  Created by Marc Rousavy on 21.02.23.
@@ -9,7 +9,7 @@
 // Copied & Adapted from https://github.com/expo/expo/blob/main/packages/expo-gl/common/EXTypedArrayApi.cpp
 // Credits to Expo
 
-#include "JSITypedArray.h"
+#include "TypedArray.h"
 
 #include <unordered_map>
 #include <memory>

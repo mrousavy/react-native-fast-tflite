@@ -1,5 +1,5 @@
 //
-//  JSITypedArray.h
+//  TypedArray.h
 //  VisionCamera
 //
 //  Created by Marc Rousavy on 21.02.23.
@@ -16,9 +16,9 @@
 #include <utility>
 #include <vector>
 
-namespace jsi = facebook::jsi;
-
 namespace mrousavy {
+
+using namespace facebook;
 
 enum class TypedArrayKind {
   Int8Array,

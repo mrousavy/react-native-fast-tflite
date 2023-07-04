@@ -8,10 +8,10 @@
 
 #include "TensorflowPlugin.h"
 
-#include "JSITypedArray.h"
+#include "jsi/TypedArray.h"
+#include "jsi/Promise.h"
 #include "TensorHelpers.h"
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
-#include <ReactCommon/ReactCommon/TurboModuleUtils.h>
 #include <chrono>
 #include <thread>
 #include <string>
@@ -64,8 +64,8 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
     }
      */
     
-    auto promise = react::createPromiseAsJSIValue(runtime, [=](jsi::Runtime &runtime,
-                                                               std::shared_ptr<react::Promise> promise) -> void {
+    auto promise = Promise::createPromise(runtime, [=](jsi::Runtime& runtime,
+                                                       std::shared_ptr<Promise> promise) -> void {
       // Launch C++ async task
       auto future = std::async(std::launch::async, [=]() {
         // Fetch model from URL (JS bundle)
@@ -87,11 +87,11 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
         }
         
         // Initialize Model and allocate memory buffers
-        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, model, delegate);
+        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegate);
         
         // Resolve Promise back on JS Thread
         callInvoker->invokeAsync([=]() {
-          auto hostObject = jsi::Object::createFromHostObject(promise->runtime_, plugin);
+          auto hostObject = jsi::Object::createFromHostObject(promise->runtime, plugin);
           promise->resolve(std::move(hostObject));
           
           auto end = std::chrono::steady_clock::now();
@@ -139,9 +139,9 @@ std::shared_ptr<TypedArrayBase> TensorflowPlugin::getOutputArrayForTensor(jsi::R
   return _outputBuffers[name];
 }
 
-jsi::Value TensorflowPlugin::run(jsi::Runtime &runtime, jsi::Value inputValues) {
+jsi::Value TensorflowPlugin::run(jsi::Runtime &runtime, jsi::Object inputValues) {
   // Input has to be array in input tensor size
-  auto array = inputValues.asObject(runtime).asArray(runtime);
+  auto array = inputValues.asArray(runtime);
   size_t count = array.size(runtime);
   if (count != TfLiteInterpreterGetInputTensorCount(_interpreter)) {
     throw std::runtime_error("TFLite: Input Values have different size than there are input tensors!");
@@ -186,7 +186,7 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                                                      const jsi::Value& thisValue,
                                                      const jsi::Value* arguments,
                                                      size_t count) -> jsi::Value {
-      return this->run(runtime, std::move(arguments[0]));
+      return this->run(runtime, arguments[0].asObject(runtime));
     });
   } else if (propName == "inputs") {
     int size = TfLiteInterpreterGetInputTensorCount(_interpreter);

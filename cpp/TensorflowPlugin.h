@@ -13,7 +13,7 @@
 #include <string>
 #include <jsi/jsi.h>
 #include <React-callinvoker/ReactCommon/CallInvoker.h>
-#include "JSITypedArray.h"
+#include "jsi/TypedArray.h"
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
 
 using namespace facebook;
@@ -44,7 +44,7 @@ public:
                                FetchURLFunc fetchURL);
 
 private:
-  jsi::Value run(jsi::Runtime& runtime, jsi::Value inputArray);
+  jsi::Value run(jsi::Runtime& runtime, jsi::Object inputArray);
   std::shared_ptr<TypedArrayBase> getOutputArrayForTensor(jsi::Runtime& runtime, const TfLiteTensor* tensor);
 
 private:

@@ -9,8 +9,10 @@
 #pragma once
 
 #include <jsi/jsi.h>
-#include "JSITypedArray.h"
+#include "jsi/TypedArray.h"
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
+
+using namespace facebook;
 
 class TensorHelpers {
 public:
