@@ -1,0 +1,8 @@
+framework module TensorFlowLiteC {
+  umbrella header "TensorFlowLiteC.h"
+  export *
+  module * { export * }
+  link "dl"
+  link "m"
+  link "pthread"
+}
