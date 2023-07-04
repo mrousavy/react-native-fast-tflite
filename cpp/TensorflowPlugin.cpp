@@ -272,6 +272,7 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
 std::vector<jsi::PropNameID> TensorflowPlugin::getPropertyNames(jsi::Runtime& runtime) {
   std::vector<jsi::PropNameID> result;
   result.push_back(jsi::PropNameID::forAscii(runtime, "run"));
+  result.push_back(jsi::PropNameID::forAscii(runtime, "runSync"));
   result.push_back(jsi::PropNameID::forAscii(runtime, "inputs"));
   result.push_back(jsi::PropNameID::forAscii(runtime, "outputs"));
   result.push_back(jsi::PropNameID::forAscii(runtime, "delegate"));
