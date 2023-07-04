@@ -16,7 +16,6 @@
 #include "JSITypedArray.h"
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
 
-
 using namespace facebook;
 using namespace mrousavy;
 
@@ -32,7 +31,9 @@ public:
   enum Delegate { Default, Metal, CoreML };
 
 public:
-  explicit TensorflowPlugin(std::shared_ptr<TfLiteInterpreter> interpreter, Delegate delegate);
+  explicit TensorflowPlugin(TfLiteInterpreter* interpreter,
+                            Buffer model,
+                            Delegate delegate);
   ~TensorflowPlugin();
 
   jsi::Value get(jsi::Runtime& runtime, const jsi::PropNameID& name) override;
@@ -44,11 +45,12 @@ public:
 
 private:
   jsi::Value run(jsi::Runtime& runtime, jsi::Value inputArray);
-  std::shared_ptr<TypedArrayBase> getOutputArrayForTensor(jsi::Runtime& runtime, TfLiteTensor& tensor);
+  std::shared_ptr<TypedArrayBase> getOutputArrayForTensor(jsi::Runtime& runtime, TfLiteTensor* tensor);
 
 private:
-  std::shared_ptr<TfLiteInterpreter> _interpreter = nullptr;
+  TfLiteInterpreter* _interpreter = nullptr;
   Delegate _delegate = Delegate::Default;
+  Buffer _model;
 
   std::unordered_map<std::string, std::shared_ptr<TypedArrayBase>> _outputBuffers;
 };

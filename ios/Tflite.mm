@@ -20,13 +20,23 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
   jsi::Runtime& runtime = *(jsi::Runtime*)cxxBridge.runtime;
   
   auto fetchByteDataFromUrl = [](std::string url) {
-    NSURL* nsURL = [NSURL URLWithString:[NSString stringWithUTF8String:url.c_str()]];
+    NSString* string = [NSString stringWithUTF8String:url.c_str()];
+    NSLog(@"Fetching %@...", string);
+    NSURL* nsURL = [NSURL URLWithString:string];
     NSData* contents = [NSData dataWithContentsOfURL:nsURL];
     
+    void* data = malloc(contents.length * sizeof(uint8_t));
+    memcpy(data, contents.bytes, contents.length);
+    return Buffer {
+      .data = data,
+      .size = contents.length
+    };
   };
   
   try {
-    TensorflowPlugin::installToRuntime(runtime, [bridge jsCallInvoker]);
+    TensorflowPlugin::installToRuntime(runtime,
+                                       [bridge jsCallInvoker],
+                                       fetchByteDataFromUrl);
   } catch (std::exception& exc) {
     NSLog(@"Failed to install TensorFlow Lite plugin to Runtime! %s", exc.what());
     return @(false);

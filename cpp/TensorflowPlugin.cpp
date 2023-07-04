@@ -9,12 +9,14 @@
 #include "TensorflowPlugin.h"
 
 #include "JSITypedArray.h"
+#include "TensorHelpers.h"
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
 #include <ReactCommon/ReactCommon/TurboModuleUtils.h>
 #include <chrono>
 #include <thread>
 #include <string>
 #include <iostream>
+#include <future>
 
 using namespace facebook;
 using namespace mrousavy;
@@ -40,14 +42,10 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
     
     log("Loading TensorFlow Lite Model from \"%s\"...", modelPath.c_str());
     
-    std::thread t([]() {
-      
-    });
-    
     // TODO: Figure out how to use Metal/CoreML delegates
+    Delegate delegate = Delegate::Default;
     /*
     auto delegates = [[NSMutableArray alloc] init];
-    Delegate delegate = Delegate::Default;
     if (count > 1 && arguments[1].isString()) {
       // user passed a custom delegate command
       auto delegate = arguments[1].asString(runtime).utf8(runtime);
@@ -68,44 +66,37 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
     
     auto promise = react::createPromiseAsJSIValue(runtime, [=](jsi::Runtime &runtime,
                                                                std::shared_ptr<react::Promise> promise) -> void {
-      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        
-        // Download Model from JS bundle to local file
-        /*
-        NSURL* modelUrl = [[NSURL alloc] initWithString:[[NSString alloc] initWithUTF8String:modelPath.c_str()]];
-        NSData* modelData = [NSData dataWithContentsOfURL:modelUrl];
-        auto tempDirectory = [[NSFileManager defaultManager] temporaryDirectory];
-        auto tempFileName = [NSString stringWithFormat:@"%@.tflite", [[NSUUID UUID] UUIDString]];
-        auto tempFilePath = [tempDirectory URLByAppendingPathComponent:tempFileName].path;
-        [modelData writeToFile:tempFilePath atomically:NO];
-        NSLog(@"Model downloaded to \"%@\"! Loading into TensorFlow..", tempFilePath);
-         */
-        Buffer data = fetchURL(modelPath);
+      // Launch C++ async task
+      auto future = std::async(std::launch::async, [=]() {
+        // Fetch model from URL (JS bundle)
+        Buffer buffer = fetchURL(modelPath);
         
         // Load Model into Tensorflow
-        auto model = TfLiteModelCreateWithErrorReporter(<#const void *model_data#>, <#size_t model_size#>, <#void (*reporter)(void *, const char *, va_list)#>, <#void *user_data#>)
-        TfLiteInterpreterCreate(<#const TfLiteModel *model#>, <#const TfLiteInterpreterOptions *optional_options#>)
-        NSError* error;
-        TFLInterpreter* interpreter = [[TFLInterpreter alloc] initWithModelPath:tempFilePath
-                                                                        options:[[TFLInterpreterOptions alloc] init]
-                                                                      delegates:delegates
-                                                                          error:&error];
-        if (error != nil) {
-          std::string str = std::string("Failed to load model \"") + tempFilePath.UTF8String + "\"! Error: " + [error.description UTF8String];
-          promise->reject(str);
+        auto model = TfLiteModelCreate(buffer.data, buffer.size);
+        if (model == nullptr) {
+          promise->reject("Failed to load model from \"" + modelPath + "\"!");
+          return;
+        }
+        
+        // Create TensorFlow Interpreter
+        auto options = TfLiteInterpreterOptionsCreate();
+        auto interpreter = TfLiteInterpreterCreate(model, options);
+        if (interpreter == nullptr) {
+          promise->reject("Failed to create TFLite interpreter from model \"" + modelPath + "\"!");
           return;
         }
         
         // Initialize Model and allocate memory buffers
-        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, delegate);
+        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, model, delegate);
         
         // Resolve Promise back on JS Thread
         callInvoker->invokeAsync([=]() {
           auto hostObject = jsi::Object::createFromHostObject(promise->runtime_, plugin);
           promise->resolve(std::move(hostObject));
           
-          CFTimeInterval endTime = CACurrentMediaTime();
-          NSLog(@"Successfully loaded Tensorflow Model in %g s!", endTime - startTime);
+          auto end = std::chrono::steady_clock::now();
+          log("Successfully loaded Tensorflow Model in %i ms!",
+              std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
         });
       });
     });
@@ -116,66 +107,54 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
 }
 
 
-TensorflowPlugin::TensorflowPlugin(TFLInterpreter* interpreter, Delegate delegate): _interpreter(interpreter), _delegate(delegate) {
-  NSError* error;
-  
-  // Allocate memory for the model's input `TFLTensor`s.
-  [interpreter allocateTensorsWithError:&error];
-  if (error != nil) {
-    throw std::runtime_error(std::string("Failed to allocate memory for the model's input tensors! Error: ") + [error.description UTF8String]);
+TensorflowPlugin::TensorflowPlugin(TfLiteInterpreter* interpreter,
+                                   Buffer model,
+                                   Delegate delegate): _interpreter(interpreter), _model(model), _delegate(delegate) {
+  // Allocate memory for the model's input/output `TFLTensor`s.
+  TfLiteStatus status = TfLiteInterpreterAllocateTensors(_interpreter);
+  if (status != kTfLiteOk) {
+    throw std::runtime_error("Failed to allocate memory for input/output tensors! Status: " + std::to_string(status));
   }
   
-  // Get the input `TFLTensor`
-  _inputTensor = [interpreter inputTensorAtIndex:0 error:&error];
-  if (error != nil) {
-    throw std::runtime_error(std::string("Failed to find input sensor for model! Error: ") + [error.description UTF8String]);
-  }
-  
-  auto inputShape = [_inputTensor shapeWithError:&error];
-  if (error != nil) {
-    throw std::runtime_error(std::string("Failed to get input tensor shape! Error: ") + [error.description UTF8String]);
-  }
-  
-  auto inputWidth = inputShape[1].unsignedLongValue;
-  auto inputHeight = inputShape[2].unsignedLongValue;
-  auto inputChannels = inputShape[3].unsignedLongValue;
-  _frameResizer = std::make_shared<FrameResizer>(inputWidth, inputHeight, inputChannels, _inputTensor.dataType);
-  
-  NSLog(@"Successfully loaded TensorFlow Lite Model! Input Shape: %@, Type: %lu",
-        inputShape, static_cast<unsigned long>(_inputTensor.dataType));
+  log("Successfully created Tensorflow Plugin!");
 }
 
 TensorflowPlugin::~TensorflowPlugin() {
-  // TODO: Clean up buffers here
+  if (_model.data != nullptr) {
+    free(_model.data);
+    _model.data = nullptr;
+    _model.size = 0;
+  }
+  if (_interpreter != nullptr) {
+    TfLiteInterpreterDelete(_interpreter);
+    _interpreter = nullptr;
+  }
 }
 
-std::shared_ptr<TypedArrayBase> TensorflowPlugin::getOutputArrayForTensor(jsi::Runtime& runtime, TFLTensor* tensor) {
-  auto name = std::string(tensor.name.UTF8String);
+std::shared_ptr<TypedArrayBase> TensorflowPlugin::getOutputArrayForTensor(jsi::Runtime& runtime, TfLiteTensor* tensor) {
+  auto name = std::string(TfLiteTensorName(tensor));
   if (_outputBuffers.find(name) == _outputBuffers.end()) {
     _outputBuffers[name] = std::make_shared<TypedArrayBase>(TensorHelpers::createJSBufferForTensor(runtime, tensor));
   }
   return _outputBuffers[name];
 }
 
-jsi::Value TensorflowPlugin::run(jsi::Runtime &runtime, Frame* frame) {
-  CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(frame.buffer);
+jsi::Value TensorflowPlugin::run(jsi::Runtime &runtime, jsi::Value inputValues) {
+  // Input has to be array in input tensor size
+  auto array = inputValues.asObject(runtime).asArray(runtime);
+  size_t count = array.size(runtime);
   
-  vImage_Buffer resizedFrame = _frameResizer->resizeFrame(pixelBuffer);
-  
-  NSError* error;
-  // Copy the input data to the input `TFLTensor`.
-  auto nsData = [NSData dataWithBytes:resizedFrame.data
-                               length:resizedFrame.rowBytes * resizedFrame.height];
-  [_inputTensor copyData:nsData error:&error];
-  if (error != nil) {
-    throw jsi::JSError(runtime, std::string("Failed to copy input data to model! Error: ") + [error.description UTF8String]);
+  for (size_t i = 0; i < count; i++) {
+    TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
+    
+    auto value = array.getValueAtIndex(runtime, i);
+    auto inputBuffer = getTypedArray(runtime, value.asObject(runtime));
+    
+    TensorHelpers::updateTensorFromJSBuffer(runtime, tensor, inputBuffer);
   }
   
-  // Run inference by invoking the `TFLInterpreter`.
-  [_interpreter invokeWithError:&error];
-  if (error != nil) {
-    throw jsi::JSError(runtime, std::string("Failed to run model! Error: ") + [error.description UTF8String]);
-  }
+  // Run Model
+  TfLiteInterpreterInvoke(_interpreter);
   
   // Copy output to `NSData` to process the inference results.
   size_t outputTensorsCount = _interpreter.outputTensorCount;
