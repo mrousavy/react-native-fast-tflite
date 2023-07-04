@@ -35,7 +35,7 @@
     "prepack": "bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
-    "bootstrap": "git submodule update --init --recursive && yarn example && yarn install && yarn example pods",
+    "bootstrap": "git submodule update --init --recursive && yarn example && yarn install && yarn example pods && cd tensorflow && ./configure",
     "build-tflite-ios": "./scripts/build-tensorflow-ios.sh"
   },
   "keywords": [
