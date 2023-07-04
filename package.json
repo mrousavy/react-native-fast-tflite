@@ -35,7 +35,8 @@
     "prepack": "bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
-    "bootstrap": "git submodule update --init --recursive && yarn example && yarn install && yarn example pods"
+    "bootstrap": "git submodule update --init --recursive && yarn example && yarn install && yarn example pods",
+    "build-tflite-ios": "cd tensorflow && bazel build --config=ios_fat -c opt --cxxopt=--std=c++17 //tensorflow/lite/ios:TensorFlowLiteC_framework && cp -r bazel-bin/tensorflow/lite/ios/ ../ios/"
   },
   "keywords": [
     "react-native",
