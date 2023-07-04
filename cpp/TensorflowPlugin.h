@@ -45,7 +45,7 @@ public:
 
 private:
   jsi::Value run(jsi::Runtime& runtime, jsi::Value inputArray);
-  std::shared_ptr<TypedArrayBase> getOutputArrayForTensor(jsi::Runtime& runtime, TfLiteTensor* tensor);
+  std::shared_ptr<TypedArrayBase> getOutputArrayForTensor(jsi::Runtime& runtime, const TfLiteTensor* tensor);
 
 private:
   TfLiteInterpreter* _interpreter = nullptr;

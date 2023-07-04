@@ -84,7 +84,7 @@ size_t TensorHelpers::getTFLTensorDataTypeSize(TfLiteType dataType) {
   }
 }
 
-int getTensorTotalLength(TfLiteTensor* tensor) {
+int getTensorTotalLength(const TfLiteTensor* tensor) {
   int dimensions = TfLiteTensorNumDims(tensor);
   if (dimensions < 1) {
     // TODO: Handle error here, there is something wrong with this tensor...
@@ -98,7 +98,7 @@ int getTensorTotalLength(TfLiteTensor* tensor) {
   return size;
 }
 
-TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime, TfLiteTensor* tensor) {
+TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime, const TfLiteTensor* tensor) {
   int size = getTensorTotalLength(tensor);
 
   auto dataType = TfLiteTensorType(tensor);
@@ -126,7 +126,7 @@ TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime, TfL
 }
 
 
-void TensorHelpers::updateJSBuffer(jsi::Runtime& runtime, TypedArrayBase& jsBuffer, TfLiteTensor* tensor) {
+void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBase& jsBuffer, const TfLiteTensor* tensor) {
   auto name = std::string(TfLiteTensorName(tensor));
   auto dataType = TfLiteTensorType(tensor);
   
@@ -185,7 +185,7 @@ void TensorHelpers::updateJSBuffer(jsi::Runtime& runtime, TypedArrayBase& jsBuff
   }
 }
 
-jsi::Object TensorHelpers::tensorToJSObject(jsi::Runtime& runtime, TfLiteTensor* tensor) {
+jsi::Object TensorHelpers::tensorToJSObject(jsi::Runtime& runtime, const TfLiteTensor* tensor) {
   jsi::Object result(runtime);
   result.setProperty(runtime, "name", jsi::String::createFromUtf8(runtime, TfLiteTensorName(tensor)));
   result.setProperty(runtime, "dataType", jsi::String::createFromUtf8(runtime, dataTypeToString(TfLiteTensorType(tensor))));

@@ -131,7 +131,7 @@ TensorflowPlugin::~TensorflowPlugin() {
   }
 }
 
-std::shared_ptr<TypedArrayBase> TensorflowPlugin::getOutputArrayForTensor(jsi::Runtime& runtime, TfLiteTensor* tensor) {
+std::shared_ptr<TypedArrayBase> TensorflowPlugin::getOutputArrayForTensor(jsi::Runtime& runtime, const TfLiteTensor* tensor) {
   auto name = std::string(TfLiteTensorName(tensor));
   if (_outputBuffers.find(name) == _outputBuffers.end()) {
     _outputBuffers[name] = std::make_shared<TypedArrayBase>(TensorHelpers::createJSBufferForTensor(runtime, tensor));
@@ -143,6 +143,9 @@ jsi::Value TensorflowPlugin::run(jsi::Runtime &runtime, jsi::Value inputValues) 
   // Input has to be array in input tensor size
   auto array = inputValues.asObject(runtime).asArray(runtime);
   size_t count = array.size(runtime);
+  if (count != TfLiteInterpreterGetInputTensorCount(_interpreter)) {
+    throw std::runtime_error("TFLite: Input Values have different size than there are input tensors!");
+  }
   
   for (size_t i = 0; i < count; i++) {
     TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
@@ -154,18 +157,18 @@ jsi::Value TensorflowPlugin::run(jsi::Runtime &runtime, jsi::Value inputValues) 
   }
   
   // Run Model
-  TfLiteInterpreterInvoke(_interpreter);
+  TfLiteStatus status = TfLiteInterpreterInvoke(_interpreter);
+  if (status != kTfLiteOk) {
+    throw std::runtime_error("Failed to run TFLite Model! Status: " + std::to_string(status));
+  }
   
-  // Copy output to `NSData` to process the inference results.
-  size_t outputTensorsCount = _interpreter.outputTensorCount;
+  // Copy output to result process the inference results.
+  int outputTensorsCount = TfLiteInterpreterGetOutputTensorCount(_interpreter);
   jsi::Array result(runtime, outputTensorsCount);
   for (size_t i = 0; i < outputTensorsCount; i++) {
-    TFLTensor* outputTensor = [_interpreter outputTensorAtIndex:i error:&error];
-    if (error != nil) {
-      throw jsi::JSError(runtime, std::string("Failed to get output tensor! Error: ") + [error.description UTF8String]);
-    }
+    const TfLiteTensor* outputTensor = TfLiteInterpreterGetOutputTensor(_interpreter, i);
     auto outputBuffer = getOutputArrayForTensor(runtime, outputTensor);
-    TensorHelpers::updateJSBuffer(runtime, *outputBuffer, outputTensor);
+    TensorHelpers::updateJSBufferFromTensor(runtime, *outputBuffer, outputTensor);
     result.setValueAtIndex(runtime, i, *outputBuffer);
   }
   return result;
@@ -183,16 +186,15 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                                                      const jsi::Value& thisValue,
                                                      const jsi::Value* arguments,
                                                      size_t count) -> jsi::Value {
-      auto frame = arguments[0].asObject(runtime).asHostObject<FrameHostObject>(runtime);
-      return this->run(runtime, frame->frame);
+      return this->run(runtime, std::move(arguments[0]));
     });
   } else if (propName == "inputs") {
-    jsi::Array tensors(runtime, _interpreter.inputTensorCount);
-    for (size_t i = 0; i < _interpreter.inputTensorCount; i++) {
-      NSError* error;
-      TFLTensor* tensor = [_interpreter inputTensorAtIndex:i error:&error];
-      if (error != nil) {
-        throw jsi::JSError(runtime, "Failed to get input tensor " + std::to_string(i) + "! " + error.description.UTF8String);
+    int size = TfLiteInterpreterGetInputTensorCount(_interpreter);
+    jsi::Array tensors(runtime, size);
+    for (size_t i = 0; i < size; i++) {
+      TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
+      if (tensor == nullptr) {
+        throw jsi::JSError(runtime, "Failed to get input tensor " + std::to_string(i) + "!");
       }
       
       jsi::Object object = TensorHelpers::tensorToJSObject(runtime, tensor);
@@ -200,12 +202,12 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     }
     return tensors;
   } else if (propName == "outputs") {
-    jsi::Array tensors(runtime, _interpreter.outputTensorCount);
-    for (size_t i = 0; i < _interpreter.outputTensorCount; i++) {
-      NSError* error;
-      TFLTensor* tensor = [_interpreter outputTensorAtIndex:i error:&error];
-      if (error != nil) {
-        throw jsi::JSError(runtime, "Failed to get output tensor " + std::to_string(i) + "! " + error.description.UTF8String);
+    int size = TfLiteInterpreterGetOutputTensorCount(_interpreter);
+    jsi::Array tensors(runtime, size);
+    for (size_t i = 0; i < size; i++) {
+      const TfLiteTensor* tensor = TfLiteInterpreterGetOutputTensor(_interpreter, i);
+      if (tensor == nullptr) {
+        throw jsi::JSError(runtime, "Failed to get output tensor " + std::to_string(i) + "!");
       }
       
       jsi::Object object = TensorHelpers::tensorToJSObject(runtime, tensor);
