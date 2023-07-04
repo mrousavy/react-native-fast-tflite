@@ -10,7 +10,7 @@ export default function App() {
   const [result, setResult] = React.useState<number | undefined>();
 
   const model = useTensorflowModel(
-    require('../assets/smartreply_1_default_1.tflite')
+    require('../assets/object_detection_mobile_object_localizer_v1_1_default_1.tflite')
   );
 
   React.useEffect(() => {
@@ -18,7 +18,9 @@ export default function App() {
 
     console.log(`Running Model...`);
     const result = model.model.run([new Uint8Array([5])]);
-    console.log(`Successfully ran Model!`, result);
+    result.then((result) => {
+      console.log(`Successfully ran Model!`, result);
+    });
   }, [model.model]);
 
   return (

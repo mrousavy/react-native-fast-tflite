@@ -67,7 +67,12 @@ export interface TensorflowModel {
    * Run the Tensorflow Model with the given input buffer.
    * The input buffer has to match the input tensor's shape.
    */
-  run(input: TypedArray[]): TypedArray[];
+  run(input: TypedArray[]): Promise<TypedArray[]>;
+  /**
+   * Synchronously run the Tensorflow Model with the given input buffer.
+   * The input buffer has to match the input tensor's shape.
+   */
+  runSync(input: TypedArray[]): TypedArray[];
 
   /**
    * All input tensors of this Tensorflow Model.

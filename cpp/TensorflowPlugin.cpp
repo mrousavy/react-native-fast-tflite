@@ -91,7 +91,7 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
         }
         
         // Initialize Model and allocate memory buffers
-        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegate);
+        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegate, callInvoker);
         
         callInvoker->invokeAsync([=, &runtime]() {
           auto result = jsi::Object::createFromHostObject(runtime, plugin);
@@ -112,7 +112,9 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
 
 TensorflowPlugin::TensorflowPlugin(TfLiteInterpreter* interpreter,
                                    Buffer model,
-                                   Delegate delegate): _interpreter(interpreter), _model(model), _delegate(delegate) {
+                                   Delegate delegate,
+                                   std::shared_ptr<react::CallInvoker> callInvoker):
+  _interpreter(interpreter), _model(model), _delegate(delegate), _callInvoker(callInvoker) {
   // Allocate memory for the model's input/output `TFLTensor`s.
   TfLiteStatus status = TfLiteInterpreterAllocateTensors(_interpreter);
   if (status != kTfLiteOk) {
@@ -142,7 +144,7 @@ std::shared_ptr<TypedArrayBase> TensorflowPlugin::getOutputArrayForTensor(jsi::R
   return _outputBuffers[name];
 }
 
-jsi::Value TensorflowPlugin::run(jsi::Runtime &runtime, jsi::Object inputValues) {
+void TensorflowPlugin::copyInputBuffers(jsi::Runtime &runtime, jsi::Object inputValues) {
   // Input has to be array in input tensor size
   auto array = inputValues.asArray(runtime);
   size_t count = array.size(runtime);
@@ -152,19 +154,13 @@ jsi::Value TensorflowPlugin::run(jsi::Runtime &runtime, jsi::Object inputValues)
   
   for (size_t i = 0; i < count; i++) {
     TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
-    
     auto value = array.getValueAtIndex(runtime, i);
     auto inputBuffer = getTypedArray(runtime, value.asObject(runtime));
-    
     TensorHelpers::updateTensorFromJSBuffer(runtime, tensor, inputBuffer);
   }
-  
-  // Run Model
-  TfLiteStatus status = TfLiteInterpreterInvoke(_interpreter);
-  if (status != kTfLiteOk) {
-    throw std::runtime_error("Failed to run TFLite Model! Status: " + std::to_string(status));
-  }
-  
+}
+
+jsi::Value TensorflowPlugin::copyOutputBuffers(jsi::Runtime &runtime) {
   // Copy output to result process the inference results.
   int outputTensorsCount = TfLiteInterpreterGetOutputTensorCount(_interpreter);
   jsi::Array result(runtime, outputTensorsCount);
@@ -177,11 +173,19 @@ jsi::Value TensorflowPlugin::run(jsi::Runtime &runtime, jsi::Object inputValues)
   return result;
 }
 
+void TensorflowPlugin::run() {
+  // Run Model
+  TfLiteStatus status = TfLiteInterpreterInvoke(_interpreter);
+  if (status != kTfLiteOk) {
+    throw std::runtime_error("Failed to run TFLite Model! Status: " + std::to_string(status));
+  }
+}
+
 
 jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& propNameId) {
   auto propName = propNameId.utf8(runtime);
   
-  if (propName == "run") {
+  if (propName == "runSync") {
     return jsi::Function::createFromHostFunction(runtime,
                                                  jsi::PropNameID::forAscii(runtime, "runModel"),
                                                  1,
@@ -189,7 +193,40 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                                                      const jsi::Value& thisValue,
                                                      const jsi::Value* arguments,
                                                      size_t count) -> jsi::Value {
-      return this->run(runtime, arguments[0].asObject(runtime));
+      // 1.
+      copyInputBuffers(runtime, arguments[0].asObject(runtime));
+      // 2.
+      this->run();
+      // 3.
+      return copyOutputBuffers(runtime);
+    });
+  } else if (propName == "run") {
+    return jsi::Function::createFromHostFunction(runtime,
+                                                 jsi::PropNameID::forAscii(runtime, "runModel"),
+                                                 1,
+                                                 [=](jsi::Runtime& runtime,
+                                                     const jsi::Value& thisValue,
+                                                     const jsi::Value* arguments,
+                                                     size_t count) -> jsi::Value {
+      // 1.
+      copyInputBuffers(runtime, arguments[0].asObject(runtime));
+      auto promise = Promise::createPromise(runtime, [=, &runtime](std::shared_ptr<Promise> promise) {
+        std::async(std::launch::async, [=, &runtime]() {
+          // 2.
+          try {
+            this->run();
+            
+            this->_callInvoker->invokeAsync([=, &runtime]() {
+              // 3.
+              auto result = this->copyOutputBuffers(runtime);
+              promise->resolve(std::move(result));
+            });
+          } catch (std::runtime_error error) {
+            promise->reject(error.what());
+          }
+        });
+      });
+      return promise;
     });
   } else if (propName == "inputs") {
     int size = TfLiteInterpreterGetInputTensorCount(_interpreter);

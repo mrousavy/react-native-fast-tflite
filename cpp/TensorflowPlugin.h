@@ -33,7 +33,8 @@ public:
 public:
   explicit TensorflowPlugin(TfLiteInterpreter* interpreter,
                             Buffer model,
-                            Delegate delegate);
+                            Delegate delegate,
+                            std::shared_ptr<react::CallInvoker> callInvoker);
   ~TensorflowPlugin();
 
   jsi::Value get(jsi::Runtime& runtime, const jsi::PropNameID& name) override;
@@ -44,13 +45,17 @@ public:
                                FetchURLFunc fetchURL);
 
 private:
-  jsi::Value run(jsi::Runtime& runtime, jsi::Object inputArray);
+  void copyInputBuffers(jsi::Runtime &runtime, jsi::Object inputValues);
+  void run();
+  jsi::Value copyOutputBuffers(jsi::Runtime &runtime);
+  
   std::shared_ptr<TypedArrayBase> getOutputArrayForTensor(jsi::Runtime& runtime, const TfLiteTensor* tensor);
 
 private:
   TfLiteInterpreter* _interpreter = nullptr;
   Delegate _delegate = Delegate::Default;
   Buffer _model;
+  std::shared_ptr<react::CallInvoker> _callInvoker;
 
   std::unordered_map<std::string, std::shared_ptr<TypedArrayBase>> _outputBuffers;
 };
