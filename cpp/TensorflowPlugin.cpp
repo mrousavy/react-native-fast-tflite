@@ -12,6 +12,9 @@
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
 #include <ReactCommon/ReactCommon/TurboModuleUtils.h>
 #include <chrono>
+#include <thread>
+#include <string>
+#include <iostream>
 
 using namespace facebook;
 using namespace mrousavy;
@@ -20,7 +23,11 @@ void log(std::string string...) {
   // TODO: Figure out how to log to console
 }
 
-void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime, std::shared_ptr<react::CallInvoker> callInvoker) {
+void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
+                                        std::shared_ptr<react::CallInvoker> callInvoker,
+                                        FetchURLFunc fetchURL) {
+  
+  
   auto func = jsi::Function::createFromHostFunction(runtime,
                                                     jsi::PropNameID::forAscii(runtime, "__loadTensorflowModel"),
                                                     1,
@@ -32,6 +39,10 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime, std::shared_ptr<r
     auto modelPath = arguments[0].asString(runtime).utf8(runtime);
     
     log("Loading TensorFlow Lite Model from \"%s\"...", modelPath.c_str());
+    
+    std::thread t([]() {
+      
+    });
     
     // TODO: Figure out how to use Metal/CoreML delegates
     /*
@@ -69,6 +80,7 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime, std::shared_ptr<r
         [modelData writeToFile:tempFilePath atomically:NO];
         NSLog(@"Model downloaded to \"%@\"! Loading into TensorFlow..", tempFilePath);
          */
+        Buffer data = fetchURL(modelPath);
         
         // Load Model into Tensorflow
         auto model = TfLiteModelCreateWithErrorReporter(<#const void *model_data#>, <#size_t model_size#>, <#void (*reporter)(void *, const char *, va_list)#>, <#void *user_data#>)

@@ -4,6 +4,7 @@
 #import <React-NativeModulesApple/ReactCommon/RCTTurboModule.h>
 #import <jsi/jsi.h>
 #import "../cpp/TensorflowPlugin.h"
+#import <string>
 
 using namespace facebook;
 
@@ -17,6 +18,12 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
     return @(false);
   }
   jsi::Runtime& runtime = *(jsi::Runtime*)cxxBridge.runtime;
+  
+  auto fetchByteDataFromUrl = [](std::string url) {
+    NSURL* nsURL = [NSURL URLWithString:[NSString stringWithUTF8String:url.c_str()]];
+    NSData* contents = [NSData dataWithContentsOfURL:nsURL];
+    
+  };
   
   try {
     TensorflowPlugin::installToRuntime(runtime, [bridge jsCallInvoker]);

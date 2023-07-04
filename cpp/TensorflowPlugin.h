@@ -10,13 +10,21 @@
 
 #include <memory>
 #include <unordered_map>
+#include <string>
 #include <jsi/jsi.h>
 #include <React-callinvoker/ReactCommon/CallInvoker.h>
 #include "JSITypedArray.h"
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
 
+
 using namespace facebook;
 using namespace mrousavy;
+
+struct Buffer {
+  void* data;
+  size_t size;
+};
+typedef std::function<Buffer(std::string)> FetchURLFunc;
 
 class TensorflowPlugin: public jsi::HostObject {
 public:
@@ -30,7 +38,9 @@ public:
   jsi::Value get(jsi::Runtime& runtime, const jsi::PropNameID& name) override;
   std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override;
 
-  static void installToRuntime(jsi::Runtime& runtime, std::shared_ptr<react::CallInvoker> callInvoker);
+  static void installToRuntime(jsi::Runtime& runtime,
+                               std::shared_ptr<react::CallInvoker> callInvoker,
+                               FetchURLFunc fetchURL);
 
 private:
   jsi::Value run(jsi::Runtime& runtime, jsi::Value inputArray);
