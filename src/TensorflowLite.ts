@@ -13,7 +13,12 @@ declare global {
   ) => Promise<TensorflowModel>;
 }
 // Installs the JSI bindings into the global namespace.
-TensorflowModule.install();
+console.log('Installing bindings...');
+const result = TensorflowModule.install() as boolean;
+if (result !== true) {
+  console.error(`Failed to install Tensorflow Lite bindings!`);
+}
+console.log('Successfully installed!');
 
 export type TensorflowModelDelegate = 'default' | 'metal' | 'core-ml';
 
@@ -95,7 +100,7 @@ export function loadTensorflowModel(
   console.log(`Loading Tensorflow Lite Model ${path}`);
   const source = Image.resolveAssetSource(path);
   console.log(`Resolved Model path: ${source.uri}`);
-  return __loadTensorflowModel(source.uri, delegate);
+  return global.__loadTensorflowModel(source.uri, delegate);
 }
 
 /**

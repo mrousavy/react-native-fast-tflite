@@ -3,25 +3,36 @@
 #include <jsi/jsi.h>
 #include <utility>
 #include <vector>
+#import <React-callinvoker/ReactCommon/CallInvoker.h>
 
 namespace mrousavy {
 
 using namespace facebook;
 
-typedef std::function<void(jsi::Value)> Resolver;
-typedef std::function<void(std::string)> Rejecter;
-
 class Promise {
 public:
-  Promise(jsi::Runtime& runtime, Resolver resolve, Rejecter reject);
+  Promise(jsi::Runtime& runtime,
+          std::shared_ptr<facebook::react::CallInvoker> callInvoker,
+          jsi::Value resolver,
+          jsi::Value rejecter);
+  
+  void resolve(jsi::Value&& result);
+  void reject(std::string error);
   
 public:
-  Resolver resolve;
-  Rejecter reject;
   jsi::Runtime& runtime;
+private:
+  jsi::Value _resolver;
+  jsi::Value _rejecter;
+  std::shared_ptr<facebook::react::CallInvoker> _callInvoker;
   
 public:
-  static jsi::Value createPromise(jsi::Runtime& runtime, std::function<void(jsi::Runtime& runtime, std::shared_ptr<Promise>)> run);
+  /**
+   Create a new Promise and runs the given `run` function in a Thread pool.
+   */
+  static jsi::Value createPromise(jsi::Runtime& runtime,
+                                  std::shared_ptr<facebook::react::CallInvoker> callInvoker,
+                                  std::function<jsi::Value(jsi::Runtime& runtime)> run);
 };
 
 } // namespace mrousavy;

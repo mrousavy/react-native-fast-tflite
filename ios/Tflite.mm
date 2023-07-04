@@ -17,7 +17,7 @@ using namespace facebook;
 RCT_EXPORT_MODULE()
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
-  RCTBridge* bridge = [self bridge];
+  RCTBridge* bridge = [RCTBridge currentBridge];
   RCTCxxBridge* cxxBridge = (RCTCxxBridge*)bridge;
   if (!cxxBridge.runtime) {
     return @(false);
