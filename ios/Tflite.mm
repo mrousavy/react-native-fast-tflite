@@ -1,10 +1,15 @@
 #import "Tflite.h"
 #import <React/RCTBridge+Private.h>
 #import <React-callinvoker/ReactCommon/CallInvoker.h>
-#import <React-NativeModulesApple/ReactCommon/RCTTurboModule.h>
 #import <jsi/jsi.h>
 #import "../cpp/TensorflowPlugin.h"
 #import <string>
+
+// This is defined in RCTTurboModule.h.
+// for future versions of React we might need to figure out another approach to get the JSCallInvoker!
+@interface RCTBridge (RCTTurboModule)
+- (std::shared_ptr<facebook::react::CallInvoker>)jsCallInvoker;
+@end
 
 using namespace facebook;
 

@@ -185,6 +185,21 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
   }
 }
 
+
+void TensorHelpers::updateTensorFromJSBuffer(jsi::Runtime& runtime, TfLiteTensor* tensor, TypedArrayBase& jsBuffer) {
+  auto name = std::string(TfLiteTensorName(tensor));
+  void* data = TfLiteTensorData(tensor);
+  if (data == nullptr) {
+      throw std::runtime_error("Failed to get data from tensor \"" + name + "\"!");
+  }
+  
+  auto buffer = jsBuffer.getBuffer(runtime);
+  
+  TfLiteTensorCopyFromBuffer(tensor,
+                             buffer.data(runtime) + jsBuffer.byteOffset(runtime),
+                             buffer.size(runtime));
+}
+
 jsi::Object TensorHelpers::tensorToJSObject(jsi::Runtime& runtime, const TfLiteTensor* tensor) {
   jsi::Object result(runtime);
   result.setProperty(runtime, "name", jsi::String::createFromUtf8(runtime, TfLiteTensorName(tensor)));
