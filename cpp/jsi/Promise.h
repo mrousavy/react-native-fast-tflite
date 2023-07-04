@@ -12,7 +12,6 @@ using namespace facebook;
 class Promise {
 public:
   Promise(jsi::Runtime& runtime,
-          std::shared_ptr<facebook::react::CallInvoker> callInvoker,
           jsi::Value resolver,
           jsi::Value rejecter);
   
@@ -24,15 +23,13 @@ public:
 private:
   jsi::Value _resolver;
   jsi::Value _rejecter;
-  std::shared_ptr<facebook::react::CallInvoker> _callInvoker;
   
 public:
   /**
-   Create a new Promise and runs the given `run` function in a Thread pool.
+   Create a new Promise and runs the given `run` function.
    */
   static jsi::Value createPromise(jsi::Runtime& runtime,
-                                  std::shared_ptr<facebook::react::CallInvoker> callInvoker,
-                                  std::function<jsi::Value(jsi::Runtime& runtime)> run);
+                                  std::function<void(std::shared_ptr<Promise> promise)> run);
 };
 
 } // namespace mrousavy;

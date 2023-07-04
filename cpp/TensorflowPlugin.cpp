@@ -65,32 +65,43 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
      */
     
     auto promise = Promise::createPromise(runtime,
-                                          callInvoker,
-                                          [=](jsi::Runtime& runtime) -> jsi::Value {
-      // Fetch model from URL (JS bundle)
-      Buffer buffer = fetchURL(modelPath);
-      
-      // Load Model into Tensorflow
-      auto model = TfLiteModelCreate(buffer.data, buffer.size);
-      if (model == nullptr) {
-        throw std::runtime_error("Failed to load model from \"" + modelPath + "\"!");
-      }
-      
-      // Create TensorFlow Interpreter
-      auto options = TfLiteInterpreterOptionsCreate();
-      auto interpreter = TfLiteInterpreterCreate(model, options);
-      if (interpreter == nullptr) {
-        throw std::runtime_error("Failed to create TFLite interpreter from model \"" + modelPath + "\"!");
-      }
-      
-      // Initialize Model and allocate memory buffers
-      auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegate);
-      
-      auto end = std::chrono::steady_clock::now();
-      log("Successfully loaded Tensorflow Model in %i ms!",
-          std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
-      
-      return jsi::Object::createFromHostObject(runtime, plugin);
+                                          [=, &runtime](std::shared_ptr<Promise> promise) {
+      // Launch async thread
+      std::async(std::launch::async, [=, &runtime]() {
+        // Fetch model from URL (JS bundle)
+        Buffer buffer = fetchURL(modelPath);
+        
+        // Load Model into Tensorflow
+        auto model = TfLiteModelCreate(buffer.data, buffer.size);
+        if (model == nullptr) {
+          callInvoker->invokeAsync([=]() {
+            promise->reject("Failed to load model from \"" + modelPath + "\"!");
+          });
+          return;
+        }
+        
+        // Create TensorFlow Interpreter
+        auto options = TfLiteInterpreterOptionsCreate();
+        auto interpreter = TfLiteInterpreterCreate(model, options);
+        if (interpreter == nullptr) {
+          callInvoker->invokeAsync([=]() {
+            promise->reject("Failed to create TFLite interpreter from model \"" + modelPath + "\"!");
+          });
+          return;
+        }
+        
+        // Initialize Model and allocate memory buffers
+        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegate);
+        
+        callInvoker->invokeAsync([=, &runtime]() {
+          auto result = jsi::Object::createFromHostObject(runtime, plugin);
+          promise->resolve(std::move(result));
+        });
+        
+        auto end = std::chrono::steady_clock::now();
+        log("Successfully loaded Tensorflow Model in %i ms!",
+            std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+      });
     });
     return promise;
   });

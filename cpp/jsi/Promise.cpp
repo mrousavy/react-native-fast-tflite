@@ -9,15 +9,13 @@ namespace mrousavy {
 using namespace facebook;
 
 Promise::Promise(jsi::Runtime& runtime,
-                 std::shared_ptr<facebook::react::CallInvoker> callInvoker,
                  jsi::Value resolver,
                  jsi::Value rejecter):
-  runtime(runtime), _callInvoker(callInvoker), _resolver(std::move(resolver)), _rejecter(std::move(rejecter)) {
+  runtime(runtime), _resolver(std::move(resolver)), _rejecter(std::move(rejecter)) {
 }
 
 jsi::Value Promise::createPromise(jsi::Runtime& runtime,
-                                  std::shared_ptr<facebook::react::CallInvoker> callInvoker,
-                                  std::function<jsi::Value(jsi::Runtime& runtime)> run) {
+                                  std::function<void(std::shared_ptr<Promise> promise)> run) {
   // Get Promise ctor from global
   auto promiseCtor = runtime.global().getPropertyAsFunction(runtime, "Promise");
   
@@ -30,21 +28,9 @@ jsi::Value Promise::createPromise(jsi::Runtime& runtime,
                                                                    size_t count) -> jsi::Value {
     // Call function
     auto promise = std::make_shared<Promise>(runtime,
-                                             callInvoker,
                                              arguments[0].asObject(runtime),
                                              arguments[1].asObject(runtime));
-    
-    auto callback = std::async(std::launch::async, [run, promise, &runtime]() {
-      try {
-        auto result = run(runtime);
-        promise->resolve(std::move(result));
-      } catch (std::runtime_error error) {
-        promise->reject(error.what());
-      } catch (...) {
-        promise->reject("Promise rejected, unknown error!");
-      }
-    });
-    
+    run(promise);
     
     return jsi::Value::undefined();
   });
@@ -53,18 +39,12 @@ jsi::Value Promise::createPromise(jsi::Runtime& runtime,
 }
 
 void Promise::resolve(jsi::Value&& result) {
-  // TODO: Use std::move into Lambda to avoid shared_ptr here
-  std::shared_ptr<jsi::Value> shared = std::make_shared<jsi::Value>(std::move(result));
-  _callInvoker->invokeAsync([this, shared]() {
-    this->_resolver.asObject(runtime).asFunction(runtime).call(runtime, *shared);
-  });
+  _resolver.asObject(runtime).asFunction(runtime).call(runtime, std::move(result));
 }
 
 void Promise::reject(std::string message) {
-  _callInvoker->invokeAsync([this, message]() {
-    jsi::JSError error(runtime, message);
-    this->_rejecter.asObject(runtime).asFunction(runtime).call(runtime, error.value());
-  });
+  jsi::JSError error(runtime, message);
+  _rejecter.asObject(runtime).asFunction(runtime).call(runtime, error.value());
 }
 
 } // namespace mrousavy;
