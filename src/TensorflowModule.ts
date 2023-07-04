@@ -17,6 +17,4 @@ const Tflite = NativeModules.Tflite
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return Tflite.multiply(a, b);
-}
+export const TensorflowModule = Tflite;
