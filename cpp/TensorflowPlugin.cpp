@@ -6,23 +6,19 @@
 //  Copyright © 2023 mrousavy. All rights reserved.
 //
 
-#import "TensorflowPlugin.h"
-#import <Foundation/Foundation.h>
+#include "TensorflowPlugin.h"
 
-#import "ImageHelpers.h"
-#import "TensorHelpers.h"
-#import "../Frame Processor/FrameHostObject.h"
-#import "../../cpp/JSITypedArray.h"
-
-#import <TensorFlowLiteObjC/TFLTensorFlowLite.h>
-#import <TensorFlowLiteObjC/TFLMetalDelegate.h>
-#import <TensorFlowLiteObjC/TFLCoreMLDelegate.h>
-#import <Accelerate/Accelerate.h>
-#include <ReactCommon/TurboModuleUtils.h>
+#include "JSITypedArray.h"
+#include <TensorFlowLiteC/TensorFlowLiteC.h>
+#include <ReactCommon/ReactCommon/TurboModuleUtils.h>
+#include <chrono>
 
 using namespace facebook;
-using namespace vision;
+using namespace mrousavy;
 
+void log(std::string string...) {
+  // TODO: Figure out how to log to console
+}
 
 void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime, std::shared_ptr<react::CallInvoker> callInvoker) {
   auto func = jsi::Function::createFromHostFunction(runtime,
@@ -32,10 +28,13 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime, std::shared_ptr<r
                                                         const jsi::Value& thisValue,
                                                         const jsi::Value* arguments,
                                                         size_t count) -> jsi::Value {
-    CFTimeInterval startTime = CACurrentMediaTime();
+    auto start = std::chrono::steady_clock::now();
     auto modelPath = arguments[0].asString(runtime).utf8(runtime);
-    NSLog(@"Loading TensorFlow Lite Model from \"%s\"...", modelPath.c_str());
     
+    log("Loading TensorFlow Lite Model from \"%s\"...", modelPath.c_str());
+    
+    // TODO: Figure out how to use Metal/CoreML delegates
+    /*
     auto delegates = [[NSMutableArray alloc] init];
     Delegate delegate = Delegate::Default;
     if (count > 1 && arguments[1].isString()) {
@@ -54,11 +53,14 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime, std::shared_ptr<r
         delegate = Delegate::Default;
       }
     }
+     */
     
     auto promise = react::createPromiseAsJSIValue(runtime, [=](jsi::Runtime &runtime,
                                                                std::shared_ptr<react::Promise> promise) -> void {
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
         // Download Model from JS bundle to local file
+        /*
         NSURL* modelUrl = [[NSURL alloc] initWithString:[[NSString alloc] initWithUTF8String:modelPath.c_str()]];
         NSData* modelData = [NSData dataWithContentsOfURL:modelUrl];
         auto tempDirectory = [[NSFileManager defaultManager] temporaryDirectory];
@@ -66,8 +68,11 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime, std::shared_ptr<r
         auto tempFilePath = [tempDirectory URLByAppendingPathComponent:tempFileName].path;
         [modelData writeToFile:tempFilePath atomically:NO];
         NSLog(@"Model downloaded to \"%@\"! Loading into TensorFlow..", tempFilePath);
+         */
         
         // Load Model into Tensorflow
+        auto model = TfLiteModelCreateWithErrorReporter(<#const void *model_data#>, <#size_t model_size#>, <#void (*reporter)(void *, const char *, va_list)#>, <#void *user_data#>)
+        TfLiteInterpreterCreate(<#const TfLiteModel *model#>, <#const TfLiteInterpreterOptions *optional_options#>)
         NSError* error;
         TFLInterpreter* interpreter = [[TFLInterpreter alloc] initWithModelPath:tempFilePath
                                                                         options:[[TFLInterpreterOptions alloc] init]

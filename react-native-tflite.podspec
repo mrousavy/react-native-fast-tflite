@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}"
 
   s.ios.vendored_frameworks = [
-    'ios/TensorFlowLiteC.xcframework',
+    'ios/TensorFlowLiteC.framework',
   ]
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
