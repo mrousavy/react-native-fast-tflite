@@ -10,7 +10,8 @@ export default function App() {
   const [result, setResult] = React.useState<number | undefined>();
 
   const model = useTensorflowModel(
-    require('../assets/object_detection_mobile_object_localizer_v1_1_default_1.tflite')
+    require('../assets/object_detection_mobile_object_localizer_v1_1_default_1.tflite'),
+    'core-ml'
   );
 
   React.useEffect(() => {

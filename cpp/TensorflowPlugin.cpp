@@ -11,7 +11,10 @@
 #include "jsi/TypedArray.h"
 #include "jsi/Promise.h"
 #include "TensorHelpers.h"
+
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
+#include <TensorFlowLiteCCoreML/TensorFlowLiteCCoreML.h>
+
 #include <chrono>
 #include <thread>
 #include <string>
@@ -42,27 +45,18 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
     
     log("Loading TensorFlow Lite Model from \"%s\"...", modelPath.c_str());
     
-    // TODO: Figure out how to use Metal/CoreML delegates
-    Delegate delegate = Delegate::Default;
-    /*
-    auto delegates = [[NSMutableArray alloc] init];
+    TfLiteDelegate* delegate = nullptr;
     if (count > 1 && arguments[1].isString()) {
       // user passed a custom delegate command
-      auto delegate = arguments[1].asString(runtime).utf8(runtime);
-      if (delegate == "core-ml") {
-        NSLog(@"Using CoreML delegate.");
-        [delegates addObject:[[TFLCoreMLDelegate alloc] init]];
-        delegate = Delegate::CoreML;
-      } else if (delegate == "metal") {
-        NSLog(@"Using Metal delegate.");
-        [delegates addObject:[[TFLMetalDelegate alloc] init]];
-        delegate = Delegate::Metal;
+      auto delegateArgument = arguments[1].asString(runtime).utf8(runtime);
+      if (delegateArgument == "core-ml") {
+        delegate = TfLiteCoreMlDelegateCreate(nullptr);
+      } else if (delegateArgument == "metal") {
+        throw std::runtime_error("Metal Delegate is not yet implemented!");
       } else {
-        NSLog(@"Using standard CPU delegate.");
-        delegate = Delegate::Default;
+        delegate = nullptr;
       }
     }
-     */
     
     auto promise = Promise::createPromise(runtime,
                                           [=, &runtime](std::shared_ptr<Promise> promise) {
@@ -82,6 +76,7 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
         
         // Create TensorFlow Interpreter
         auto options = TfLiteInterpreterOptionsCreate();
+        TfLiteInterpreterOptionsAddDelegate(options, delegate);
         auto interpreter = TfLiteInterpreterCreate(model, options);
         if (interpreter == nullptr) {
           callInvoker->invokeAsync([=]() {
@@ -91,7 +86,7 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
         }
         
         // Initialize Model and allocate memory buffers
-        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegate, callInvoker);
+        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, Delegate::Default, callInvoker);
         
         callInvoker->invokeAsync([=, &runtime]() {
           auto result = jsi::Object::createFromHostObject(runtime, plugin);

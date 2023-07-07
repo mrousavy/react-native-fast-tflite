@@ -1,0 +1,9 @@
+framework module TensorFlowLiteCCoreML {
+  umbrella header "TensorFlowLiteCCoreML.h"
+  export *
+  module * { export * }
+  link "m"
+  link "pthread"
+  link framework "CoreML"
+  link framework "Foundation"
+}

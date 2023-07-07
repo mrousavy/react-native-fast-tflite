@@ -22,6 +22,8 @@ Pod::Spec.new do |s|
 
   s.ios.vendored_frameworks = [
     'ios/TensorFlowLiteC.framework',
+    'ios/TensorFlowLiteCCoreML.framework',
+    'ios/TensorFlowLiteCMetal.framework',
   ]
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
