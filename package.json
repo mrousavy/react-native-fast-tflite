@@ -40,6 +40,16 @@
   },
   "keywords": [
     "react-native",
+    "tensorflow",
+    "vision-camera",
+    "tflite",
+    "lite",
+    "tensorflowlite",
+    "tensorflow-lite",
+    "visioncamera",
+    "react-native-vision-camera",
+    "vision",
+    "camera",
     "ios",
     "android"
   ],
