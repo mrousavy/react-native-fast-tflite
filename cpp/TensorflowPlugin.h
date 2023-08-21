@@ -12,9 +12,14 @@
 #include <unordered_map>
 #include <string>
 #include <jsi/jsi.h>
-#include <React-callinvoker/ReactCommon/CallInvoker.h>
 #include "jsi/TypedArray.h"
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
+
+#ifdef ANDROID
+#include <ReactCommon/CallInvoker.h>
+#else
+#include <React-callinvoker/ReactCommon/CallInvoker.h>
+#endif
 
 using namespace facebook;
 using namespace mrousavy;

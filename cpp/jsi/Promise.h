@@ -3,7 +3,12 @@
 #include <jsi/jsi.h>
 #include <utility>
 #include <vector>
-#import <React-callinvoker/ReactCommon/CallInvoker.h>
+
+#ifdef ANDROID
+#include <ReactCommon/CallInvoker.h>
+#else
+#include <React-callinvoker/ReactCommon/CallInvoker.h>
+#endif
 
 namespace mrousavy {
 
