@@ -1,3 +1,5 @@
+import java.nio.file.Paths
+
 buildscript {
   repositories {
     google()
@@ -5,7 +7,7 @@ buildscript {
   }
 
   dependencies {
-    classpath "com.android.tools.build:gradle:7.2.1"
+    classpath "com.android.tools.build:gradle:7.2.2"
   }
 }
 
@@ -30,9 +32,27 @@ def getExtOrIntegerDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["Tflite_" + name]).toInteger()
 }
 
+static def findNodeModules(baseDir) {
+  def basePath = baseDir.toPath().normalize()
+  // Node's module resolution algorithm searches up to the root directory,
+  // after which the base path will be null
+  while (basePath) {
+    def nodeModulesPath = Paths.get(basePath.toString(), "node_modules")
+    def reactNativePath = Paths.get(nodeModulesPath.toString(), "react-native")
+    if (nodeModulesPath.toFile().exists() && reactNativePath.toFile().exists()) {
+      return nodeModulesPath.toString()
+    }
+    basePath = basePath.getParent()
+  }
+  throw new GradleException("vision-camera-tflite: Failed to find node_modules/ path!")
+}
+
+def nodeModules = findNodeModules(projectDir)
+
 android {
   ndkVersion getExtOrDefault("ndkVersion")
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
+  namespace "com.tflite"
 
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
@@ -40,6 +60,9 @@ android {
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
     externalNativeBuild {
       cmake {
+        arguments "-DANDROID_STL=c++_shared",
+                "-DNODE_MODULES_DIR=${nodeModules}",
+                "-DIS_NEW_ARCHITECTURE_ENABLED=${isNewArchitectureEnabled()}"
         cppFlags "-O2 -frtti -fexceptions -Wall -fstack-protector-all"
         abiFilters "x86", "x86_64", "armeabi-v7a", "arm64-v8a"
       }
@@ -54,6 +77,10 @@ android {
     release {
       minifyEnabled false
     }
+  }
+
+  buildFeatures {
+    prefab true
   }
 
   lintOptions {
