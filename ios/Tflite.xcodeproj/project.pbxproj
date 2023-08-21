@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5E555C0D2413F4C50049A1A2 /* Tflite.mm in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* Tflite.mm */; };
 		B843C0D92A541AD0005F585B /* TensorFlowLiteC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B843C0D82A541AD0005F585B /* TensorFlowLiteC.framework */; };
+		B84FBB7A2A93B57C008D281C /* TensorFlowLiteCCoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B84FBB792A93B57C008D281C /* TensorFlowLiteCCoreML.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,6 +30,7 @@
 		B843C0D82A541AD0005F585B /* TensorFlowLiteC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TensorFlowLiteC.framework; sourceTree = "<group>"; };
 		B843C0DA2A541C75005F585B /* Tflite.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tflite.h; sourceTree = "<group>"; };
 		B843C0DB2A541C7E005F585B /* cpp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = cpp; path = ../cpp; sourceTree = "<group>"; };
+		B84FBB792A93B57C008D281C /* TensorFlowLiteCCoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TensorFlowLiteCCoreML.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,6 +39,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B843C0D92A541AD0005F585B /* TensorFlowLiteC.framework in Frameworks */,
+				B84FBB7A2A93B57C008D281C /* TensorFlowLiteCCoreML.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,6 +58,7 @@
 			isa = PBXGroup;
 			children = (
 				B843C0D82A541AD0005F585B /* TensorFlowLiteC.framework */,
+				B84FBB792A93B57C008D281C /* TensorFlowLiteCCoreML.framework */,
 				B843C0DA2A541C75005F585B /* Tflite.h */,
 				B3E7B5891CC2AC0600A0062D /* Tflite.mm */,
 				B843C0DB2A541C7E005F585B /* cpp */,

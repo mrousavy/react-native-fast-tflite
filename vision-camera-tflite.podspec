@@ -3,6 +3,12 @@ require "json"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
 
+enableCoreMLDelegate = false
+if defined?($EnableCoreMLDelegate)
+  enableCoreMLDelegate = $EnableCoreMLDelegate
+end
+Pod::UI.puts "[TFLite] CoreML Delegate is set to #{enableCoreMLDelegate}! ($EnableCoreMLDelegate setting in Podfile)"
+
 Pod::Spec.new do |s|
   s.name         = "vision-camera-tflite"
   s.version      = package["version"]
@@ -17,11 +23,13 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}"
 
   s.pod_target_xcconfig = {
+    'GCC_PREPROCESSOR_DEFINITIONS' => "$(inherited) VISION_CAMERA_TFLITE_ENABLE_CORE_ML=#{enableCoreMLDelegate}",
     'CLANG_CXX_LANGUAGE_STANDARD' => 'c++17',
   }
 
   s.ios.vendored_frameworks = [
     'ios/TensorFlowLiteC.framework',
+    enableCoreMLDelegate ? 'ios/TensorFlowLiteCCoreML.framework' : ''
   ]
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.

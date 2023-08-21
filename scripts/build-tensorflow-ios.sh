@@ -10,5 +10,7 @@ cd ..
 cp -f -r tensorflow/bazel-bin/tensorflow/lite/ios/ ios/
 
 unzip -o ios/TensorFlowLiteC_framework.zip -d ios
-
 rm ios/TensorFlowLiteC_framework.zip
+
+unzip -o ios/TensorFlowLiteCCoreML_framework.zip -d ios
+rm ios/TensorFlowLiteCCoreML_framework.zip

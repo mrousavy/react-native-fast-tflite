@@ -18,6 +18,10 @@
 #include <iostream>
 #include <future>
 
+#if VISION_CAMERA_TFLITE_ENABLE_CORE_ML
+#include <TensorFlowLiteCCoreML/TensorFlowLiteCCoreML.h>
+#endif
+
 using namespace facebook;
 using namespace mrousavy;
 
@@ -28,8 +32,8 @@ void log(std::string string...) {
 void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
                                         std::shared_ptr<react::CallInvoker> callInvoker,
                                         FetchURLFunc fetchURL) {
-  
-  
+
+
   auto func = jsi::Function::createFromHostFunction(runtime,
                                                     jsi::PropNameID::forAscii(runtime, "__loadTensorflowModel"),
                                                     1,
@@ -39,38 +43,30 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
                                                         size_t count) -> jsi::Value {
     auto start = std::chrono::steady_clock::now();
     auto modelPath = arguments[0].asString(runtime).utf8(runtime);
-    
+
     log("Loading TensorFlow Lite Model from \"%s\"...", modelPath.c_str());
-    
+
     // TODO: Figure out how to use Metal/CoreML delegates
-    Delegate delegate = Delegate::Default;
-    /*
-    auto delegates = [[NSMutableArray alloc] init];
+    Delegate delegateType = Delegate::Default;
     if (count > 1 && arguments[1].isString()) {
       // user passed a custom delegate command
       auto delegate = arguments[1].asString(runtime).utf8(runtime);
       if (delegate == "core-ml") {
-        NSLog(@"Using CoreML delegate.");
-        [delegates addObject:[[TFLCoreMLDelegate alloc] init]];
-        delegate = Delegate::CoreML;
+        delegateType = Delegate::CoreML;
       } else if (delegate == "metal") {
-        NSLog(@"Using Metal delegate.");
-        [delegates addObject:[[TFLMetalDelegate alloc] init]];
-        delegate = Delegate::Metal;
+        delegateType = Delegate::Metal;
       } else {
-        NSLog(@"Using standard CPU delegate.");
-        delegate = Delegate::Default;
+        delegateType = Delegate::Default;
       }
     }
-     */
-    
+
     auto promise = Promise::createPromise(runtime,
                                           [=, &runtime](std::shared_ptr<Promise> promise) {
       // Launch async thread
       std::async(std::launch::async, [=, &runtime]() {
         // Fetch model from URL (JS bundle)
         Buffer buffer = fetchURL(modelPath);
-        
+
         // Load Model into Tensorflow
         auto model = TfLiteModelCreate(buffer.data, buffer.size);
         if (model == nullptr) {
@@ -79,25 +75,52 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
           });
           return;
         }
-        
+
         // Create TensorFlow Interpreter
         auto options = TfLiteInterpreterOptionsCreate();
+        
+        switch (delegateType) {
+          case Delegate::CoreML: {
+#if VISION_CAMERA_TFLITE_ENABLE_CORE_ML
+            TfLiteCoreMlDelegateOptions delegateOptions;
+            auto delegate = TfLiteCoreMlDelegateCreate(&delegateOptions);
+            TfLiteInterpreterOptionsAddDelegate(options, delegate);
+            break;
+#else
+            callInvoker->invokeAsync([=]() {
+              promise->reject("CoreML Delegate is not enabled! Set $EnableCoreMLDelegate to true in Podfile and rebuild.");
+            });
+            return;
+#endif
+          }
+          case Delegate::Metal: {
+            callInvoker->invokeAsync([=]() {
+              promise->reject("Metal Delegate is not supported!");
+            });
+            return;
+          }
+          default: {
+            // use default CPU delegate.
+          }
+        }
+        
         auto interpreter = TfLiteInterpreterCreate(model, options);
+        
         if (interpreter == nullptr) {
           callInvoker->invokeAsync([=]() {
             promise->reject("Failed to create TFLite interpreter from model \"" + modelPath + "\"!");
           });
           return;
         }
-        
+
         // Initialize Model and allocate memory buffers
-        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegate, callInvoker);
-        
+        auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegateType, callInvoker);
+
         callInvoker->invokeAsync([=, &runtime]() {
           auto result = jsi::Object::createFromHostObject(runtime, plugin);
           promise->resolve(std::move(result));
         });
-        
+
         auto end = std::chrono::steady_clock::now();
         log("Successfully loaded Tensorflow Model in %i ms!",
             std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
@@ -105,7 +128,7 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
     });
     return promise;
   });
-  
+
   runtime.global().setProperty(runtime, "__loadTensorflowModel", func);
 }
 
@@ -120,7 +143,7 @@ TensorflowPlugin::TensorflowPlugin(TfLiteInterpreter* interpreter,
   if (status != kTfLiteOk) {
     throw std::runtime_error("Failed to allocate memory for input/output tensors! Status: " + std::to_string(status));
   }
-  
+
   log("Successfully created Tensorflow Plugin!");
 }
 
@@ -151,7 +174,7 @@ void TensorflowPlugin::copyInputBuffers(jsi::Runtime &runtime, jsi::Object input
   if (count != TfLiteInterpreterGetInputTensorCount(_interpreter)) {
     throw std::runtime_error("TFLite: Input Values have different size than there are input tensors!");
   }
-  
+
   for (size_t i = 0; i < count; i++) {
     TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
     auto value = array.getValueAtIndex(runtime, i);
@@ -184,7 +207,7 @@ void TensorflowPlugin::run() {
 
 jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& propNameId) {
   auto propName = propNameId.utf8(runtime);
-  
+
   if (propName == "runSync") {
     return jsi::Function::createFromHostFunction(runtime,
                                                  jsi::PropNameID::forAscii(runtime, "runModel"),
@@ -215,7 +238,7 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
           // 2.
           try {
             this->run();
-            
+
             this->_callInvoker->invokeAsync([=, &runtime]() {
               // 3.
               auto result = this->copyOutputBuffers(runtime);
@@ -236,7 +259,7 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
       if (tensor == nullptr) {
         throw jsi::JSError(runtime, "Failed to get input tensor " + std::to_string(i) + "!");
       }
-      
+
       jsi::Object object = TensorHelpers::tensorToJSObject(runtime, tensor);
       tensors.setValueAtIndex(runtime, i, object);
     }
@@ -249,7 +272,7 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
       if (tensor == nullptr) {
         throw jsi::JSError(runtime, "Failed to get output tensor " + std::to_string(i) + "!");
       }
-      
+
       jsi::Object object = TensorHelpers::tensorToJSObject(runtime, tensor);
       tensors.setValueAtIndex(runtime, i, object);
     }
@@ -264,7 +287,7 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
         return jsi::String::createFromUtf8(runtime, "metal");
     }
   }
-  
+
   return jsi::HostObject::get(runtime, propNameId);
 }
 
