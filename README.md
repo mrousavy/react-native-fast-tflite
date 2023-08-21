@@ -1,17 +1,17 @@
-# react-native-tflite
+# vision-camera-tflite
 
 High-performance TensorFlow Lite library for React Native
 
 ## Installation
 
 ```sh
-npm install react-native-tflite
+npm install vision-camera-tflite
 ```
 
 ## Usage
 
 ```js
-import { multiply } from 'react-native-tflite';
+import { multiply } from 'vision-camera-tflite';
 
 // ...
 

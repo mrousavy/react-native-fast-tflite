@@ -1,5 +1,5 @@
 #ifdef __cplusplus
-#import "react-native-tflite.h"
+#import "vision-camera-tflite.h"
 #endif
 
 #ifdef RCT_NEW_ARCH_ENABLED

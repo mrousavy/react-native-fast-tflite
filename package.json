@@ -1,5 +1,5 @@
 {
-  "name": "@mrousavy/react-native-tflite",
+  "name": "vision-camera-tflite",
   "version": "0.1.0",
   "description": "High-performance TensorFlow Lite library for React Native",
   "main": "lib/commonjs/index",
@@ -43,13 +43,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/mrousavy/react-native-tflite",
+  "repository": "https://github.com/mrousavy/vision-camera-tflite",
   "author": "Marc Rousavy <me@mrousavy.com> (https://github.com/mrousavy)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mrousavy/react-native-tflite/issues"
+    "url": "https://github.com/mrousavy/vision-camera-tflite/issues"
   },
-  "homepage": "https://github.com/mrousavy/react-native-tflite#readme",
+  "homepage": "https://github.com/mrousavy/vision-camera-tflite#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

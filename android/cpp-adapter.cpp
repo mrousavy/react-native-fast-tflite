@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "react-native-tflite.h"
+#include "vision-camera-tflite.h"
 
 extern "C"
 JNIEXPORT jint JNICALL

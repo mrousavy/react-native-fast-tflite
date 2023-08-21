@@ -53,9 +53,9 @@ Remember to add tests for your change if possible. Run the unit tests by:
 yarn test
 ```
 
-To edit the Objective-C or Swift files, open `example/ios/TfliteExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > react-native-tflite`.
+To edit the Objective-C or Swift files, open `example/ios/TfliteExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > vision-camera-tflite`.
 
-To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `react-native-tflite` under `Android`.
+To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `vision-camera-tflite` under `Android`.
 
 
 ### Commit message convention

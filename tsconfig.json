@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@mrousavy/react-native-tflite": ["./src/index"]
+      "vision-camera-tflite": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

@@ -5,7 +5,7 @@ set (CMAKE_CXX_STANDARD 11)
 
 add_library(cpp
             SHARED
-            ../cpp/react-native-tflite.cpp
+            ../cpp/vision-camera-tflite.cpp
             cpp-adapter.cpp
 )
 
