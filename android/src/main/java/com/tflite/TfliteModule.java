@@ -20,7 +20,7 @@ import okhttp3.Response;
 /** @noinspection JavaJniMissingFunction*/
 @ReactModule(name = TfliteModule.NAME)
 public class TfliteModule extends ReactContextBaseJavaModule {
-  public static final String NAME = "vision-camera-tflite";
+  public static final String NAME = "Tflite";
 
   public TfliteModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -54,7 +54,7 @@ public class TfliteModule extends ReactContextBaseJavaModule {
   public boolean install() {
     try {
       Log.i(NAME, "Loading C++ library...");
-      System.loadLibrary("vision-camera-tflite");
+      System.loadLibrary("VisionCameraTflite");
 
       JavaScriptContextHolder jsContext = getReactApplicationContext().getJavaScriptContextHolder();
       CallInvokerHolderImpl callInvoker = (CallInvokerHolderImpl) getReactApplicationContext().getCatalystInstance().getJSCallInvokerHolder();

@@ -73,6 +73,18 @@ android {
       path "CMakeLists.txt"
     }
   }
+  packagingOptions {
+    excludes = [
+            "META-INF",
+            "META-INF/**",
+            "**/libc++_shared.so",
+            "**/libfbjni.so",
+            "**/libjsi.so",
+            "**/libreactnativejni.so",
+            "**/libturbomodulejsijni.so",
+            "**/libreact_nativemodule_core.so",
+    ]
+  }
   buildTypes {
     release {
       minifyEnabled false

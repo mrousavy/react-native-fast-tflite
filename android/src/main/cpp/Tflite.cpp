@@ -4,7 +4,8 @@
 #include <exception>
 #include <memory>
 
-#include "TensorflowPlugin.h"
+// TODO: Uncomment this when tensorflow-lite C/C++ API can be successfully built/linked here
+// #include "TensorflowPlugin.h"
 #include <ReactCommon/CallInvoker.h>
 #include <ReactCommon/CallInvokerHolder.h>
 
@@ -28,7 +29,8 @@ struct TfliteModule : public jni::JavaClass<TfliteModule> {
     }
     auto jsCallInvoker = jsCallInvokerHolder->cthis()->getCallInvoker();
 
-    auto fetchByteDataFromUrl = [](std::string url) {
+      // TODO: Uncomment this when tensorflow-lite C/C++ API can be successfully built/linked here
+    /*auto fetchByteDataFromUrl = [](std::string url) {
       static const auto cls = javaClassStatic();
       static const auto method = cls->getStaticMethod<jbyteArray(std::string)>("fetchByteDataFromUrl");
 
@@ -42,9 +44,23 @@ struct TfliteModule : public jni::JavaClass<TfliteModule> {
           .size = size
       };
     };
+     */
 
     try {
-      TensorflowPlugin::installToRuntime(*runtime, jsCallInvoker, fetchByteDataFromUrl);
+        // TODO: Uncomment this when tensorflow-lite C/C++ API can be successfully built/linked here
+        // TensorflowPlugin::installToRuntime(*runtime, jsCallInvoker, fetchByteDataFromUrl);
+
+        // TODO: Remove this when tensorflow-lite C/C++ API can be successfully built/linked here
+        auto func = jsi::Function::createFromHostFunction(*runtime,
+                                                          jsi::PropNameID::forAscii(*runtime, "__loadTensorflowModel"),
+                                                          1,
+                                                          [=](jsi::Runtime& runtime,
+                                                              const jsi::Value& thisValue,
+                                                              const jsi::Value* arguments,
+                                                              size_t count) -> jsi::Value {
+            throw jsi::JSError(runtime, "vision-camera-tflite is not yet supported on Android! I couldn't manage to get TFLite to build for NDK/C++ :/");
+        });
+        runtime->global().setProperty(*runtime, "__loadTensorflowModel", func);
     } catch (std::exception &exc) {
       return false;
     }
