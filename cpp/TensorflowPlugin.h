@@ -13,12 +13,13 @@
 #include <string>
 #include <jsi/jsi.h>
 #include "jsi/TypedArray.h"
-#include <TensorFlowLiteC/TensorFlowLiteC.h>
 
 #ifdef ANDROID
+#include <tensorflow/lite/c/c_api.h>
 #include <ReactCommon/CallInvoker.h>
 #else
 #include <React-callinvoker/ReactCommon/CallInvoker.h>
+#include <TensorFlowLiteC/TensorFlowLiteC.h>
 #endif
 
 using namespace facebook;

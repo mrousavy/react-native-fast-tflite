@@ -10,7 +10,12 @@
 
 #include <jsi/jsi.h>
 #include "jsi/TypedArray.h"
+
+#ifdef ANDROID
+#include <tensorflow/lite/c/c_api.h>
+#else
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
+#endif
 
 using namespace facebook;
 

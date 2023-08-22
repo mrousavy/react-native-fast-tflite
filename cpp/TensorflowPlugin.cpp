@@ -11,15 +11,20 @@
 #include "jsi/TypedArray.h"
 #include "jsi/Promise.h"
 #include "TensorHelpers.h"
-#include <TensorFlowLiteC/TensorFlowLiteC.h>
 #include <chrono>
 #include <thread>
 #include <string>
 #include <iostream>
 #include <future>
 
+#ifdef ANDROID
+#include <tensorflow/lite/c/c_api.h>
+#else
+#include <TensorFlowLiteC/TensorFlowLiteC.h>
+
 #if VISION_CAMERA_TFLITE_ENABLE_CORE_ML
 #include <TensorFlowLiteCCoreML/TensorFlowLiteCCoreML.h>
+#endif
 #endif
 
 using namespace facebook;

@@ -26,6 +26,7 @@ target_include_directories(
   PRIVATE
   "../cpp"
   "src/main/cpp"
+  "src/main/cpp/lib/tensorflow/headers/"
   "${NODE_MODULES_DIR}/react-native/ReactCommon"
   "${NODE_MODULES_DIR}/react-native/ReactCommon/callinvoker"
   "${NODE_MODULES_DIR}/react-native/ReactAndroid/src/main/jni/react/turbomodule" # <-- CallInvokerHolder JNI wrapper

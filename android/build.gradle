@@ -123,7 +123,7 @@ task extractAARHeaders {
       def packageName = file.name.tokenize('-')[0]
       copy {
         from zipTree(file)
-        into "src/main/cpp/$packageName/headers"
+        into "src/main/cpp/lib/$packageName/"
         include "**/*.h"
       }
     }
@@ -137,7 +137,7 @@ task extractSOFiles {
       def packageName = file.name.tokenize('-')[0]
       copy {
         from zipTree(file)
-        into "src/main/cpp/$packageName/"
+        into "src/main/cpp/lib/$packageName/"
         include "jni/**/*.so"
       }
     }
