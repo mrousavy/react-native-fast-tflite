@@ -86,6 +86,7 @@ export interface TensorflowModel {
 }
 
 type Require = ReturnType<typeof require>;
+type ModelSource = Require | { url: string }
 
 export type TensorflowPlugin =
   | {
@@ -104,28 +105,42 @@ export type TensorflowPlugin =
 
 /**
  * Load a Tensorflow Lite Model from the given `.tflite` asset.
- * @param path The `.tflite` model in form of a `require(..)` statement. Make sure to add `tflite` as an asset extension to `metro.config.js`!
+ *
+ * * If you are passing in a `.tflite` model from your app's bundle using `require(..)`, make sure to add `tflite` as an asset extension to `metro.config.js`!
+ * * If you are passing in a `{ url: ... }`, make sure the URL points directly to a `.tflite` model. This can either be a web URL (`http://..`/`https://..`), or a local file (`file://..`).
+ *
+ * @param source The `.tflite` model in form of either a `require(..)` statement or a `{ url: string }`.
  * @param delegate The delegate to use for computations. Uses the standard CPU delegate per default. The `core-ml` or `metal` delegates are GPU-accelerated, but don't work on every model.
  * @returns The loaded Model.
  */
 export function loadTensorflowModel(
-  path: Require,
+  source: ModelSource,
   delegate: TensorflowModelDelegate = 'default'
 ): Promise<TensorflowModel> {
-  console.log(`Loading Tensorflow Lite Model ${path}`);
-  const source = Image.resolveAssetSource(path);
-  console.log(`Resolved Model path: ${source.uri}`);
-  return global.__loadTensorflowModel(source.uri, delegate);
+  let uri: string
+  if ("url" in source) {
+    uri = source.url
+  } else {
+    console.log(`Loading Tensorflow Lite Model ${source}`);
+    const asset = Image.resolveAssetSource(source);
+    uri = asset.uri
+    console.log(`Resolved Model path: ${asset.uri}`);
+  }
+  return global.__loadTensorflowModel(uri, delegate);
 }
 
 /**
  * Load a Tensorflow Lite Model from the given `.tflite` asset into a React State.
- * @param path The `.tflite` model in form of a `require(..)` statement. Make sure to add `tflite` as an asset extension to `metro.config.js`!
+ *
+ * * If you are passing in a `.tflite` model from your app's bundle using `require(..)`, make sure to add `tflite` as an asset extension to `metro.config.js`!
+ * * If you are passing in a `{ url: ... }`, make sure the URL points directly to a `.tflite` model. This can either be a web URL (`http://..`/`https://..`), or a local file (`file://..`).
+ *
+ * @param source The `.tflite` model in form of either a `require(..)` statement or a `{ url: string }`.
  * @param delegate The delegate to use for computations. Uses the standard CPU delegate per default. The `core-ml` or `metal` delegates are GPU-accelerated, but don't work on every model.
  * @returns The state of the Model.
  */
 export function useTensorflowModel(
-  path: Require,
+  source: ModelSource,
   delegate: TensorflowModelDelegate = 'default'
 ): TensorflowPlugin {
   const [state, setState] = useState<TensorflowPlugin>({
@@ -137,16 +152,16 @@ export function useTensorflowModel(
     const load = async (): Promise<void> => {
       try {
         setState({ model: undefined, state: 'loading' });
-        const m = await loadTensorflowModel(path, delegate);
+        const m = await loadTensorflowModel(source, delegate);
         setState({ model: m, state: 'loaded' });
         console.log('Model loaded!');
       } catch (e) {
-        console.error(`Failed to load Tensorflow Model ${path}!`, e);
+        console.error(`Failed to load Tensorflow Model ${source}!`, e);
         setState({ model: undefined, state: 'error', error: e as Error });
       }
     };
     load();
-  }, [delegate, path]);
+  }, [delegate, source]);
 
   return state;
 }
