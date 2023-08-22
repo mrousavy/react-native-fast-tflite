@@ -80,7 +80,7 @@ In the description on [tfhub.dev](https://tfhub.dev) we can find the description
 ![Screenshot of tfhub.dev inspecting the model](./img/tfhub-description.png)
 
 From that we now know that we need a 192 x 192 input image with 3 bytes per pixel (meaning RGB).
-  
+
 
 If you were to use this model with a [VisionCamera](https://github.com/mrousavy/react-native-vision-camera) Frame Processor, you would need to convert the Frame to this 192 x 192 x 3 byte array.
 For example, here's how you can draw red rectangles around an object seen by the Camera in realtime:
@@ -149,6 +149,16 @@ To enable the CoreML Delegate, you need to include the CoreML/Metal code in your
 
 > [!NOTE]
 > Since some operations aren't supported on the CoreML delegate, make sure your Model is able to use the CoreML GPU delegate.
+
+## Adopting at scale
+
+<a href="https://github.com/sponsors/mrousavy">
+  <img align="right" width="160" alt="This library helped you? Consider sponsoring!" src=".github/funding-octocat.svg">
+</a>
+
+This library is provided _as is_, I work on it in my free time.
+
+If you're integrating react-native-fast-tflite in a production app, consider [funding this project](https://github.com/sponsors/mrousavy) and <a href="mailto:me@mrousavy.com?subject=Adopting react-native-fast-tflite at scale">contact me</a> to receive premium enterprise support, help with issues, prioritize bugfixes, request features, help at integrating react-native-fast-tflite and/or VisionCamera Frame Processors, and more.
 
 ## Android
 
