@@ -147,6 +147,11 @@
     "trailingComma": "es5",
     "useTabs": false
   },
+  "babel": {
+    "presets": [
+      "module:metro-react-native-babel-preset"
+    ]
+  },
   "react-native-builder-bob": {
     "source": "src",
     "output": "lib",
@@ -156,7 +161,7 @@
       [
         "typescript",
         {
-          "project": "tsconfig.build.json"
+          "project": "tsconfig.json"
         }
       ]
     ]
