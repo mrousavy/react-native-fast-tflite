@@ -8,6 +8,13 @@ set (CMAKE_CXX_STANDARD 17)
 find_package(ReactAndroid REQUIRED CONFIG)
 find_package(fbjni REQUIRED CONFIG)
 
+find_library(
+        TFLITE
+        tensorflowlite_jni
+        PATHS "./src/main/cpp/lib/tensorflow/jni/${ANDROID_ABI}"
+        NO_DEFAULT_PATH
+        NO_CMAKE_FIND_ROOT_PATH)
+
 string(APPEND CMAKE_CXX_FLAGS " -DANDROID")
 
 add_library(
@@ -27,6 +34,7 @@ target_include_directories(
   "../cpp"
   "src/main/cpp"
   "src/main/cpp/lib/tensorflow/headers/"
+  "../tensorflow/"
   "${NODE_MODULES_DIR}/react-native/ReactCommon"
   "${NODE_MODULES_DIR}/react-native/ReactCommon/callinvoker"
   "${NODE_MODULES_DIR}/react-native/ReactAndroid/src/main/jni/react/turbomodule" # <-- CallInvokerHolder JNI wrapper
@@ -40,4 +48,5 @@ target_link_libraries(
   ReactAndroid::jsi               # <-- jsi.h
   ReactAndroid::reactnativejni    # <-- CallInvokerImpl
   fbjni::fbjni                    # <-- fbjni.h
+  ${TFLITE}
 )

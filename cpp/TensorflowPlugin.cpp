@@ -142,7 +142,7 @@ TensorflowPlugin::TensorflowPlugin(TfLiteInterpreter* interpreter,
                                    Buffer model,
                                    Delegate delegate,
                                    std::shared_ptr<react::CallInvoker> callInvoker):
-  _interpreter(interpreter), _model(model), _delegate(delegate), _callInvoker(callInvoker) {
+  _interpreter(interpreter), _delegate(delegate), _model(model), _callInvoker(callInvoker) {
   // Allocate memory for the model's input/output `TFLTensor`s.
   TfLiteStatus status = TfLiteInterpreterAllocateTensors(_interpreter);
   if (status != kTfLiteOk) {
