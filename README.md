@@ -4,9 +4,9 @@
 
 # vision-camera-tflite
 
-⚡ High-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library for React Native.
+🔥 High-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library for React Native.
 
-* ⚡ Powered by JSI
+* 🔥 Powered by JSI
 * 💨 Zero-copy ArrayBuffers
 * 🔧 Uses the low-level C/C++ TensorFlow Lite core API for direct memory access
 * 🔄 Supports fast-refresh for swapping out TensorFlow Models at runtime
