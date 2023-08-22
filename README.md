@@ -133,8 +133,23 @@ To enable the CoreML Delegate, you need to include the CoreML/Metal code in your
 > [!NOTE]
 > Since some operations aren't supported on the CoreML delegate, make sure your Model is able to use the CoreML GPU delegate.
 
+## Android
+
+Currently, react-native-fast-tflite does not work on Android.
+
+The entire codebase is written in C/C++ and can be shared across platforms, but I couldn't manage to link tensorflow-lite against the NDK/CMake target on Android.
+This is the only missing piece, so if anyone figures this part out, please let me know/send a PR.
+
+My current approach was to use `org.tensorflow:tensorflow-lite` from Maven, extract the .so and Headers from the AAR, and then link against those (see `android/build.gradle` and `android/CMakeLists.txt`). For some reason this gave ABI errors, such as cannot link against linux x64, so for now I just ignored those and finished iOS.
 
 ## Contributing
+
+1. Clone the repo
+2. Make sure you have installed Xcode CLI tools such as `gcc`, `cmake` and `python`/`python3`. See the TensorFlow documentation on what you need exactly.
+3. Run `yarn bootstrap` and select `y` (yes) on all iOS and Android related questions.
+4. Open the Example app and start developing
+   * iOS: `example/ios/TfliteExample.xcworkspace`
+   * Android: `example/android`
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
 
