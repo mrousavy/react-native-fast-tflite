@@ -1,4 +1,10 @@
 {
+  "exclude": [
+    "tensorflow"
+  ],
+  "files": [
+    "src"
+  ],
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
