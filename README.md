@@ -32,9 +32,7 @@
 
 ## Usage
 
-1. Find a TensorFlow Lite model you want to use. There's thousands of public models on [tfhub.dev](https://tfhub.dev).
-    > [!NOTE]
-    > TensorFlow Lite models always have a `.tflite` extension.
+1. Find a TensorFlow Lite (`.tflite`) model you want to use. There's thousands of public models on [tfhub.dev](https://tfhub.dev).
 2. Drag your TensorFlow Lite model into your React Native app's asset folder (e.g. `src/assets/my-model.tflite`)
 3. Load the Model:
     ```ts
@@ -50,6 +48,21 @@
     const outputData = await model.run(inputData)
     console.log(outputData)
     ```
+
+### Loading Models
+
+Models can be loaded either from the React Native bundle using a `require(..)` statement, or any kind of URI/URL (`http://..` or `file://..`):
+
+```ts
+// Asset from React Native Bundle
+loadTensorflowModel(require('assets/my-model.tflite'))
+// File on the local filesystem
+loadTensorflowModel('file:///var/mobile/.../my-model.tflite')
+// Remote URL
+loadTensorflowModel('https://tfhub.dev/google/lite-model/object_detection/detector?lite-format=tflite')
+```
+
+Loading a Model is asynchronous since Buffers need to be allocated. Make sure to check for any potential errors when loading a Model.
 
 ### Input and Output data
 
