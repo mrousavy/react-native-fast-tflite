@@ -92,6 +92,10 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
+  configurations {
+    extractHeaders
+    extractSO
+  }
 }
 
 repositories {
@@ -105,6 +109,39 @@ dependencies {
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
+
+  // Tensorflow Lite .aar (includes C API via prefabs)
+  implementation "org.tensorflow:tensorflow-lite:2.13.0"
+  extractHeaders("org.tensorflow:tensorflow-lite:2.13.0")
+  extractSO("org.tensorflow:tensorflow-lite:2.13.0")
+}
+
+task extractAARHeaders {
+  doLast {
+    configurations.extractHeaders.files.each {
+      def file = it.absoluteFile
+      def packageName = file.name.tokenize('-')[0]
+      copy {
+        from zipTree(file)
+        into "src/main/cpp/$packageName/headers"
+        include "**/*.h"
+      }
+    }
+  }
+}
+
+task extractSOFiles {
+  doLast {
+    configurations.extractSO.files.each {
+      def file = it.absoluteFile
+      def packageName = file.name.tokenize('-')[0]
+      copy {
+        from zipTree(file)
+        into "src/main/cpp/$packageName/"
+        include "jni/**/*.so"
+      }
+    }
+  }
 }
 
 if (isNewArchitectureEnabled()) {
@@ -113,4 +150,21 @@ if (isNewArchitectureEnabled()) {
     libraryName = "Tflite"
     codegenJavaPackageName = "com.tflite"
   }
+}
+
+
+def nativeBuildDependsOn(dependsOnTask) {
+  def buildTasks = tasks.findAll({ task -> (
+          !task.name.contains("Clean")
+                  && (task.name.contains("externalNative")
+                  || task.name.contains("CMake")
+                  || task.name.contains("generateJsonModel")
+          )
+  ) })
+  buildTasks.forEach { task -> task.dependsOn(dependsOnTask) }
+}
+
+afterEvaluate {
+  nativeBuildDependsOn(extractAARHeaders)
+  nativeBuildDependsOn(extractSOFiles)
 }
