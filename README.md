@@ -10,6 +10,7 @@
 * 💨 Zero-copy ArrayBuffers
 * 🔧 Uses the low-level C/C++ TensorFlow Lite core API for direct memory access
 * 🔄 Supports fast-refresh for swapping out TensorFlow Models at runtime
+* 🖥️ Supports GPU-accelerated delegates (CoreML/Metal/OpenGL)
 
 ## Installation
 
