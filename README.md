@@ -6,6 +6,11 @@
 
 ⚡ High-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library for React Native.
 
+* ⚡ Powered by JSI
+* 💨 Zero-copy ArrayBuffers
+* 🔧 Uses the low-level C/C++ TensorFlow Lite core API for direct memory access
+* 🔄 Supports fast-refresh for swapping out TensorFlow Models at runtime
+
 ## Installation
 
 1. Add the npm package
@@ -20,6 +25,7 @@
             assetExts: ['tflite', // ...
             // ...
     ```
+    This allows you to drop `.tflite` files into your app and swap them out at runtime without having to rebuild anything! 🔥
 3. (Optional) If you want to enable the GPU Delegate, see ["Using GPU Delegates"](#using-gpu-delegates) down below.
 4. Run your app (`yarn android` / `npx pod-install && yarn ios`)
 
