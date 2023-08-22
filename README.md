@@ -80,8 +80,10 @@ In the description on [tfhub.dev](https://tfhub.dev) we can find the description
 ![Screenshot of tfhub.dev inspecting the model](./img/tfhub-description.png)
 
 From that we now know that we need a 192 x 192 input image with 3 bytes per pixel (meaning RGB).
+  
 
-If you were to use this model with a [VisionCamera](https://github.com/mrousavy/react-native-vision-camera) Frame Processor, you would need to convert the Frame to this 192 x 192 x 3 byte array:
+If you were to use this model with a [VisionCamera](https://github.com/mrousavy/react-native-vision-camera) Frame Processor, you would need to convert the Frame to this 192 x 192 x 3 byte array.
+For example, here's how you can draw red rectangles around an object seen by the Camera in realtime:
 
 ```tsx
 const model = useTensorflowModel(require('object_detection.tflite'))
