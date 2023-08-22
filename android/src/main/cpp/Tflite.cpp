@@ -18,7 +18,8 @@ struct TfliteModule : public jni::JavaClass<TfliteModule> {
  public:
   static constexpr auto kJavaDescriptor = "Lcom/tflite/TfliteModule;";
 
-  static jboolean nativeInstall(jlong runtimePtr,
+  static jboolean nativeInstall(jni::alias_ref<jni::JClass>,
+                                jlong runtimePtr,
                                 jni::alias_ref <react::CallInvokerHolder::javaobject> jsCallInvokerHolder) {
     auto runtime = reinterpret_cast<jsi::Runtime *>(runtimePtr);
     if (runtime == nullptr) {
@@ -43,7 +44,7 @@ struct TfliteModule : public jni::JavaClass<TfliteModule> {
     };
 
     try {
-      TensorflowPlugin::installToRuntime(runtime, jsCallInvoker, fetchByteDataFromUrl);
+      TensorflowPlugin::installToRuntime(*runtime, jsCallInvoker, fetchByteDataFromUrl);
     } catch (std::exception &exc) {
       return false;
     }
@@ -53,9 +54,8 @@ struct TfliteModule : public jni::JavaClass<TfliteModule> {
 
   static void registerNatives() {
     javaClassStatic()->registerNatives({
-      makeNativeMethod("nativeInstall",
-        TfliteModule::nativeInstall),
-      });
+      makeNativeMethod("nativeInstall", TfliteModule::nativeInstall),
+    });
   }
 };
 
