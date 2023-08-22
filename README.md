@@ -89,7 +89,7 @@ const frameProcessor = useFrameProcessor((frame) => {
     'worklet'
     if (model.state !== "loaded") return
 
-    const data = frame.toByteArray()
+    const data = frame.toArrayBuffer()
     // do RGB conversion if the Frame is not already in RGB Format
     const outputs = model.model.runSync([data])
 
