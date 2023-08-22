@@ -1,0 +1,16 @@
+
+{
+  "extends": "../tsconfig",
+  "compilerOptions": {
+    "paths": {
+      "vision-camera-tflite": ["../src/index"]
+    },
+  },
+  "include": [
+    "src",
+    "index.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

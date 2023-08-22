@@ -1,8 +1,11 @@
 {
   "exclude": [
-    "tensorflow"
+    "tensorflow",
+    "node_modules",
+    "lib",
+    "example"
   ],
-  "files": [
+  "include": [
     "src"
   ],
   "compilerOptions": {
@@ -28,7 +31,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "esnext",
-    "verbatimModuleSyntax": true
+    "target": "esnext"
   }
 }
