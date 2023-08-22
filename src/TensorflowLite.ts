@@ -17,7 +17,7 @@ declare global {
    * Loads the Model into memory. Path is fetchable resource, e.g.:
    * http://192.168.8.110:8081/assets/assets/model.tflite?platform=ios&hash=32e9958c83e5db7d0d693633a9f0b175
    */
-  const __loadTensorflowModel: (
+  var __loadTensorflowModel: (
     path: string,
     delegate: TensorflowModelDelegate
   ) => Promise<TensorflowModel>;
