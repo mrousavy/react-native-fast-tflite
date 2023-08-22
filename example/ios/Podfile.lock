@@ -485,7 +485,7 @@ PODS:
     - React-logger (= 0.72.1)
     - React-perflogger (= 0.72.1)
   - SocketRocket (0.6.1)
-  - vision-camera-tflite (0.1.0):
+  - react-native-fast-tflite (0.1.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - Yoga (1.14.0)
@@ -555,7 +555,7 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - vision-camera-tflite (from `../..`)
+  - react-native-fast-tflite (from `../..`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -653,7 +653,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  vision-camera-tflite:
+  react-native-fast-tflite:
     :path: "../.."
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
@@ -710,7 +710,7 @@ SPEC CHECKSUMS:
   React-utils: 0a70ea97d4e2749f336b450c082905be1d389435
   ReactCommon: e593d19c9e271a6da4d0bd7f13b28cfeae5d164b
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  vision-camera-tflite: 0966a28ed0d2e0bf927b91558bb39183a670f5be
+  react-native-fast-tflite: 0966a28ed0d2e0bf927b91558bb39183a670f5be
   Yoga: 65286bb6a07edce5e4fe8c90774da977ae8fc009
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 

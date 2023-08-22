@@ -44,7 +44,7 @@ static def findNodeModules(baseDir) {
     }
     basePath = basePath.getParent()
   }
-  throw new GradleException("vision-camera-tflite: Failed to find node_modules/ path!")
+  throw new GradleException("react-native-fast-tflite: Failed to find node_modules/ path!")
 }
 
 def nodeModules = findNodeModules(projectDir)

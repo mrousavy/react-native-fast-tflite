@@ -11,7 +11,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "vision-camera-tflite": ["./src/index"]
+      "react-native-fast-tflite": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

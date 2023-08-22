@@ -58,7 +58,7 @@ struct TfliteModule : public jni::JavaClass<TfliteModule> {
                                                               const jsi::Value& thisValue,
                                                               const jsi::Value* arguments,
                                                               size_t count) -> jsi::Value {
-            throw jsi::JSError(runtime, "vision-camera-tflite is not yet supported on Android! I couldn't manage to get TFLite to build for NDK/C++ :/");
+            throw jsi::JSError(runtime, "react-native-fast-tflite is not yet supported on Android! I couldn't manage to get TFLite to build for NDK/C++ :/");
         });
         runtime->global().setProperty(*runtime, "__loadTensorflowModel", func);
     } catch (std::exception &exc) {

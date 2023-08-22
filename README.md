@@ -2,7 +2,7 @@
   <img src="./img/banner.svg" width="100%" />
 </a>
 
-# vision-camera-tflite
+# react-native-fast-tflite
 
 🔥 High-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library for React Native.
 
@@ -15,7 +15,7 @@
 
 1. Add the npm package
     ```sh
-    yarn add vision-camera-tflite
+    yarn add react-native-fast-tflite
     ```
 2. In `metro.config.js`, add `tflite` as a supported asset extension:
     ```js

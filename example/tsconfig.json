@@ -3,7 +3,7 @@
   "extends": "../tsconfig",
   "compilerOptions": {
     "paths": {
-      "vision-camera-tflite": ["../src/index"]
+      "react-native-fast-tflite": ["../src/index"]
     },
   },
   "include": [
