@@ -232,7 +232,7 @@ void TypedArray<T>::update(jsi::Runtime &runtime, const std::vector<ContentType<
 
 template <TypedArrayKind T>
 void TypedArray<T>::updateUnsafe(jsi::Runtime &runtime, ContentType<T> *data, size_t length) {
-  if (length != size(runtime)) {
+  if (length != byteLength(runtime)) {
     throw jsi::JSError(runtime, "TypedArray can only be updated with an array of the same size");
   }
   uint8_t *rawData = getBuffer(runtime).data(runtime) + byteOffset(runtime);

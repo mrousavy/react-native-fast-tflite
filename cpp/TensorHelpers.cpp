@@ -124,7 +124,7 @@ TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime, con
       return TypedArray<TypedArrayKind::Uint16Array>(runtime, size);
     case kTfLiteUInt32:
       return TypedArray<TypedArrayKind::Uint32Array>(runtime, size);
-      
+
     default:
       throw std::runtime_error("Unsupported tensor data type! " + dataTypeToString(dataType));
   }
@@ -134,14 +134,14 @@ TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime, con
 void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBase& jsBuffer, const TfLiteTensor* tensor) {
   auto name = std::string(TfLiteTensorName(tensor));
   auto dataType = TfLiteTensorType(tensor);
-  
+
   void* data = TfLiteTensorData(tensor);
   if (data == nullptr) {
       throw std::runtime_error("Failed to get data from tensor \"" + name + "\"!");
   }
-  
-  // count of numbers in there, not byte size!
-  size_t size = getTensorTotalLength(tensor);
+
+  // count of bytes, may be larger than count of numbers (e.g. for float32)
+  size_t size = getTensorTotalLength(tensor) * getTFLTensorDataTypeSize(dataType);
 
   switch (dataType) {
     case kTfLiteFloat32:
@@ -184,7 +184,7 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
         .as<TypedArrayKind::Uint32Array>(runtime)
         .updateUnsafe(runtime, (uint32_t*)data, size);
       break;
-      
+
     default:
       throw jsi::JSError(runtime, "Unsupported output data type! " + dataTypeToString(dataType));
   }
@@ -197,9 +197,9 @@ void TensorHelpers::updateTensorFromJSBuffer(jsi::Runtime& runtime, TfLiteTensor
   if (data == nullptr) {
       throw std::runtime_error("Failed to get data from tensor \"" + name + "\"!");
   }
-  
+
   auto buffer = jsBuffer.getBuffer(runtime);
-  
+
   TfLiteTensorCopyFromBuffer(tensor,
                              buffer.data(runtime) + jsBuffer.byteOffset(runtime),
                              buffer.size(runtime));
