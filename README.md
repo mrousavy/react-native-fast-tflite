@@ -60,7 +60,7 @@ loadTensorflowModel(require('assets/my-model.tflite'))
 // File on the local filesystem
 loadTensorflowModel('file:///var/mobile/.../my-model.tflite')
 // Remote URL
-loadTensorflowModel('https://tfhub.dev/google/lite-model/object_detection/detector?lite-format=tflite')
+loadTensorflowModel('https://tfhub.dev/google/lite-model/object_detection_v1.tflite')
 ```
 
 Loading a Model is asynchronous since Buffers need to be allocated. Make sure to check for any potential errors when loading a Model.
