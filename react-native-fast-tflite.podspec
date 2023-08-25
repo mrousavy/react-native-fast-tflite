@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}"
 
   s.pod_target_xcconfig = {
-    'GCC_PREPROCESSOR_DEFINITIONS' => "$(inherited) VISION_CAMERA_TFLITE_ENABLE_CORE_ML=#{enableCoreMLDelegate}",
+    'GCC_PREPROCESSOR_DEFINITIONS' => "$(inherited) FAST_TFLITE_ENABLE_CORE_ML=#{enableCoreMLDelegate}",
     'CLANG_CXX_LANGUAGE_STANDARD' => 'c++17',
   }
 

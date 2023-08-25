@@ -22,7 +22,7 @@
 #else
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
 
-#if VISION_CAMERA_TFLITE_ENABLE_CORE_ML
+#if FAST_TFLITE_ENABLE_CORE_ML
 #include <TensorFlowLiteCCoreML/TensorFlowLiteCCoreML.h>
 #endif
 #endif
@@ -83,10 +83,10 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
 
         // Create TensorFlow Interpreter
         auto options = TfLiteInterpreterOptionsCreate();
-        
+
         switch (delegateType) {
           case Delegate::CoreML: {
-#if VISION_CAMERA_TFLITE_ENABLE_CORE_ML
+#if FAST_TFLITE_ENABLE_CORE_ML
             TfLiteCoreMlDelegateOptions delegateOptions;
             auto delegate = TfLiteCoreMlDelegateCreate(&delegateOptions);
             TfLiteInterpreterOptionsAddDelegate(options, delegate);
@@ -108,9 +108,9 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
             // use default CPU delegate.
           }
         }
-        
+
         auto interpreter = TfLiteInterpreterCreate(model, options);
-        
+
         if (interpreter == nullptr) {
           callInvoker->invokeAsync([=]() {
             promise->reject("Failed to create TFLite interpreter from model \"" + modelPath + "\"!");
@@ -287,7 +287,7 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
       case Delegate::Default:
         return jsi::String::createFromUtf8(runtime, "default");
       case Delegate::CoreML:
-        return jsi::String::createFromUtf8(runtime, "coreml");
+        return jsi::String::createFromUtf8(runtime, "core-ml");
       case Delegate::Metal:
         return jsi::String::createFromUtf8(runtime, "metal");
     }
