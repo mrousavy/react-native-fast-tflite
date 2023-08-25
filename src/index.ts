@@ -1,1 +1,1 @@
-export * from './TensorflowLite';
+export * from './TensorflowLite'

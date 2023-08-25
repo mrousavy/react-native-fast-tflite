@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Image } from 'react-native';
-import { TensorflowModule } from './TensorflowModule';
+import { useEffect, useState } from 'react'
+import { Image } from 'react-native'
+import { TensorflowModule } from './TensorflowModule'
 
 type TypedArray =
   | Float32Array
@@ -10,7 +10,7 @@ type TypedArray =
   | Int32Array
   | Uint8Array
   | Uint16Array
-  | Uint32Array;
+  | Uint32Array
 
 declare global {
   /**
@@ -20,23 +20,23 @@ declare global {
   var __loadTensorflowModel: (
     path: string,
     delegate: TensorflowModelDelegate
-  ) => Promise<TensorflowModel>;
+  ) => Promise<TensorflowModel>
 }
 // Installs the JSI bindings into the global namespace.
-console.log('Installing bindings...');
-const result = TensorflowModule.install() as boolean;
+console.log('Installing bindings...')
+const result = TensorflowModule.install() as boolean
 if (result !== true) {
-  console.error(`Failed to install Tensorflow Lite bindings!`);
+  console.error(`Failed to install Tensorflow Lite bindings!`)
 }
-console.log('Successfully installed!');
+console.log('Successfully installed!')
 
-export type TensorflowModelDelegate = 'default' | 'metal' | 'core-ml';
+export type TensorflowModelDelegate = 'default' | 'metal' | 'core-ml'
 
 interface Tensor {
   /**
    * The name of the Tensor.
    */
-  name: string;
+  name: string
   /**
    * The data-type all values of this Tensor are represented in.
    */
@@ -50,11 +50,11 @@ interface Tensor {
     | 'float16'
     | 'float32'
     | 'float64'
-    | 'invalid';
+    | 'invalid'
   /**
    * The shape of the data from this tensor.
    */
-  shape: number[];
+  shape: number[]
 }
 
 export interface TensorflowModel {
@@ -62,46 +62,46 @@ export interface TensorflowModel {
    * The computation delegate used by this Model.
    * While CoreML and Metal delegates might be faster as they use the GPU, not all models support those delegates.
    */
-  delegate: TensorflowModelDelegate;
+  delegate: TensorflowModelDelegate
   /**
    * Run the Tensorflow Model with the given input buffer.
    * The input buffer has to match the input tensor's shape.
    */
-  run(input: TypedArray[]): Promise<TypedArray[]>;
+  run(input: TypedArray[]): Promise<TypedArray[]>
   /**
    * Synchronously run the Tensorflow Model with the given input buffer.
    * The input buffer has to match the input tensor's shape.
    */
-  runSync(input: TypedArray[]): TypedArray[];
+  runSync(input: TypedArray[]): TypedArray[]
 
   /**
    * All input tensors of this Tensorflow Model.
    */
-  inputs: Tensor[];
+  inputs: Tensor[]
   /**
    * All output tensors of this Tensorflow Model.
    * The user is responsible for correctly interpreting this data.
    */
-  outputs: Tensor[];
+  outputs: Tensor[]
 }
 
-type Require = ReturnType<typeof require>;
+type Require = ReturnType<typeof require>
 type ModelSource = Require | { url: string }
 
 export type TensorflowPlugin =
   | {
-      model: TensorflowModel;
-      state: 'loaded';
+      model: TensorflowModel
+      state: 'loaded'
     }
   | {
-      model: undefined;
-      state: 'loading';
+      model: undefined
+      state: 'loading'
     }
   | {
-      model: undefined;
-      error: Error;
-      state: 'error';
-    };
+      model: undefined
+      error: Error
+      state: 'error'
+    }
 
 /**
  * Load a Tensorflow Lite Model from the given `.tflite` asset.
@@ -118,15 +118,15 @@ export function loadTensorflowModel(
   delegate: TensorflowModelDelegate = 'default'
 ): Promise<TensorflowModel> {
   let uri: string
-  if ("url" in source) {
+  if ('url' in source) {
     uri = source.url
   } else {
-    console.log(`Loading Tensorflow Lite Model ${source}`);
-    const asset = Image.resolveAssetSource(source);
+    console.log(`Loading Tensorflow Lite Model ${source}`)
+    const asset = Image.resolveAssetSource(source)
     uri = asset.uri
-    console.log(`Resolved Model path: ${asset.uri}`);
+    console.log(`Resolved Model path: ${asset.uri}`)
   }
-  return global.__loadTensorflowModel(uri, delegate);
+  return global.__loadTensorflowModel(uri, delegate)
 }
 
 /**
@@ -146,22 +146,22 @@ export function useTensorflowModel(
   const [state, setState] = useState<TensorflowPlugin>({
     model: undefined,
     state: 'loading',
-  });
+  })
 
   useEffect(() => {
     const load = async (): Promise<void> => {
       try {
-        setState({ model: undefined, state: 'loading' });
-        const m = await loadTensorflowModel(source, delegate);
-        setState({ model: m, state: 'loaded' });
-        console.log('Model loaded!');
+        setState({ model: undefined, state: 'loading' })
+        const m = await loadTensorflowModel(source, delegate)
+        setState({ model: m, state: 'loaded' })
+        console.log('Model loaded!')
       } catch (e) {
-        console.error(`Failed to load Tensorflow Model ${source}!`, e);
-        setState({ model: undefined, state: 'error', error: e as Error });
+        console.error(`Failed to load Tensorflow Model ${source}!`, e)
+        setState({ model: undefined, state: 'error', error: e as Error })
       }
-    };
-    load();
-  }, [delegate, source]);
+    }
+    load()
+  }, [delegate, source])
 
-  return state;
+  return state
 }
