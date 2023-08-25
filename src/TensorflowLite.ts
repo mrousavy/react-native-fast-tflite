@@ -85,7 +85,8 @@ export interface TensorflowModel {
   outputs: Tensor[]
 }
 
-type Require = ReturnType<typeof require>
+// In React Native, `require(..)` returns a number.
+type Require = number // ReturnType<typeof require>
 type ModelSource = Require | { url: string }
 
 export type TensorflowPlugin =
@@ -118,13 +119,17 @@ export function loadTensorflowModel(
   delegate: TensorflowModelDelegate = 'default'
 ): Promise<TensorflowModel> {
   let uri: string
-  if ('url' in source) {
-    uri = source.url
-  } else {
+  if (typeof source === 'number') {
     console.log(`Loading Tensorflow Lite Model ${source}`)
     const asset = Image.resolveAssetSource(source)
     uri = asset.uri
     console.log(`Resolved Model path: ${asset.uri}`)
+  } else if (typeof source === 'object' && 'url' in source) {
+    uri = source.url
+  } else {
+    throw new Error(
+      'Invalid source passed! Source should be either a React Native require(..) or a `{ url: string }` object!'
+    )
   }
   return global.__loadTensorflowModel(uri, delegate)
 }
