@@ -150,6 +150,10 @@ To enable the CoreML Delegate, you need to include the CoreML/Metal code in your
 > [!NOTE]
 > Since some operations aren't supported on the CoreML delegate, make sure your Model is able to use the CoreML GPU delegate.
 
+## Community Discord
+
+[Join the Margelo Community Discord](https://discord.gg/6CSHz2qAvA) to chat about react-native-fast-tflite or other Margelo libraries.
+
 ## Adopting at scale
 
 <a href="https://github.com/sponsors/mrousavy">
