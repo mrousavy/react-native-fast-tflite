@@ -48,21 +48,21 @@ limitations under the License.
 #include <stddef.h>
 #include <stdint.h>
 
-#include "c_api_types.h"  // IWYU pragma: export
+#include "c_api_types.h" // IWYU pragma: export
 
 #ifdef __cplusplus
 extern "C" {
-#endif  // __cplusplus
+#endif // __cplusplus
 
 // The list of external context types known to TF Lite. This list exists solely
 // to avoid conflicts and to ensure ops can share the external contexts they
 // need. Access to the external contexts is controlled by one of the
 // corresponding support files.
 typedef enum TfLiteExternalContextType {
-  kTfLiteEigenContext = 0,       // include eigen_support.h to use.
-  kTfLiteGemmLowpContext = 1,    // include gemm_support.h to use.
-  kTfLiteEdgeTpuContext = 2,     // Placeholder for Edge TPU support.
-  kTfLiteCpuBackendContext = 3,  // include cpu_backend_context.h to use.
+  kTfLiteEigenContext = 0,      // include eigen_support.h to use.
+  kTfLiteGemmLowpContext = 1,   // include gemm_support.h to use.
+  kTfLiteEdgeTpuContext = 2,    // Placeholder for Edge TPU support.
+  kTfLiteCpuBackendContext = 3, // include cpu_backend_context.h to use.
   kTfLiteMaxExternalContexts = 4
 } TfLiteExternalContextType;
 
@@ -93,10 +93,8 @@ typedef struct TfLiteIntArray {
 #if defined(_MSC_VER)
   // Context for why this is needed is in http://b/189926408#comment21
   int data[1];
-#elif (!defined(__clang__) && defined(__GNUC__) && __GNUC__ == 6 && \
-       __GNUC_MINOR__ >= 1) ||                                      \
-    defined(HEXAGON) ||                                             \
-    (defined(__clang__) && __clang_major__ == 7 && __clang_minor__ == 1)
+#elif (!defined(__clang__) && defined(__GNUC__) && __GNUC__ == 6 && __GNUC_MINOR__ >= 1) ||        \
+    defined(HEXAGON) || (defined(__clang__) && __clang_major__ == 7 && __clang_minor__ == 1)
   // gcc 6.1+ have a bug where flexible members aren't properly handled
   // https://github.com/google/re2/commit/b94b7cd42e9f02673cd748c1ac1d16db4052514c
   int data[0];
@@ -119,8 +117,7 @@ TfLiteIntArray* TfLiteIntArrayCreate(int size);
 int TfLiteIntArrayEqual(const TfLiteIntArray* a, const TfLiteIntArray* b);
 
 // Check if an intarray equals an array. Returns 1 if equals, 0 otherwise.
-int TfLiteIntArrayEqualsArray(const TfLiteIntArray* a, int b_size,
-                              const int b_data[]);
+int TfLiteIntArrayEqualsArray(const TfLiteIntArray* a, int b_size, const int b_data[]);
 
 #ifndef TF_LITE_STATIC_MEMORY
 // Create a copy of an array passed as `src`.
@@ -129,7 +126,7 @@ TfLiteIntArray* TfLiteIntArrayCopy(const TfLiteIntArray* src);
 
 // Free memory of array `a`.
 void TfLiteIntArrayFree(TfLiteIntArray* a);
-#endif  // TF_LITE_STATIC_MEMORY
+#endif // TF_LITE_STATIC_MEMORY
 
 // Fixed size list of floats. Used for per-channel quantization.
 typedef struct TfLiteFloatArray {
@@ -137,10 +134,8 @@ typedef struct TfLiteFloatArray {
 #if defined(_MSC_VER)
   // Context for why this is needed is in http://b/189926408#comment21
   float data[1];
-#elif (!defined(__clang__) && defined(__GNUC__) && __GNUC__ == 6 && \
-       __GNUC_MINOR__ >= 1) ||                                      \
-    defined(HEXAGON) ||                                             \
-    (defined(__clang__) && __clang_major__ == 7 && __clang_minor__ == 1)
+#elif (!defined(__clang__) && defined(__GNUC__) && __GNUC__ == 6 && __GNUC_MINOR__ >= 1) ||        \
+    defined(HEXAGON) || (defined(__clang__) && __clang_major__ == 7 && __clang_minor__ == 1)
   // gcc 6.1+ have a bug where flexible members aren't properly handled
   // https://github.com/google/re2/commit/b94b7cd42e9f02673cd748c1ac1d16db4052514c
   float data[0];
@@ -164,7 +159,7 @@ TfLiteFloatArray* TfLiteFloatArrayCopy(const TfLiteFloatArray* src);
 
 // Free memory of array `a`.
 void TfLiteFloatArrayFree(TfLiteFloatArray* a);
-#endif  // TF_LITE_STATIC_MEMORY
+#endif // TF_LITE_STATIC_MEMORY
 
 // Since we must not depend on any libraries, define a minimal subset of
 // error macros while avoiding names that have pre-conceived meanings like
@@ -174,50 +169,49 @@ void TfLiteFloatArrayFree(TfLiteFloatArray* a);
 // calling the context->ReportError function directly, so that message strings
 // can be stripped out if the binary size needs to be severely optimized.
 #ifndef TF_LITE_STRIP_ERROR_STRINGS
-#define TF_LITE_KERNEL_LOG(context, ...)            \
-  do {                                              \
-    (context)->ReportError((context), __VA_ARGS__); \
+#define TF_LITE_KERNEL_LOG(context, ...)                                                           \
+  do {                                                                                             \
+    (context)->ReportError((context), __VA_ARGS__);                                                \
   } while (false)
 
-#define TF_LITE_MAYBE_KERNEL_LOG(context, ...)        \
-  do {                                                \
-    if ((context) != nullptr) {                       \
-      (context)->ReportError((context), __VA_ARGS__); \
-    }                                                 \
+#define TF_LITE_MAYBE_KERNEL_LOG(context, ...)                                                     \
+  do {                                                                                             \
+    if ((context) != nullptr) {                                                                    \
+      (context)->ReportError((context), __VA_ARGS__);                                              \
+    }                                                                                              \
   } while (false)
-#else  // TF_LITE_STRIP_ERROR_STRINGS
+#else // TF_LITE_STRIP_ERROR_STRINGS
 #define ARGS_UNUSED(...) (void)sizeof(#__VA_ARGS__)
 #define TF_LITE_KERNEL_LOG(context, ...) ARGS_UNUSED(__VA_ARGS__)
 #define TF_LITE_MAYBE_KERNEL_LOG(context, ...) ARGS_UNUSED(__VA_ARGS__)
-#endif  // TF_LITE_STRIP_ERROR_STRINGS
+#endif // TF_LITE_STRIP_ERROR_STRINGS
 
 // Check whether value is true, and if not return kTfLiteError from
 // the current function (and report the error string msg).
-#define TF_LITE_ENSURE_MSG(context, value, msg)        \
-  do {                                                 \
-    if (!(value)) {                                    \
-      TF_LITE_KERNEL_LOG((context), __FILE__ " " msg); \
-      return kTfLiteError;                             \
-    }                                                  \
+#define TF_LITE_ENSURE_MSG(context, value, msg)                                                    \
+  do {                                                                                             \
+    if (!(value)) {                                                                                \
+      TF_LITE_KERNEL_LOG((context), __FILE__ " " msg);                                             \
+      return kTfLiteError;                                                                         \
+    }                                                                                              \
   } while (0)
 
 // Check whether the value `a` is true, and if not return kTfLiteError from
 // the current function, while also reporting the location of the error.
-#define TF_LITE_ENSURE(context, a)                                      \
-  do {                                                                  \
-    if (!(a)) {                                                         \
-      TF_LITE_KERNEL_LOG((context), "%s:%d %s was not true.", __FILE__, \
-                         __LINE__, #a);                                 \
-      return kTfLiteError;                                              \
-    }                                                                   \
+#define TF_LITE_ENSURE(context, a)                                                                 \
+  do {                                                                                             \
+    if (!(a)) {                                                                                    \
+      TF_LITE_KERNEL_LOG((context), "%s:%d %s was not true.", __FILE__, __LINE__, #a);             \
+      return kTfLiteError;                                                                         \
+    }                                                                                              \
   } while (0)
 
-#define TF_LITE_ENSURE_STATUS(a) \
-  do {                           \
-    const TfLiteStatus s = (a);  \
-    if (s != kTfLiteOk) {        \
-      return s;                  \
-    }                            \
+#define TF_LITE_ENSURE_STATUS(a)                                                                   \
+  do {                                                                                             \
+    const TfLiteStatus s = (a);                                                                    \
+    if (s != kTfLiteOk) {                                                                          \
+      return s;                                                                                    \
+    }                                                                                              \
   } while (0)
 
 // Check whether the value `a == b` is true, and if not return kTfLiteError from
@@ -225,52 +219,50 @@ void TfLiteFloatArrayFree(TfLiteFloatArray* a);
 // `a` and `b` may be evaluated more than once, so no side effects or
 // extremely expensive computations should be done.
 // NOTE: Use TF_LITE_ENSURE_TYPES_EQ if comparing TfLiteTypes.
-#define TF_LITE_ENSURE_EQ(context, a, b)                                   \
-  do {                                                                     \
-    if ((a) != (b)) {                                                      \
-      TF_LITE_KERNEL_LOG((context), "%s:%d %s != %s (%d != %d)", __FILE__, \
-                         __LINE__, #a, #b, (a), (b));                      \
-      return kTfLiteError;                                                 \
-    }                                                                      \
+#define TF_LITE_ENSURE_EQ(context, a, b)                                                           \
+  do {                                                                                             \
+    if ((a) != (b)) {                                                                              \
+      TF_LITE_KERNEL_LOG((context), "%s:%d %s != %s (%d != %d)", __FILE__, __LINE__, #a, #b, (a),  \
+                         (b));                                                                     \
+      return kTfLiteError;                                                                         \
+    }                                                                                              \
   } while (0)
 
-#define TF_LITE_ENSURE_TYPES_EQ(context, a, b)                             \
-  do {                                                                     \
-    if ((a) != (b)) {                                                      \
-      TF_LITE_KERNEL_LOG((context), "%s:%d %s != %s (%s != %s)", __FILE__, \
-                         __LINE__, #a, #b, TfLiteTypeGetName(a),           \
-                         TfLiteTypeGetName(b));                            \
-      return kTfLiteError;                                                 \
-    }                                                                      \
+#define TF_LITE_ENSURE_TYPES_EQ(context, a, b)                                                     \
+  do {                                                                                             \
+    if ((a) != (b)) {                                                                              \
+      TF_LITE_KERNEL_LOG((context), "%s:%d %s != %s (%s != %s)", __FILE__, __LINE__, #a, #b,       \
+                         TfLiteTypeGetName(a), TfLiteTypeGetName(b));                              \
+      return kTfLiteError;                                                                         \
+    }                                                                                              \
   } while (0)
 
-#define TF_LITE_ENSURE_NEAR(context, a, b, epsilon)                          \
-  do {                                                                       \
-    auto delta = ((a) > (b)) ? ((a) - (b)) : ((b) - (a));                    \
-    if (delta > epsilon) {                                                   \
-      TF_LITE_KERNEL_LOG((context), "%s:%d %s not near %s (%f != %f)",       \
-                         __FILE__, __LINE__, #a, #b, static_cast<double>(a), \
-                         static_cast<double>(b));                            \
-      return kTfLiteError;                                                   \
-    }                                                                        \
+#define TF_LITE_ENSURE_NEAR(context, a, b, epsilon)                                                \
+  do {                                                                                             \
+    auto delta = ((a) > (b)) ? ((a) - (b)) : ((b) - (a));                                          \
+    if (delta > epsilon) {                                                                         \
+      TF_LITE_KERNEL_LOG((context), "%s:%d %s not near %s (%f != %f)", __FILE__, __LINE__, #a, #b, \
+                         static_cast<double>(a), static_cast<double>(b));                          \
+      return kTfLiteError;                                                                         \
+    }                                                                                              \
   } while (0)
 
-#define TF_LITE_ENSURE_OK(context, status) \
-  do {                                     \
-    const TfLiteStatus s = (status);       \
-    if ((s) != kTfLiteOk) {                \
-      return s;                            \
-    }                                      \
+#define TF_LITE_ENSURE_OK(context, status)                                                         \
+  do {                                                                                             \
+    const TfLiteStatus s = (status);                                                               \
+    if ((s) != kTfLiteOk) {                                                                        \
+      return s;                                                                                    \
+    }                                                                                              \
   } while (0)
 
 // Single-precision complex data type compatible with the C99 definition.
 typedef struct TfLiteComplex64 {
-  float re, im;  // real and imaginary parts, respectively.
+  float re, im; // real and imaginary parts, respectively.
 } TfLiteComplex64;
 
 // Double-precision complex data type compatible with the C99 definition.
 typedef struct TfLiteComplex128 {
-  double re, im;  // real and imaginary parts, respectively.
+  double re, im; // real and imaginary parts, respectively.
 } TfLiteComplex128;
 
 // Half precision data type compatible with the C99 definition.
@@ -522,7 +514,7 @@ typedef struct TfLiteNode {
   // Whether this op might have side effect (e.g. stateful op).
   bool might_have_side_effect;
 } TfLiteNode;
-#else   // defined(TF_LITE_STATIC_MEMORY)?
+#else  // defined(TF_LITE_STATIC_MEMORY)?
 // NOTE: This flag is opt-in only at compile time.
 //
 // Specific reduced TfLiteTensor struct for TF Micro runtime. This struct
@@ -606,7 +598,7 @@ typedef struct TfLiteNode {
   const void* custom_initial_data;
   int custom_initial_data_size;
 } TfLiteNode;
-#endif  // TF_LITE_STATIC_MEMORY
+#endif // TF_LITE_STATIC_MEMORY
 
 // Light-weight tensor struct for TF Micro runtime. Provides the minimal amount
 // of information required for a kernel to run during TfLiteRegistration::Eval.
@@ -641,10 +633,9 @@ void TfLiteTensorFree(TfLiteTensor* t);
 
 // Set all of a tensor's fields (and free any previously allocated data).
 void TfLiteTensorReset(TfLiteType type, const char* name, TfLiteIntArray* dims,
-                       TfLiteQuantizationParams quantization, char* buffer,
-                       size_t size, TfLiteAllocationType allocation_type,
-                       const void* allocation, bool is_variable,
-                       TfLiteTensor* tensor);
+                       TfLiteQuantizationParams quantization, char* buffer, size_t size,
+                       TfLiteAllocationType allocation_type, const void* allocation,
+                       bool is_variable, TfLiteTensor* tensor);
 
 // Copies the contents of 'src' in 'dst'.
 // Function does nothing if either 'src' or 'dst' is passed as nullptr and
@@ -677,7 +668,7 @@ TfLiteStatus TfLiteTensorResizeMaybeCopy(size_t num_bytes, TfLiteTensor* tensor,
 // the minimum of the old and new sizes. In the case
 // of NULL tensor, or an error allocating new memory, returns `kTfLiteError`.
 TfLiteStatus TfLiteTensorRealloc(size_t num_bytes, TfLiteTensor* tensor);
-#endif  // TF_LITE_STATIC_MEMORY
+#endif // TF_LITE_STATIC_MEMORY
 
 // WARNING: This is an experimental interface that is subject to change.
 //
@@ -751,8 +742,7 @@ typedef struct TfLiteContext {
   // }
   //
   // WARNING: This is an experimental interface that is subject to change.
-  TfLiteStatus (*GetExecutionPlan)(struct TfLiteContext* context,
-                                   TfLiteIntArray** execution_plan);
+  TfLiteStatus (*GetExecutionPlan)(struct TfLiteContext* context, TfLiteIntArray** execution_plan);
 
   // An array of tensors in the interpreter context (of length `tensors_size`)
   TfLiteTensor* tensors;
@@ -775,15 +765,15 @@ typedef struct TfLiteContext {
 
   // Get a Tensor node by node_index.
   // WARNING: This is an experimental interface that is subject to change.
-  TfLiteStatus (*GetNodeAndRegistration)(
-      struct TfLiteContext*, int node_index, TfLiteNode** node,
-      struct TfLiteRegistration** registration);
+  TfLiteStatus (*GetNodeAndRegistration)(struct TfLiteContext*, int node_index, TfLiteNode** node,
+                                         struct TfLiteRegistration** registration);
 
   // Replace ops with one or more stub delegate operations. This function
   // does not take ownership of `nodes_to_replace`.
-  TfLiteStatus (*ReplaceNodeSubsetsWithDelegateKernels)(
-      struct TfLiteContext*, struct TfLiteRegistration registration,
-      const TfLiteIntArray* nodes_to_replace, struct TfLiteDelegate* delegate);
+  TfLiteStatus (*ReplaceNodeSubsetsWithDelegateKernels)(struct TfLiteContext*,
+                                                        struct TfLiteRegistration registration,
+                                                        const TfLiteIntArray* nodes_to_replace,
+                                                        struct TfLiteDelegate* delegate);
 
   // Number of threads that are recommended to subsystems like gemmlowp and
   // eigen.
@@ -791,8 +781,7 @@ typedef struct TfLiteContext {
 
   // Access external contexts by type.
   // WARNING: This is an experimental interface that is subject to change.
-  TfLiteExternalContext* (*GetExternalContext)(struct TfLiteContext*,
-                                               TfLiteExternalContextType);
+  TfLiteExternalContext* (*GetExternalContext)(struct TfLiteContext*, TfLiteExternalContextType);
   // Set the value of a external context. Does not take ownership of the
   // pointer.
   // WARNING: This is an experimental interface that is subject to change.
@@ -820,16 +809,15 @@ typedef struct TfLiteContext {
   // NOTE: If possible use RequestScratchBufferInArena method to avoid memory
   // allocation during inference time.
   // WARNING: This is an experimental interface that is subject to change.
-  TfLiteStatus (*AllocateBufferForEval)(struct TfLiteContext* ctx, size_t bytes,
-                                        void** ptr);
+  TfLiteStatus (*AllocateBufferForEval)(struct TfLiteContext* ctx, size_t bytes, void** ptr);
 
   // Request a scratch buffer in the arena through static memory planning.
   // This method is only available in Prepare stage and the buffer is allocated
   // by the interpreter between Prepare and Eval stage. In Eval stage,
   // GetScratchBuffer API can be used to fetch the address.
   // WARNING: This is an experimental interface that is subject to change.
-  TfLiteStatus (*RequestScratchBufferInArena)(struct TfLiteContext* ctx,
-                                              size_t bytes, int* buffer_idx);
+  TfLiteStatus (*RequestScratchBufferInArena)(struct TfLiteContext* ctx, size_t bytes,
+                                              int* buffer_idx);
 
   // Get the scratch buffer pointer.
   // This method is only available in Eval stage.
@@ -840,8 +828,7 @@ typedef struct TfLiteContext {
   // `ResizeTensor`, except that it makes a copy of the shape array internally
   // so the shape array could be deallocated right afterwards.
   // WARNING: This is an experimental interface that is subject to change.
-  TfLiteStatus (*ResizeTensorExplicit)(struct TfLiteContext* ctx,
-                                       TfLiteTensor* tensor, int dims,
+  TfLiteStatus (*ResizeTensorExplicit)(struct TfLiteContext* ctx, TfLiteTensor* tensor, int dims,
                                        const int* shape);
 
   // This method provides a preview of post-delegation partitioning. Each
@@ -864,21 +851,20 @@ typedef struct TfLiteContext {
   // TfLiteDelegateParams::Prepare returns.
   //
   // WARNING: This is an experimental interface that is subject to change.
-  TfLiteStatus (*PreviewDelegatePartitioning)(
-      struct TfLiteContext* context, const TfLiteIntArray* nodes_to_replace,
-      TfLiteDelegateParams** partition_params_array, int* num_partitions);
+  TfLiteStatus (*PreviewDelegatePartitioning)(struct TfLiteContext* context,
+                                              const TfLiteIntArray* nodes_to_replace,
+                                              TfLiteDelegateParams** partition_params_array,
+                                              int* num_partitions);
 
   // Returns a TfLiteTensor struct for a given index.
   // WARNING: This is an experimental interface that is subject to change.
   // WARNING: This method may not be available on all platforms.
-  TfLiteTensor* (*GetTensor)(const struct TfLiteContext* context,
-                             int tensor_idx);
+  TfLiteTensor* (*GetTensor)(const struct TfLiteContext* context, int tensor_idx);
 
   // Returns a TfLiteEvalTensor struct for a given index.
   // WARNING: This is an experimental interface that is subject to change.
   // WARNING: This method may not be available on all platforms.
-  TfLiteEvalTensor* (*GetEvalTensor)(const struct TfLiteContext* context,
-                                     int tensor_idx);
+  TfLiteEvalTensor* (*GetEvalTensor)(const struct TfLiteContext* context, int tensor_idx);
 
   // Retrieves named metadata buffer from the TFLite model.
   // Returns kTfLiteOk if metadata is successfully obtained from the flatbuffer
@@ -888,9 +874,8 @@ typedef struct TfLiteContext {
   // The data from `ptr` is valid for the lifetime of the Interpreter.
   //
   // WARNING: This is an experimental interface that is subject to change.
-  TfLiteStatus (*GetModelMetadata)(const struct TfLiteContext* context,
-                                   const char* name, const char** ptr,
-                                   size_t* bytes);
+  TfLiteStatus (*GetModelMetadata)(const struct TfLiteContext* context, const char* name,
+                                   const char** ptr, size_t* bytes);
 
   // Retrieves the corresponding TfLiteContext of a subgraph that the given
   // subgraph_index points to and switches to the delegate context for that
@@ -900,9 +885,8 @@ typedef struct TfLiteContext {
   // are no longer needed.
   //
   // WARNING: This is an experimental interface that is subject to change.
-  TfLiteStatus (*AcquireSubgraphContext)(
-      struct TfLiteContext* context, int subgraph_index,
-      struct TfLiteContext** acquired_context);
+  TfLiteStatus (*AcquireSubgraphContext)(struct TfLiteContext* context, int subgraph_index,
+                                         struct TfLiteContext** acquired_context);
   // Releases the subgraph context by switching back to the TFLite kernel
   // context for the subgraph that the given subgraph_index points to.
   // NOTE: This function is expected to be used after AcquireSubgraphContext()
@@ -910,8 +894,7 @@ typedef struct TfLiteContext {
   // are no longer needed.
   //
   // WARNING: This is an experimental interface that is subject to change.
-  TfLiteStatus (*ReleaseSubgraphContext)(struct TfLiteContext* context,
-                                         int subgraph_index);
+  TfLiteStatus (*ReleaseSubgraphContext)(struct TfLiteContext* context, int subgraph_index);
 } TfLiteContext;
 
 // `TfLiteRegistrationExternal` is an external version of `TfLiteRegistration`
@@ -1019,8 +1002,7 @@ typedef struct TfLiteRegistration {
   // given op to appear multiple times is the profiling report. This is
   // particularly useful for custom ops that can perform significantly
   // different calculations depending on their `user-data`.
-  const char* (*profiling_string)(const TfLiteContext* context,
-                                  const TfLiteNode* node);
+  const char* (*profiling_string)(const TfLiteContext* context, const TfLiteNode* node);
 
   // Builtin codes. If this kernel refers to a builtin this is the code
   // of the builtin. This is so we can do marshaling to other frameworks like
@@ -1056,8 +1038,7 @@ typedef struct TfLiteRegistration {
   // by applying a delegate.
   // If the function returns nullptr, that means that the underlying delegate
   // does not support asynchronous execution for this `node`.
-  struct TfLiteAsyncKernel* (*async_kernel)(TfLiteContext* context,
-                                            TfLiteNode* node);
+  struct TfLiteAsyncKernel* (*async_kernel)(TfLiteContext* context, TfLiteNode* node);
 
   // Indicates if an operator's output may safely overwrite its inputs.
   // See the comments in `TfLiteInPlaceOp`.
@@ -1079,14 +1060,12 @@ typedef struct TfLiteRegistration_V3 {
   void (*free)(TfLiteContext* context, void* buffer);
   TfLiteStatus (*prepare)(TfLiteContext* context, TfLiteNode* node);
   TfLiteStatus (*invoke)(TfLiteContext* context, TfLiteNode* node);
-  const char* (*profiling_string)(const TfLiteContext* context,
-                                  const TfLiteNode* node);
+  const char* (*profiling_string)(const TfLiteContext* context, const TfLiteNode* node);
   int32_t builtin_code;
   const char* custom_name;
   int version;
   TfLiteRegistrationExternal* registration_external;
-  struct TfLiteAsyncKernel* (*async_kernel)(TfLiteContext* context,
-                                            TfLiteNode* node);
+  struct TfLiteAsyncKernel* (*async_kernel)(TfLiteContext* context, TfLiteNode* node);
 } TfLiteRegistration_V3;
 
 /// \private
@@ -1104,8 +1083,7 @@ typedef struct TfLiteRegistration_V2 {
   void (*free)(TfLiteContext* context, void* buffer);
   TfLiteStatus (*prepare)(TfLiteContext* context, TfLiteNode* node);
   TfLiteStatus (*invoke)(TfLiteContext* context, TfLiteNode* node);
-  const char* (*profiling_string)(const TfLiteContext* context,
-                                  const TfLiteNode* node);
+  const char* (*profiling_string)(const TfLiteContext* context, const TfLiteNode* node);
   int32_t builtin_code;
   const char* custom_name;
   int version;
@@ -1127,8 +1105,7 @@ typedef struct TfLiteRegistration_V1 {
   void (*free)(TfLiteContext* context, void* buffer);
   TfLiteStatus (*prepare)(TfLiteContext* context, TfLiteNode* node);
   TfLiteStatus (*invoke)(TfLiteContext* context, TfLiteNode* node);
-  const char* (*profiling_string)(const TfLiteContext* context,
-                                  const TfLiteNode* node);
+  const char* (*profiling_string)(const TfLiteContext* context, const TfLiteNode* node);
   int32_t builtin_code;
   const char* custom_name;
   int version;
@@ -1189,31 +1166,25 @@ typedef struct TfLiteDelegate {
   // will look at the nodes and call ReplaceNodeSubsetsWithDelegateKernels()
   // to ask the TensorFlow lite runtime to create macro-nodes to represent
   // delegated subgraphs of the original graph.
-  TfLiteStatus (*Prepare)(TfLiteContext* context,
-                          struct TfLiteDelegate* delegate);
+  TfLiteStatus (*Prepare)(TfLiteContext* context, struct TfLiteDelegate* delegate);
 
   // Copy the data from delegate buffer handle into raw memory of the given
   // 'tensor'. Note that the delegate is allowed to allocate the raw bytes as
   // long as it follows the rules for kTfLiteDynamic tensors, in which case this
   // cannot be null.
-  TfLiteStatus (*CopyFromBufferHandle)(TfLiteContext* context,
-                                       struct TfLiteDelegate* delegate,
-                                       TfLiteBufferHandle buffer_handle,
-                                       TfLiteTensor* tensor);
+  TfLiteStatus (*CopyFromBufferHandle)(TfLiteContext* context, struct TfLiteDelegate* delegate,
+                                       TfLiteBufferHandle buffer_handle, TfLiteTensor* tensor);
 
   // Copy the data from raw memory of the given 'tensor' to delegate buffer
   // handle. This can be null if the delegate doesn't use its own buffer.
-  TfLiteStatus (*CopyToBufferHandle)(TfLiteContext* context,
-                                     struct TfLiteDelegate* delegate,
-                                     TfLiteBufferHandle buffer_handle,
-                                     TfLiteTensor* tensor);
+  TfLiteStatus (*CopyToBufferHandle)(TfLiteContext* context, struct TfLiteDelegate* delegate,
+                                     TfLiteBufferHandle buffer_handle, TfLiteTensor* tensor);
 
   // Free the Delegate Buffer Handle. Note: This only frees the handle, but
   // this doesn't release the underlying resource (e.g. textures). The
   // resources are either owned by application layer or the delegate.
   // This can be null if the delegate doesn't use its own buffer.
-  void (*FreeBufferHandle)(TfLiteContext* context,
-                           struct TfLiteDelegate* delegate,
+  void (*FreeBufferHandle)(TfLiteContext* context, struct TfLiteDelegate* delegate,
                            TfLiteBufferHandle* handle);
 
   // Bitmask flags. See the comments in `TfLiteDelegateFlags`.
@@ -1254,27 +1225,26 @@ typedef struct TfLiteOpaqueDelegateBuilder {
   // will look at the nodes and call ReplaceNodeSubsetsWithDelegateKernels()
   // to ask the TensorFlow lite runtime to create macro-nodes to represent
   // delegated subgraphs of the original graph.
-  TfLiteStatus (*Prepare)(TfLiteOpaqueContext* context,  // NOLINT
+  TfLiteStatus (*Prepare)(TfLiteOpaqueContext* context, // NOLINT
                           TfLiteOpaqueDelegate* delegate, void* data);
   // Copies the data from delegate buffer handle into raw memory of the given
   // 'tensor'. Note that the delegate is allowed to allocate the raw bytes as
   // long as it follows the rules for kTfLiteDynamic tensors, in which case this
   // cannot be null.
-  TfLiteStatus (*CopyFromBufferHandle)(  // NOLINT
+  TfLiteStatus (*CopyFromBufferHandle)( // NOLINT
       TfLiteOpaqueContext* context, TfLiteOpaqueDelegate* delegate, void* data,
       TfLiteBufferHandle buffer_handle, TfLiteOpaqueTensor* tensor);
   // Copies the data from raw memory of the given 'tensor' to delegate buffer
   // handle. This can be null if the delegate doesn't use its own buffer.
-  TfLiteStatus (*CopyToBufferHandle)(  // NOLINT
+  TfLiteStatus (*CopyToBufferHandle)( // NOLINT
       TfLiteOpaqueContext* context, TfLiteOpaqueDelegate* delegate, void* data,
       TfLiteBufferHandle buffer_handle, TfLiteOpaqueTensor* tensor);
   // Frees the Delegate Buffer Handle. Note: This only frees the handle, but
   // this doesn't release the underlying resource (e.g. textures). The
   // resources are either owned by application layer or the delegate.
   // This can be null if the delegate doesn't use its own buffer.
-  void (*FreeBufferHandle)(TfLiteOpaqueContext* context,  // NOLINT
-                           TfLiteOpaqueDelegate* delegate, void* data,
-                           TfLiteBufferHandle* handle);
+  void (*FreeBufferHandle)(TfLiteOpaqueContext* context, // NOLINT
+                           TfLiteOpaqueDelegate* delegate, void* data, TfLiteBufferHandle* handle);
   // Bitmask flags. See the comments in `TfLiteDelegateFlags`.
   int64_t flags;
 } TfLiteOpaqueDelegateBuilder;
@@ -1290,13 +1260,13 @@ typedef struct TfLiteOpaqueDelegateBuilder {
 // address should be passed to 'TfLiteOpaqueDelegateDelete' for deletion.  If
 // 'opaque_delegate_builder' is a null pointer, then a null pointer will be
 // returned.
-TfLiteOpaqueDelegate* TfLiteOpaqueDelegateCreate(
-    const TfLiteOpaqueDelegateBuilder* opaque_delegate_builder);
+TfLiteOpaqueDelegate*
+TfLiteOpaqueDelegateCreate(const TfLiteOpaqueDelegateBuilder* opaque_delegate_builder);
 
 // Deletes the provided opaque 'delegate'.  This function has no effect if the
 // 'delegate' is a null pointer.
 void TfLiteOpaqueDelegateDelete(TfLiteOpaqueDelegate* delegate);
-#endif  // TF_LITE_STATIC_MEMORY
+#endif // TF_LITE_STATIC_MEMORY
 
 // Returns a pointer to the data associated with the provided opaque 'delegate'.
 //
@@ -1313,7 +1283,7 @@ void TfLiteOpaqueDelegateDelete(TfLiteOpaqueDelegate* delegate);
 void* TfLiteOpaqueDelegateGetData(const TfLiteOpaqueDelegate* delegate);
 
 #ifdef __cplusplus
-}  // extern "C"
+} // extern "C"
 
 #include <utility>
 
@@ -1380,7 +1350,7 @@ void* TfLiteOpaqueDelegateGetData(const TfLiteOpaqueDelegate* delegate);
 //    A good example of this issue is ellucidate in the bottom code snippet
 // here: https://en.cppreference.com/w/cpp/utility/launder.
 class VariantData {
- public:
+public:
   // All variant objects must be able to be destroyed and copied.
   virtual ~VariantData() = default;
   // A "virtual copy-constructor". Often the destination tensor of a variant
@@ -1393,9 +1363,8 @@ class VariantData {
 };
 
 // Concrete implementations extend `AbstractVariantData` with CRPT.
-template <typename ErasedDerived>
-class AbstractVariantData : public VariantData {
- public:
+template <typename ErasedDerived> class AbstractVariantData : public VariantData {
+public:
   VariantData* CloneTo(VariantData* maybe_alloc) const override {
     if (maybe_alloc != nullptr) {
       // If the output is still allocated, then its object may still be
@@ -1407,13 +1376,12 @@ class AbstractVariantData : public VariantData {
       // underlying implementation to optimize for this case.
       auto* derived = static_cast<ErasedDerived*>(maybe_alloc);
       derived->~ErasedDerived();
-      return new (derived)
-          ErasedDerived(static_cast<ErasedDerived const&>(*this));
+      return new (derived) ErasedDerived(static_cast<ErasedDerived const&>(*this));
     }
     return new ErasedDerived(static_cast<ErasedDerived const&>(*this));
   }
 
- protected:
+protected:
   AbstractVariantData() = default;
   AbstractVariantData(const AbstractVariantData&) = default;
   AbstractVariantData(AbstractVariantData&&) = delete;
@@ -1425,9 +1393,9 @@ class AbstractVariantData : public VariantData {
 // a list of argument types with which to construct a new `VariantType`.
 // `VariantArgs` must match a constructor of `VariantType`.
 template <class VariantType, class... VariantArgs>
-TfLiteStatus TfLiteTensorVariantRealloc(TfLiteTensor* t,
-                                        VariantArgs&&... args) {
-  if (t->type != kTfLiteVariant) return kTfLiteError;
+TfLiteStatus TfLiteTensorVariantRealloc(TfLiteTensor* t, VariantArgs&&... args) {
+  if (t->type != kTfLiteVariant)
+    return kTfLiteError;
   VariantType* new_vd;
   if (t->data.raw != nullptr) {
     auto* target_vd = static_cast<VariantData*>(t->data.data);
@@ -1443,5 +1411,5 @@ TfLiteStatus TfLiteTensorVariantRealloc(TfLiteTensor* t,
   return kTfLiteOk;
 }
 
-#endif  // __cplusplus
-#endif  // TENSORFLOW_LITE_CORE_C_COMMON_H_
+#endif // __cplusplus
+#endif // TENSORFLOW_LITE_CORE_C_COMMON_H_

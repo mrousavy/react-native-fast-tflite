@@ -29,7 +29,8 @@
   "scripts": {
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
+    "lint-cpp": "scripts/clang-format.sh",
     "prepare": "git submodule update --init --recursive",
     "update-submodule": "git submodule update --remote --merge",
     "prepack": "bob build",

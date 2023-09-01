@@ -16,19 +16,18 @@ using namespace facebook;
 
 class Promise {
 public:
-  Promise(jsi::Runtime& runtime,
-          jsi::Value resolver,
-          jsi::Value rejecter);
-  
+  Promise(jsi::Runtime& runtime, jsi::Value resolver, jsi::Value rejecter);
+
   void resolve(jsi::Value&& result);
   void reject(std::string error);
-  
+
 public:
   jsi::Runtime& runtime;
+
 private:
   jsi::Value _resolver;
   jsi::Value _rejecter;
-  
+
 public:
   /**
    Create a new Promise and runs the given `run` function.
@@ -37,4 +36,4 @@ public:
                                   std::function<void(std::shared_ptr<Promise> promise)> run);
 };
 
-} // namespace mrousavy;
+} // namespace mrousavy
