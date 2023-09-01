@@ -8,15 +8,15 @@
 
 #pragma once
 
-#include <memory>
-#include <unordered_map>
-#include <string>
-#include <jsi/jsi.h>
 #include "jsi/TypedArray.h"
+#include <jsi/jsi.h>
+#include <memory>
+#include <string>
+#include <unordered_map>
 
 #ifdef ANDROID
-#include <tensorflow/lite/c/c_api.h>
 #include <ReactCommon/CallInvoker.h>
+#include <tensorflow/lite/c/c_api.h>
 #else
 #include <React-callinvoker/ReactCommon/CallInvoker.h>
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
@@ -31,15 +31,13 @@ struct Buffer {
 };
 typedef std::function<Buffer(std::string)> FetchURLFunc;
 
-class TensorflowPlugin: public jsi::HostObject {
+class TensorflowPlugin : public jsi::HostObject {
 public:
   // TFL Delegate Type
   enum Delegate { Default, Metal, CoreML };
 
 public:
-  explicit TensorflowPlugin(TfLiteInterpreter* interpreter,
-                            Buffer model,
-                            Delegate delegate,
+  explicit TensorflowPlugin(TfLiteInterpreter* interpreter, Buffer model, Delegate delegate,
                             std::shared_ptr<react::CallInvoker> callInvoker);
   ~TensorflowPlugin();
 
@@ -51,11 +49,12 @@ public:
                                FetchURLFunc fetchURL);
 
 private:
-  void copyInputBuffers(jsi::Runtime &runtime, jsi::Object inputValues);
+  void copyInputBuffers(jsi::Runtime& runtime, jsi::Object inputValues);
   void run();
-  jsi::Value copyOutputBuffers(jsi::Runtime &runtime);
-  
-  std::shared_ptr<TypedArrayBase> getOutputArrayForTensor(jsi::Runtime& runtime, const TfLiteTensor* tensor);
+  jsi::Value copyOutputBuffers(jsi::Runtime& runtime);
+
+  std::shared_ptr<TypedArrayBase> getOutputArrayForTensor(jsi::Runtime& runtime,
+                                                          const TfLiteTensor* tensor);
 
 private:
   TfLiteInterpreter* _interpreter = nullptr;

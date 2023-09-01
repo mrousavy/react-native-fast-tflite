@@ -21,7 +21,7 @@ limitations under the License.
 
 #ifdef __cplusplus
 extern "C" {
-#endif  // __cplusplus
+#endif // __cplusplus
 
 // The enum for builtin operators.
 // Note: CUSTOM, DELEGATE, and PLACEHOLDER_FOR_GREATER_OP_CODES are 3 special
@@ -220,6 +220,6 @@ typedef enum {
 } TfLiteBuiltinOperator;
 
 #ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus
-#endif  // TENSORFLOW_LITE_BUILTIN_OPS_H_
+} // extern "C"
+#endif // __cplusplus
+#endif // TENSORFLOW_LITE_BUILTIN_OPS_H_

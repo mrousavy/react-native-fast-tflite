@@ -103,7 +103,8 @@ int getTensorTotalLength(const TfLiteTensor* tensor) {
   return size;
 }
 
-TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime, const TfLiteTensor* tensor) {
+TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime,
+                                                      const TfLiteTensor* tensor) {
   int size = getTensorTotalLength(tensor);
 
   auto dataType = TfLiteTensorType(tensor);
@@ -130,14 +131,14 @@ TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime, con
   }
 }
 
-
-void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBase& jsBuffer, const TfLiteTensor* tensor) {
+void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBase& jsBuffer,
+                                             const TfLiteTensor* tensor) {
   auto name = std::string(TfLiteTensorName(tensor));
   auto dataType = TfLiteTensorType(tensor);
 
   void* data = TfLiteTensorData(tensor);
   if (data == nullptr) {
-      throw std::runtime_error("Failed to get data from tensor \"" + name + "\"!");
+    throw std::runtime_error("Failed to get data from tensor \"" + name + "\"!");
   }
 
   // count of bytes, may be larger than count of numbers (e.g. for float32)
@@ -146,43 +147,43 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
   switch (dataType) {
     case kTfLiteFloat32:
       getTypedArray(runtime, jsBuffer)
-        .as<TypedArrayKind::Float32Array>(runtime)
-        .updateUnsafe(runtime, (float32_t*)data, size);
+          .as<TypedArrayKind::Float32Array>(runtime)
+          .updateUnsafe(runtime, (float32_t*)data, size);
       break;
     case kTfLiteFloat64:
       getTypedArray(runtime, jsBuffer)
-        .as<TypedArrayKind::Float64Array>(runtime)
-        .updateUnsafe(runtime, (float64_t*)data, size);
+          .as<TypedArrayKind::Float64Array>(runtime)
+          .updateUnsafe(runtime, (float64_t*)data, size);
       break;
     case kTfLiteInt8:
       getTypedArray(runtime, jsBuffer)
-        .as<TypedArrayKind::Int8Array>(runtime)
-        .updateUnsafe(runtime, (int8_t*)data, size);
+          .as<TypedArrayKind::Int8Array>(runtime)
+          .updateUnsafe(runtime, (int8_t*)data, size);
       break;
     case kTfLiteInt16:
       getTypedArray(runtime, jsBuffer)
-        .as<TypedArrayKind::Int16Array>(runtime)
-        .updateUnsafe(runtime, (int16_t*)data, size);
+          .as<TypedArrayKind::Int16Array>(runtime)
+          .updateUnsafe(runtime, (int16_t*)data, size);
       break;
     case kTfLiteInt32:
       getTypedArray(runtime, jsBuffer)
-        .as<TypedArrayKind::Int32Array>(runtime)
-        .updateUnsafe(runtime, (int32_t*)data, size);
+          .as<TypedArrayKind::Int32Array>(runtime)
+          .updateUnsafe(runtime, (int32_t*)data, size);
       break;
     case kTfLiteUInt8:
       getTypedArray(runtime, jsBuffer)
-        .as<TypedArrayKind::Uint8Array>(runtime)
-        .updateUnsafe(runtime, (uint8_t*)data, size);
+          .as<TypedArrayKind::Uint8Array>(runtime)
+          .updateUnsafe(runtime, (uint8_t*)data, size);
       break;
     case kTfLiteUInt16:
       getTypedArray(runtime, jsBuffer)
-        .as<TypedArrayKind::Uint16Array>(runtime)
-        .updateUnsafe(runtime, (uint16_t*)data, size);
+          .as<TypedArrayKind::Uint16Array>(runtime)
+          .updateUnsafe(runtime, (uint16_t*)data, size);
       break;
     case kTfLiteUInt32:
       getTypedArray(runtime, jsBuffer)
-        .as<TypedArrayKind::Uint32Array>(runtime)
-        .updateUnsafe(runtime, (uint32_t*)data, size);
+          .as<TypedArrayKind::Uint32Array>(runtime)
+          .updateUnsafe(runtime, (uint32_t*)data, size);
       break;
 
     default:
@@ -190,25 +191,27 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
   }
 }
 
-
-void TensorHelpers::updateTensorFromJSBuffer(jsi::Runtime& runtime, TfLiteTensor* tensor, TypedArrayBase& jsBuffer) {
+void TensorHelpers::updateTensorFromJSBuffer(jsi::Runtime& runtime, TfLiteTensor* tensor,
+                                             TypedArrayBase& jsBuffer) {
   auto name = std::string(TfLiteTensorName(tensor));
   void* data = TfLiteTensorData(tensor);
   if (data == nullptr) {
-      throw std::runtime_error("Failed to get data from tensor \"" + name + "\"!");
+    throw std::runtime_error("Failed to get data from tensor \"" + name + "\"!");
   }
 
   auto buffer = jsBuffer.getBuffer(runtime);
 
-  TfLiteTensorCopyFromBuffer(tensor,
-                             buffer.data(runtime) + jsBuffer.byteOffset(runtime),
+  TfLiteTensorCopyFromBuffer(tensor, buffer.data(runtime) + jsBuffer.byteOffset(runtime),
                              buffer.size(runtime));
 }
 
 jsi::Object TensorHelpers::tensorToJSObject(jsi::Runtime& runtime, const TfLiteTensor* tensor) {
   jsi::Object result(runtime);
-  result.setProperty(runtime, "name", jsi::String::createFromUtf8(runtime, TfLiteTensorName(tensor)));
-  result.setProperty(runtime, "dataType", jsi::String::createFromUtf8(runtime, dataTypeToString(TfLiteTensorType(tensor))));
+  result.setProperty(runtime, "name",
+                     jsi::String::createFromUtf8(runtime, TfLiteTensorName(tensor)));
+  result.setProperty(
+      runtime, "dataType",
+      jsi::String::createFromUtf8(runtime, dataTypeToString(TfLiteTensorType(tensor))));
 
   int dimensions = TfLiteTensorNumDims(tensor);
   jsi::Array shapeArray(runtime, dimensions);

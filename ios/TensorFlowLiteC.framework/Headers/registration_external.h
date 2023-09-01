@@ -22,12 +22,12 @@ limitations under the License.
 #include <stdlib.h>
 
 #include "builtin_ops.h"
-#include "types.h"
 #include "c_api_types.h"
+#include "types.h"
 
 #ifdef __cplusplus
 extern "C" {
-#endif  // __cplusplus
+#endif // __cplusplus
 
 // TfLiteRegistrationExternal is an external version of TfLiteRegistration to
 // use custom op registration API.
@@ -43,35 +43,34 @@ typedef struct TfLiteRegistrationExternal TfLiteRegistrationExternal;
 //
 // \warning This is an experimental API and subject to change.
 TFL_CAPI_EXPORT extern TfLiteRegistrationExternal*
-TfLiteRegistrationExternalCreate(TfLiteBuiltinOperator builtin_code,
-                                 const char* custom_name, int version);
+TfLiteRegistrationExternalCreate(TfLiteBuiltinOperator builtin_code, const char* custom_name,
+                                 int version);
 
 // Destroys the TfLiteRegistrationExternal instance.
 //
 // \warning This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern void TfLiteRegistrationExternalDelete(
-    TfLiteRegistrationExternal* registration);
+TFL_CAPI_EXPORT extern void
+TfLiteRegistrationExternalDelete(TfLiteRegistrationExternal* registration);
 
 // Return the builtin op code of the provided external 'registration'.
 //
 // \warning This is an experimental API and subject to change.
 TFL_CAPI_EXPORT extern TfLiteBuiltinOperator
-TfLiteRegistrationExternalGetBuiltInCode(
-    const TfLiteRegistrationExternal* registration);
+TfLiteRegistrationExternalGetBuiltInCode(const TfLiteRegistrationExternal* registration);
 
 /// Returns the custom name of the provided 'registration'. The returned pointer
 /// will be non-null iff the op is a custom op.
 ///
 /// \warning This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern const char* TfLiteRegistrationExternalGetCustomName(
-    const TfLiteRegistrationExternal* registration);
+TFL_CAPI_EXPORT extern const char*
+TfLiteRegistrationExternalGetCustomName(const TfLiteRegistrationExternal* registration);
 
 /// Return the OP version of the provided external 'registration'.  Return -1
 /// in case of error, or if the provided address is null.
 ///
 /// \warning This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern int TfLiteRegistrationExternalGetVersion(
-    const TfLiteRegistrationExternal* registration);
+TFL_CAPI_EXPORT extern int
+TfLiteRegistrationExternalGetVersion(const TfLiteRegistrationExternal* registration);
 
 // Sets the initialization callback for the registration.
 //
@@ -81,8 +80,7 @@ TFL_CAPI_EXPORT extern int TfLiteRegistrationExternalGetVersion(
 // \warning This is an experimental API and subject to change.
 TFL_CAPI_EXPORT extern void TfLiteRegistrationExternalSetInit(
     TfLiteRegistrationExternal* registration,
-    void* (*init)(TfLiteOpaqueContext* context, const char* buffer,
-                  size_t length));
+    void* (*init)(TfLiteOpaqueContext* context, const char* buffer, size_t length));
 
 // Sets the deallocation callback for the registration.
 //
@@ -92,9 +90,9 @@ TFL_CAPI_EXPORT extern void TfLiteRegistrationExternalSetInit(
 // Please refer `free` of `TfLiteRegistration` for the detail.
 //
 // \warning This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern void TfLiteRegistrationExternalSetFree(
-    TfLiteRegistrationExternal* registration,
-    void (*free)(TfLiteOpaqueContext* context, void* data));
+TFL_CAPI_EXPORT extern void
+TfLiteRegistrationExternalSetFree(TfLiteRegistrationExternal* registration,
+                                  void (*free)(TfLiteOpaqueContext* context, void* data));
 
 // Sets the preparation callback for the registration.
 //
@@ -104,8 +102,7 @@ TFL_CAPI_EXPORT extern void TfLiteRegistrationExternalSetFree(
 // \warning This is an experimental API and subject to change.
 TFL_CAPI_EXPORT extern void TfLiteRegistrationExternalSetPrepare(
     TfLiteRegistrationExternal* registration,
-    TfLiteStatus (*prepare)(TfLiteOpaqueContext* context,
-                            TfLiteOpaqueNode* node));
+    TfLiteStatus (*prepare)(TfLiteOpaqueContext* context, TfLiteOpaqueNode* node));
 
 // Sets the invocation callback for the registration.
 //
@@ -115,8 +112,7 @@ TFL_CAPI_EXPORT extern void TfLiteRegistrationExternalSetPrepare(
 // \warning This is an experimental API and subject to change.
 TFL_CAPI_EXPORT extern void TfLiteRegistrationExternalSetInvoke(
     TfLiteRegistrationExternal* registration,
-    TfLiteStatus (*invoke)(TfLiteOpaqueContext* context,
-                           TfLiteOpaqueNode* node));
+    TfLiteStatus (*invoke)(TfLiteOpaqueContext* context, TfLiteOpaqueNode* node));
 
 /// Sets the async kernel accessor callback for the registration.
 ///
@@ -137,11 +133,12 @@ TFL_CAPI_EXPORT extern void TfLiteRegistrationExternalSetAsyncKernel(
 /// `TfLiteRegistration` for details.
 ///
 /// \warning This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern void TfLiteRegistrationExternalSetInplaceOperator(
-    TfLiteRegistrationExternal* registration, uint64_t inplace_operator);
+TFL_CAPI_EXPORT extern void
+TfLiteRegistrationExternalSetInplaceOperator(TfLiteRegistrationExternal* registration,
+                                             uint64_t inplace_operator);
 
 #ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus
+} // extern "C"
+#endif // __cplusplus
 
-#endif  // TENSORFLOW_LITE_CORE_C_REGISTRATION_EXTERNAL_H_
+#endif // TENSORFLOW_LITE_CORE_C_REGISTRATION_EXTERNAL_H_

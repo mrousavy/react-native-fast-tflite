@@ -26,7 +26,7 @@ limitations under the License.
 
 #ifdef __cplusplus
 extern "C" {
-#endif  // __cplusplus
+#endif // __cplusplus
 
 // --------------------------------------------------------------------------
 // Opaque types used by the C API.
@@ -50,8 +50,8 @@ typedef struct TfLiteSignatureRunner TfLiteSignatureRunner;
 /// Resets all variable tensors to zero.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern TfLiteStatus TfLiteInterpreterResetVariableTensors(
-    TfLiteInterpreter* interpreter);
+TFL_CAPI_EXPORT extern TfLiteStatus
+TfLiteInterpreterResetVariableTensors(TfLiteInterpreter* interpreter);
 
 /// Adds an op registration for a builtin operator.
 ///
@@ -68,10 +68,10 @@ TFL_CAPI_EXPORT extern TfLiteStatus TfLiteInterpreterResetVariableTensors(
 /// options object.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT void TfLiteInterpreterOptionsAddBuiltinOp(
-    TfLiteInterpreterOptions* options, TfLiteBuiltinOperator op,
-    const TfLiteRegistration* registration, int32_t min_version,
-    int32_t max_version);
+TFL_CAPI_EXPORT void TfLiteInterpreterOptionsAddBuiltinOp(TfLiteInterpreterOptions* options,
+                                                          TfLiteBuiltinOperator op,
+                                                          const TfLiteRegistration* registration,
+                                                          int32_t min_version, int32_t max_version);
 
 /// Adds an op registration for a custom operator.
 ///
@@ -91,10 +91,10 @@ TFL_CAPI_EXPORT void TfLiteInterpreterOptionsAddBuiltinOp(
 /// options object.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT void TfLiteInterpreterOptionsAddCustomOp(
-    TfLiteInterpreterOptions* options, const char* name,
-    const TfLiteRegistration* registration, int32_t min_version,
-    int32_t max_version);
+TFL_CAPI_EXPORT void TfLiteInterpreterOptionsAddCustomOp(TfLiteInterpreterOptions* options,
+                                                         const char* name,
+                                                         const TfLiteRegistration* registration,
+                                                         int32_t min_version, int32_t max_version);
 
 /// Registers callbacks for resolving builtin or custom operators.
 ///
@@ -120,10 +120,8 @@ TFL_CAPI_EXPORT void TfLiteInterpreterOptionsAddCustomOp(
 /// WARNING: This is an experimental API and subject to change.
 void TfLiteInterpreterOptionsSetOpResolverExternal(
     TfLiteInterpreterOptions* options,
-    const TfLiteRegistrationExternal* (*find_builtin_op)(void* user_data,
-                                                         int op, int version),
-    const TfLiteRegistrationExternal* (*find_custom_op)(void* user_data,
-                                                        const char* custom_op,
+    const TfLiteRegistrationExternal* (*find_builtin_op)(void* user_data, int op, int version),
+    const TfLiteRegistrationExternal* (*find_custom_op)(void* user_data, const char* custom_op,
                                                         int version),
     void* op_resolver_user_data);
 
@@ -144,15 +142,14 @@ void TfLiteInterpreterOptionsSetOpResolverExternal(
 /// TF Lite itself.
 void TfLiteInterpreterOptionsSetOpResolverExternalWithFallback(
     TfLiteInterpreterOptions* options,
-    const TfLiteRegistrationExternal* (*find_builtin_op_external)(
-        void* user_data, int op, int version),
-    const TfLiteRegistrationExternal* (*find_custom_op_external)(
-        void* user_data, const char* custom_op, int version),
-    const TfLiteRegistration* (*find_builtin_op)(void* user_data,
-                                                 TfLiteBuiltinOperator op,
+    const TfLiteRegistrationExternal* (*find_builtin_op_external)(void* user_data, int op,
+                                                                  int version),
+    const TfLiteRegistrationExternal* (*find_custom_op_external)(void* user_data,
+                                                                 const char* custom_op,
+                                                                 int version),
+    const TfLiteRegistration* (*find_builtin_op)(void* user_data, TfLiteBuiltinOperator op,
                                                  int version),
-    const TfLiteRegistration* (*find_custom_op)(void* user_data, const char* op,
-                                                int version),
+    const TfLiteRegistration* (*find_custom_op)(void* user_data, const char* op, int version),
     void* op_resolver_user_data);
 
 /// Registers callbacks for resolving builtin or custom operators.
@@ -175,11 +172,9 @@ void TfLiteInterpreterOptionsSetOpResolverExternalWithFallback(
 /// DEPRECATED: use TfLiteInterpreterOptionsSetOpResolverExternal instead.
 void TfLiteInterpreterOptionsSetOpResolver(
     TfLiteInterpreterOptions* options,
-    const TfLiteRegistration* (*find_builtin_op)(void* user_data,
-                                                 TfLiteBuiltinOperator op,
+    const TfLiteRegistration* (*find_builtin_op)(void* user_data, TfLiteBuiltinOperator op,
                                                  int version),
-    const TfLiteRegistration* (*find_custom_op)(void* user_data,
-                                                const char* custom_op,
+    const TfLiteRegistration* (*find_custom_op)(void* user_data, const char* custom_op,
                                                 int version),
     void* op_resolver_user_data);
 
@@ -190,12 +185,9 @@ void TfLiteInterpreterOptionsSetOpResolver(
 /// only for binary backwards compatibility, and should not be called.
 void TfLiteInterpreterOptionsSetOpResolverV3(
     TfLiteInterpreterOptions* options,
-    const TfLiteRegistration_V3* (*find_builtin_op_v3)(void* user_data,
-                                                       TfLiteBuiltinOperator op,
+    const TfLiteRegistration_V3* (*find_builtin_op_v3)(void* user_data, TfLiteBuiltinOperator op,
                                                        int version),
-    const TfLiteRegistration_V3* (*find_custom_op_v3)(void* user_data,
-                                                      const char* op,
-                                                      int version),
+    const TfLiteRegistration_V3* (*find_custom_op_v3)(void* user_data, const char* op, int version),
     void* op_resolver_user_data);
 
 /// \private
@@ -205,12 +197,9 @@ void TfLiteInterpreterOptionsSetOpResolverV3(
 /// only for binary backwards compatibility, and should not be called.
 void TfLiteInterpreterOptionsSetOpResolverV2(
     TfLiteInterpreterOptions* options,
-    const TfLiteRegistration_V2* (*find_builtin_op_v2)(void* user_data,
-                                                       TfLiteBuiltinOperator op,
+    const TfLiteRegistration_V2* (*find_builtin_op_v2)(void* user_data, TfLiteBuiltinOperator op,
                                                        int version),
-    const TfLiteRegistration_V2* (*find_custom_op_v2)(void* user_data,
-                                                      const char* op,
-                                                      int version),
+    const TfLiteRegistration_V2* (*find_custom_op_v2)(void* user_data, const char* op, int version),
     void* op_resolver_user_data);
 
 /// \private
@@ -220,12 +209,9 @@ void TfLiteInterpreterOptionsSetOpResolverV2(
 /// only for binary backwards compatibility, and should not be called.
 void TfLiteInterpreterOptionsSetOpResolverV1(
     TfLiteInterpreterOptions* options,
-    const TfLiteRegistration_V1* (*find_builtin_op_v1)(void* user_data,
-                                                       TfLiteBuiltinOperator op,
+    const TfLiteRegistration_V1* (*find_builtin_op_v1)(void* user_data, TfLiteBuiltinOperator op,
                                                        int version),
-    const TfLiteRegistration_V1* (*find_custom_op_v1)(void* user_data,
-                                                      const char* op,
-                                                      int version),
+    const TfLiteRegistration_V1* (*find_custom_op_v1)(void* user_data, const char* op, int version),
     void* op_resolver_user_data);
 
 /// Returns a new interpreter using the provided model and options, or null on
@@ -254,8 +240,8 @@ TfLiteInterpreterCreateWithSelectedOps(const TfLiteModel* model,
 /// Enable or disable the NN API delegate for the interpreter (true to enable).
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern void TfLiteInterpreterOptionsSetUseNNAPI(
-    TfLiteInterpreterOptions* options, bool enable);
+TFL_CAPI_EXPORT extern void TfLiteInterpreterOptionsSetUseNNAPI(TfLiteInterpreterOptions* options,
+                                                                bool enable);
 
 /// Enable or disable CPU fallback for the interpreter (true to enable).
 /// If enabled, TfLiteInterpreterInvoke will do automatic fallback from
@@ -281,8 +267,8 @@ TFL_CAPI_EXPORT extern void TfLiteInterpreterOptionsSetUseNNAPI(
 ///   the same value as previously set.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern void TfLiteInterpreterOptionsSetEnableDelegateFallback(
-    TfLiteInterpreterOptions* options, bool enable);
+TFL_CAPI_EXPORT extern void
+TfLiteInterpreterOptionsSetEnableDelegateFallback(TfLiteInterpreterOptions* options, bool enable);
 
 // Set if buffer handle output is allowed.
 //
@@ -292,8 +278,8 @@ TFL_CAPI_EXPORT extern void TfLiteInterpreterOptionsSetEnableDelegateFallback(
 /// texture), it can set this flag to false, so Interpreter won't copy the
 /// data from buffer handle to CPU memory. WARNING: This is an experimental
 /// API and subject to change.
-TFL_CAPI_EXPORT extern void TfLiteSetAllowBufferHandleOutput(
-    const TfLiteInterpreter* interpreter, bool allow_buffer_handle_output);
+TFL_CAPI_EXPORT extern void TfLiteSetAllowBufferHandleOutput(const TfLiteInterpreter* interpreter,
+                                                             bool allow_buffer_handle_output);
 
 /// Allow a delegate to look at the graph and modify the graph to handle
 /// parts of the graph themselves. After this is called, the graph may
@@ -308,20 +294,21 @@ TFL_CAPI_EXPORT extern void TfLiteSetAllowBufferHandleOutput(
 /// NOTE: This undoes all delegates previously applied to the Interpreter.
 /// 3. kTfLiteError: Unexpected/runtime failure.
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern TfLiteStatus TfLiteInterpreterModifyGraphWithDelegate(
-    const TfLiteInterpreter* interpreter, TfLiteDelegate* delegate);
+TFL_CAPI_EXPORT extern TfLiteStatus
+TfLiteInterpreterModifyGraphWithDelegate(const TfLiteInterpreter* interpreter,
+                                         TfLiteDelegate* delegate);
 
 /// Returns the tensor index corresponding to the input tensor
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern int32_t TfLiteInterpreterGetInputTensorIndex(
-    const TfLiteInterpreter* interpreter, int32_t input_index);
+TFL_CAPI_EXPORT extern int32_t
+TfLiteInterpreterGetInputTensorIndex(const TfLiteInterpreter* interpreter, int32_t input_index);
 
 /// Returns the tensor index corresponding to the output tensor
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern int32_t TfLiteInterpreterGetOutputTensorIndex(
-    const TfLiteInterpreter* interpreter, int32_t output_index);
+TFL_CAPI_EXPORT extern int32_t
+TfLiteInterpreterGetOutputTensorIndex(const TfLiteInterpreter* interpreter, int32_t output_index);
 
 /// --------------------------------------------------------------------------
 /// SignatureRunner APIs
@@ -357,8 +344,8 @@ TFL_CAPI_EXPORT extern int32_t TfLiteInterpreterGetOutputTensorIndex(
 /// Returns the number of signatures defined in the model.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern int32_t TfLiteInterpreterGetSignatureCount(
-    const TfLiteInterpreter* interpreter);
+TFL_CAPI_EXPORT extern int32_t
+TfLiteInterpreterGetSignatureCount(const TfLiteInterpreter* interpreter);
 
 /// Returns the key of the Nth signature in the model, where N is specified as
 /// `signature_index`.
@@ -367,8 +354,8 @@ TFL_CAPI_EXPORT extern int32_t TfLiteInterpreterGetSignatureCount(
 /// lifetime of `interpreter`.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern const char* TfLiteInterpreterGetSignatureKey(
-    const TfLiteInterpreter* interpreter, int32_t signature_index);
+TFL_CAPI_EXPORT extern const char*
+TfLiteInterpreterGetSignatureKey(const TfLiteInterpreter* interpreter, int32_t signature_index);
 
 /// Returns a new signature runner using the provided interpreter and signature
 /// key, or nullptr on failure.
@@ -387,8 +374,8 @@ TfLiteInterpreterGetSignatureRunner(const TfLiteInterpreter* interpreter,
 /// Returns the number of inputs associated with a signature.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern size_t TfLiteSignatureRunnerGetInputCount(
-    const TfLiteSignatureRunner* signature_runner);
+TFL_CAPI_EXPORT extern size_t
+TfLiteSignatureRunnerGetInputCount(const TfLiteSignatureRunner* signature_runner);
 
 /// Returns the (null-terminated) name of the Nth input in a signature, where N
 /// is specified as `input_index`.
@@ -397,8 +384,9 @@ TFL_CAPI_EXPORT extern size_t TfLiteSignatureRunnerGetInputCount(
 /// lifetime of `signature_runner`.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern const char* TfLiteSignatureRunnerGetInputName(
-    const TfLiteSignatureRunner* signature_runner, const int32_t input_index);
+TFL_CAPI_EXPORT extern const char*
+TfLiteSignatureRunnerGetInputName(const TfLiteSignatureRunner* signature_runner,
+                                  const int32_t input_index);
 
 /// Resizes the input tensor identified as `input_name` to be the dimensions
 /// specified by `input_dims` and `input_dims_size`. Only unknown dimensions can
@@ -418,9 +406,10 @@ TFL_CAPI_EXPORT extern const char* TfLiteSignatureRunnerGetInputName(
 /// safely deallocate `input_dims` immediately after this function returns.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern TfLiteStatus TfLiteSignatureRunnerResizeInputTensor(
-    TfLiteSignatureRunner* signature_runner, const char* input_name,
-    const int* input_dims, int32_t input_dims_size);
+TFL_CAPI_EXPORT extern TfLiteStatus
+TfLiteSignatureRunnerResizeInputTensor(TfLiteSignatureRunner* signature_runner,
+                                       const char* input_name, const int* input_dims,
+                                       int32_t input_dims_size);
 
 /// Updates allocations for tensors associated with a signature and resizes
 /// dependent tensors using the specified input tensor dimensionality.
@@ -428,8 +417,8 @@ TFL_CAPI_EXPORT extern TfLiteStatus TfLiteSignatureRunnerResizeInputTensor(
 /// after initializing the signature runner object and/or resizing any inputs.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern TfLiteStatus TfLiteSignatureRunnerAllocateTensors(
-    TfLiteSignatureRunner* signature_runner);
+TFL_CAPI_EXPORT extern TfLiteStatus
+TfLiteSignatureRunnerAllocateTensors(TfLiteSignatureRunner* signature_runner);
 
 /// Returns the input tensor identified by `input_name` in the given signature.
 /// Returns nullptr if the given name is not valid.
@@ -438,8 +427,9 @@ TFL_CAPI_EXPORT extern TfLiteStatus TfLiteSignatureRunnerAllocateTensors(
 /// the lifetime of `signature_runner`.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern TfLiteTensor* TfLiteSignatureRunnerGetInputTensor(
-    TfLiteSignatureRunner* signature_runner, const char* input_name);
+TFL_CAPI_EXPORT extern TfLiteTensor*
+TfLiteSignatureRunnerGetInputTensor(TfLiteSignatureRunner* signature_runner,
+                                    const char* input_name);
 
 /// Runs inference on a given signature.
 ///
@@ -449,14 +439,14 @@ TFL_CAPI_EXPORT extern TfLiteTensor* TfLiteSignatureRunnerGetInputTensor(
 /// the output tensors will be set.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern TfLiteStatus TfLiteSignatureRunnerInvoke(
-    TfLiteSignatureRunner* signature_runner);
+TFL_CAPI_EXPORT extern TfLiteStatus
+TfLiteSignatureRunnerInvoke(TfLiteSignatureRunner* signature_runner);
 
 /// Returns the number of output tensors associated with the signature.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern size_t TfLiteSignatureRunnerGetOutputCount(
-    const TfLiteSignatureRunner* signature_runner);
+TFL_CAPI_EXPORT extern size_t
+TfLiteSignatureRunnerGetOutputCount(const TfLiteSignatureRunner* signature_runner);
 
 /// Returns the (null-terminated) name of the Nth output in a signature, where
 /// N is specified as `output_index`.
@@ -465,8 +455,9 @@ TFL_CAPI_EXPORT extern size_t TfLiteSignatureRunnerGetOutputCount(
 /// lifetime of `signature_runner`.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern const char* TfLiteSignatureRunnerGetOutputName(
-    const TfLiteSignatureRunner* signature_runner, int32_t output_index);
+TFL_CAPI_EXPORT extern const char*
+TfLiteSignatureRunnerGetOutputName(const TfLiteSignatureRunner* signature_runner,
+                                   int32_t output_index);
 
 /// Returns the output tensor identified by `output_name` in the given
 /// signature. Returns nullptr if the given name is not valid.
@@ -475,8 +466,9 @@ TFL_CAPI_EXPORT extern const char* TfLiteSignatureRunnerGetOutputName(
 /// the lifetime of `signature_runner`.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern const TfLiteTensor* TfLiteSignatureRunnerGetOutputTensor(
-    const TfLiteSignatureRunner* signature_runner, const char* output_name);
+TFL_CAPI_EXPORT extern const TfLiteTensor*
+TfLiteSignatureRunnerGetOutputTensor(const TfLiteSignatureRunner* signature_runner,
+                                     const char* output_name);
 
 /// Attempts to cancel in flight invocation if any.
 /// This will not affect calls to `Invoke` that happend after this.
@@ -487,14 +479,13 @@ TFL_CAPI_EXPORT extern const TfLiteTensor* TfLiteSignatureRunnerGetOutputTensor(
 /// in all SignatureRunners built from the same interpreter.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern TfLiteStatus TfLiteSignatureRunnerCancel(
-    TfLiteSignatureRunner* signature_runner);
+TFL_CAPI_EXPORT extern TfLiteStatus
+TfLiteSignatureRunnerCancel(TfLiteSignatureRunner* signature_runner);
 
 /// Destroys the signature runner.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern void TfLiteSignatureRunnerDelete(
-    TfLiteSignatureRunner* signature_runner);
+TFL_CAPI_EXPORT extern void TfLiteSignatureRunnerDelete(TfLiteSignatureRunner* signature_runner);
 
 // Forward declaration, to avoid need for dependency on
 // tensorflow/lite/profiling/telemetry/profiler.h.
@@ -505,12 +496,12 @@ struct TfLiteTelemetryProfilerStruct;
 /// must ensure profiler->data outlives the lifespan of the interpreter.
 ///
 /// WARNING: This is an experimental API and subject to change.
-TFL_CAPI_EXPORT extern void TfLiteInterpreterOptionsSetTelemetryProfiler(
-    TfLiteInterpreterOptions* options,
-    struct TfLiteTelemetryProfilerStruct* profiler);
+TFL_CAPI_EXPORT extern void
+TfLiteInterpreterOptionsSetTelemetryProfiler(TfLiteInterpreterOptions* options,
+                                             struct TfLiteTelemetryProfilerStruct* profiler);
 
 #ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus
+} // extern "C"
+#endif // __cplusplus
 
-#endif  // TENSORFLOW_LITE_CORE_C_C_API_EXPERIMENTAL_H_
+#endif // TENSORFLOW_LITE_CORE_C_C_API_EXPERIMENTAL_H_

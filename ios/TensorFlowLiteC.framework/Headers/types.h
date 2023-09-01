@@ -17,7 +17,7 @@ limitations under the License.
 
 #ifdef __cplusplus
 extern "C" {
-#endif  // __cplusplus
+#endif // __cplusplus
 
 /// Opaque type for TfLiteAsyncKernel.
 typedef struct TfLiteAsyncKernel TfLiteAsyncKernel;
@@ -37,7 +37,7 @@ typedef enum TfLiteIoType {
 } TfLiteIoType;
 
 #ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus
+} // extern "C"
+#endif // __cplusplus
 
-#endif  // TENSORFLOW_LITE_CORE_ASYNC_C_TYPES_H_
+#endif // TENSORFLOW_LITE_CORE_ASYNC_C_TYPES_H_
