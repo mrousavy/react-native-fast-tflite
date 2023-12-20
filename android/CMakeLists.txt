@@ -8,13 +8,13 @@ set (CMAKE_CXX_STANDARD 17)
 find_package(ReactAndroid REQUIRED CONFIG)
 find_package(fbjni REQUIRED CONFIG)
 
-# TODO: Fix linking TFLite
-# find_library(
-#         TFLITE
-#         tensorflowlite_jni
-#         PATHS "./src/main/cpp/lib/tensorflow/jni/${ANDROID_ABI}"
-#         NO_DEFAULT_PATH
-#         NO_CMAKE_FIND_ROOT_PATH)
+find_library(
+        TFLITE
+        tensorflowlite_jni
+        PATHS "./src/main/cpp/lib/tensorflow/jni/${ANDROID_ABI}"
+        NO_DEFAULT_PATH
+        NO_CMAKE_FIND_ROOT_PATH
+)
 
 string(APPEND CMAKE_CXX_FLAGS " -DANDROID")
 
@@ -23,9 +23,8 @@ add_library(
   SHARED
   ../cpp/jsi/Promise.cpp
   ../cpp/jsi/TypedArray.cpp
-  # TODO: Uncomment this when tensorflow-lite C/C++ API can be successfully built/linked here
-  #../cpp/TensorflowPlugin.cpp
-  #../cpp/TensorHelpers.cpp
+  ../cpp/TensorflowPlugin.cpp
+  ../cpp/TensorHelpers.cpp
   src/main/cpp/Tflite.cpp
 )
 
@@ -35,7 +34,7 @@ target_include_directories(
   PRIVATE
   "../cpp"
   "src/main/cpp"
-  # "src/main/cpp/lib/tensorflow/headers/"
+  "src/main/cpp/lib/tensorflow/headers/"
   "${NODE_MODULES_DIR}/react-native/ReactCommon"
   "${NODE_MODULES_DIR}/react-native/ReactCommon/callinvoker"
   "${NODE_MODULES_DIR}/react-native/ReactAndroid/src/main/jni/react/turbomodule" # <-- CallInvokerHolder JNI wrapper
@@ -49,5 +48,5 @@ target_link_libraries(
   ReactAndroid::jsi               # <-- jsi.h
   ReactAndroid::reactnativejni    # <-- CallInvokerImpl
   fbjni::fbjni                    # <-- fbjni.h
-  # ${TFLITE}
+  ${TFLITE}
 )
