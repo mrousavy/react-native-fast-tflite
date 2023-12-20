@@ -2,14 +2,9 @@ package com.tflite;
 
 import android.util.Log;
 
-import com.facebook.proguard.annotations.DoNotStrip;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
 import androidx.annotation.NonNull;
 
+import com.facebook.proguard.annotations.DoNotStrip;
 import com.facebook.react.bridge.JavaScriptContextHolder;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -17,6 +12,10 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /** @noinspection JavaJniMissingFunction*/
 @ReactModule(name = TfliteModule.NAME)
@@ -35,22 +34,18 @@ public class TfliteModule extends ReactContextBaseJavaModule {
 
   @DoNotStrip
   public static byte[] fetchByteDataFromUrl(String url) {
-          Log.e("AssetsManager", "fetch URL 1 " + url + "!");
-
     OkHttpClient client = new OkHttpClient();
 
     Request request = new Request.Builder().url(url).build();
 
     try (Response response = client.newCall(request).execute()) {
-
       if (response.isSuccessful() && response.body() != null) {
-
         return response.body().bytes();
       } else {
         throw new RuntimeException("Response was not successful!");
       }
     } catch (Exception e) {
-      Log.e("AssetsManager", "Failed to fetch URL " + url + "!", e);
+      Log.e(NAME, "Failed to fetch URL " + url + "!", e);
       return null;
     }
   }
