@@ -21,7 +21,7 @@ limitations under the License.
 
 #ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
+#endif  // __cplusplus
 
 // The enum for builtin operators.
 // Note: CUSTOM, DELEGATE, and PLACEHOLDER_FOR_GREATER_OP_CODES are 3 special
@@ -217,9 +217,25 @@ typedef enum {
   kTfLiteBuiltinStablehloSelect = 187,
   kTfLiteBuiltinStablehloSubtract = 188,
   kTfLiteBuiltinStablehloTanh = 189,
+  kTfLiteBuiltinStablehloScatter = 190,
+  kTfLiteBuiltinStablehloCompare = 191,
+  kTfLiteBuiltinStablehloConvert = 192,
+  kTfLiteBuiltinStablehloDynamicSlice = 193,
+  kTfLiteBuiltinStablehloDynamicUpdateSlice = 194,
+  kTfLiteBuiltinStablehloPad = 195,
+  kTfLiteBuiltinStablehloIota = 196,
+  kTfLiteBuiltinStablehloDotGeneral = 197,
+  kTfLiteBuiltinStablehloReduceWindow = 198,
+  kTfLiteBuiltinStablehloSort = 199,
+  kTfLiteBuiltinStablehloWhile = 200,
+  kTfLiteBuiltinStablehloGather = 201,
+  kTfLiteBuiltinStablehloTranspose = 202,
+  kTfLiteBuiltinDilate = 203,
+  kTfLiteBuiltinStablehloRngBitGenerator = 204,
+  kTfLiteBuiltinReduceWindow = 205,
 } TfLiteBuiltinOperator;
 
 #ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
-#endif // TENSORFLOW_LITE_BUILTIN_OPS_H_
+}  // extern "C"
+#endif  // __cplusplus
+#endif  // TENSORFLOW_LITE_BUILTIN_OPS_H_

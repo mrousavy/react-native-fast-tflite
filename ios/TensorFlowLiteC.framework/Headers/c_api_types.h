@@ -12,16 +12,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+// WARNING: Users of TensorFlow Lite should not include this file directly, but
+// should instead include "third_party/tensorflow/lite/c/c_api_types.h".
+// Only the TensorFlow Lite implementation itself should include this file
+// directly.
 
 /// This file declares types used by the pure C inference API defined in
 /// c_api.h, some of which are also used in the C++ and C kernel and interpreter
 /// APIs.
-
-// WARNING: Users of TensorFlow Lite should not include this file directly,
-// but should instead include
-// "third_party/tensorflow/lite/c/c_api_types.h".
-// Only the TensorFlow Lite implementation itself should include this
-// file directly.
+///
+// clang-format off
+// NOLINTBEGIN(whitespace/line_length)
+/// \note Users of TensorFlow Lite should use
+/// \code
+/// #include "c_api_types.h"
+/// \endcode
+/// to access the APIs documented on this page.
+// NOLINTEND(whitespace/line_length)
+// clang-format on
 
 // IWYU pragma: private, include "third_party/tensorflow/lite/c/c_api_types.h"
 
@@ -34,9 +42,13 @@ limitations under the License.
 extern "C" {
 #endif
 
-/** \addtogroup c_api_types tensorflow/lite/c/c_api_types.h
+// clang-format off
+// NOLINTBEGIN(whitespace/line_length)
+/** \defgroup c_api_types lite/c/c_api_types.h
  *  @{
  */
+// NOLINTEND(whitespace/line_length)
+// clang-format on
 
 // Define TFL_CAPI_EXPORT macro to export a function properly with a shared
 // library.
@@ -44,17 +56,17 @@ extern "C" {
 #define TFL_CAPI_EXPORT
 #elif defined(TFL_STATIC_LIBRARY_BUILD)
 #define TFL_CAPI_EXPORT
-#else // not definded TFL_STATIC_LIBRARY_BUILD
+#else  // not definded TFL_STATIC_LIBRARY_BUILD
 #if defined(_WIN32)
 #ifdef TFL_COMPILE_LIBRARY
 #define TFL_CAPI_EXPORT __declspec(dllexport)
 #else
 #define TFL_CAPI_EXPORT __declspec(dllimport)
-#endif // TFL_COMPILE_LIBRARY
+#endif  // TFL_COMPILE_LIBRARY
 #else
 #define TFL_CAPI_EXPORT __attribute__((visibility("default")))
-#endif // _WIN32
-#endif // SWIG
+#endif  // _WIN32
+#endif  // SWIG
 
 /// Note that new error status values may be added in future in order to
 /// indicate more fine-grained internal states, therefore, applications should
@@ -123,12 +135,11 @@ typedef enum {
   kTfLiteInt4 = 18,
 } TfLiteType;
 
-/// Legacy. Will be deprecated in favor of TfLiteAffineQuantization.
+/// Legacy. Will be deprecated in favor of `TfLiteAffineQuantization`.
 /// If per-layer quantization is specified this field will still be populated in
-/// addition to TfLiteAffineQuantization.
+/// addition to `TfLiteAffineQuantization`.
 /// Parameters for asymmetric quantization. Quantized values can be converted
-/// back to float using:
-///     real_value = scale * (quantized_value - zero_point)
+/// back to float using: `real_value = scale * (quantized_value - zero_point)`
 typedef struct TfLiteQuantizationParams {
   float scale;
   int32_t zero_point;
@@ -156,6 +167,7 @@ typedef struct TfLiteDelegate TfLiteDelegate;
 /// This is an abstract type that is intended to have the same
 /// role as TfLiteDelegate, but without exposing the implementation
 /// details of how delegates are implemented.
+///
 /// WARNING: This is an experimental type and subject to change.
 typedef struct TfLiteOpaqueDelegateStruct TfLiteOpaqueDelegateStruct;
 
@@ -163,6 +175,7 @@ typedef struct TfLiteOpaqueDelegateStruct TfLiteOpaqueDelegateStruct;
 /// TfLiteDelegate; allows delegation of nodes to alternative backends.
 /// For TF Lite in Play Services, this is an opaque type,
 /// but for regular TF Lite, this is just a typedef for TfLiteDelegate.
+///
 /// WARNING: This is an experimental type and subject to change.
 #if TFLITE_WITH_STABLE_ABI || TFLITE_USE_OPAQUE_DELEGATE
 typedef TfLiteOpaqueDelegateStruct TfLiteOpaqueDelegate;
@@ -173,6 +186,6 @@ typedef TfLiteDelegate TfLiteOpaqueDelegate;
 /** @} */
 
 #ifdef __cplusplus
-} // extern C
+}  // extern C
 #endif
-#endif // TENSORFLOW_LITE_CORE_C_C_API_TYPES_H_
+#endif  // TENSORFLOW_LITE_CORE_C_C_API_TYPES_H_
