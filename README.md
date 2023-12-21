@@ -164,15 +164,6 @@ This library is provided _as is_, I work on it in my free time.
 
 If you're integrating react-native-fast-tflite in a production app, consider [funding this project](https://github.com/sponsors/mrousavy) and <a href="mailto:me@mrousavy.com?subject=Adopting react-native-fast-tflite at scale">contact me</a> to receive premium enterprise support, help with issues, prioritize bugfixes, request features, help at integrating react-native-fast-tflite and/or VisionCamera Frame Processors, and more.
 
-## Android
-
-Currently, react-native-fast-tflite does not work on Android.
-
-The entire codebase is written in C/C++ and can be shared across platforms, but I couldn't manage to link tensorflow-lite against the NDK/CMake target on Android.
-This is the only missing piece, so if anyone figures this part out, please let me know/send a PR.
-
-My current approach was to use `org.tensorflow:tensorflow-lite` from Maven, extract the .so and Headers from the AAR, and then link against those (see `android/build.gradle` and `android/CMakeLists.txt`). For some reason this gave ABI errors, such as cannot link against linux x64, so for now I just ignored those and finished iOS.
-
 ## Contributing
 
 1. Clone the repo
