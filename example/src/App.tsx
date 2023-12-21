@@ -1,8 +1,7 @@
 import * as React from 'react'
 
-import { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, View, Text, Platform } from 'react-native'
 import {
-  loadTensorflowModel,
   useTensorflowModel,
 } from 'react-native-fast-tflite'
 
@@ -11,7 +10,7 @@ export default function App() {
 
   const model = useTensorflowModel(
     require('../assets/object_detection_mobile_object_localizer_v1_1_default_1.tflite'),
-    'core-ml'
+    Platform.OS === 'ios' ? 'core-ml' : 'default'
   )
 
   React.useEffect(() => {

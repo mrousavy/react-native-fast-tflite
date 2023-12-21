@@ -4,17 +4,18 @@
 #include <jsi/jsi.h>
 #include <memory>
 
-// TODO: Uncomment this when tensorflow-lite C/C++ API can be successfully built/linked here
-// #include "TensorflowPlugin.h"
+#include "TensorflowPlugin.h"
 #include <ReactCommon/CallInvoker.h>
 #include <ReactCommon/CallInvokerHolder.h>
 
 namespace mrousavy {
 
+JavaVM *java_machine;
+
 using namespace facebook;
 using namespace facebook::jni;
 
-// Java Insaller
+// Java Installer
 struct TfliteModule : public jni::JavaClass<TfliteModule> {
 public:
   static constexpr auto kJavaDescriptor = "Lcom/tflite/TfliteModule;";
@@ -29,37 +30,44 @@ public:
     }
     auto jsCallInvoker = jsCallInvokerHolder->cthis()->getCallInvoker();
 
-    // TODO: Uncomment this when tensorflow-lite C/C++ API can be successfully built/linked here
-    /*auto fetchByteDataFromUrl = [](std::string url) {
+    auto fetchByteDataFromUrl = [](std::string url) {
+
+      // Attaching Current Thread to JVM 
+      JNIEnv* env = nullptr;
+      int getEnvStat = java_machine->GetEnv((void**)&env, JNI_VERSION_1_6);
+      if (getEnvStat == JNI_EDETACHED) {
+          if (java_machine->AttachCurrentThread(&env, nullptr) != 0) {
+              throw std::runtime_error("Failed to attach thread to JVM");
+          }
+      }
+
       static const auto cls = javaClassStatic();
       static const auto method =
-    cls->getStaticMethod<jbyteArray(std::string)>("fetchByteDataFromUrl");
+        cls->getStaticMethod<jbyteArray(std::string)>("fetchByteDataFromUrl");
 
       auto byteData = method(cls, url);
+      
+      // TODO: to review by someone experienced much more in C++ 
+      // Detaching current thread causes app crash with exception: 
+      // "Unable to retrieve jni environment. is the thread attached?"
+      // anyway, there is still a risk of memory leakage without calling the function below:
+
+      // java_machine->DetachCurrentThread();
+
       auto size = byteData->size();
       auto bytes = byteData->getRegion(0, size);
       void* data = malloc(size);
       memcpy(data, bytes.get(), size);
+        
       return Buffer {
-          .data = data,
-          .size = size
+        .data = data,
+        .size = size
       };
+      
     };
-     */
 
     try {
-      // TODO: Uncomment this when tensorflow-lite C/C++ API can be successfully built/linked here
-      // TensorflowPlugin::installToRuntime(*runtime, jsCallInvoker, fetchByteDataFromUrl);
-
-      // TODO: Remove this when tensorflow-lite C/C++ API can be successfully built/linked here
-      auto func = jsi::Function::createFromHostFunction(
-          *runtime, jsi::PropNameID::forAscii(*runtime, "__loadTensorflowModel"), 1,
-          [=](jsi::Runtime& runtime, const jsi::Value& thisValue, const jsi::Value* arguments,
-              size_t count) -> jsi::Value {
-            throw jsi::JSError(runtime, "react-native-fast-tflite is not yet supported on Android! "
-                                        "I couldn't manage to get TFLite to build for NDK/C++ :/");
-          });
-      runtime->global().setProperty(*runtime, "__loadTensorflowModel", func);
+      TensorflowPlugin::installToRuntime(*runtime, jsCallInvoker, fetchByteDataFromUrl);
     } catch (std::exception& exc) {
       return false;
     }
@@ -77,5 +85,6 @@ public:
 } // namespace mrousavy
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
+  java_machine = vm;
   return facebook::jni::initialize(vm, [] { mrousavy::TfliteModule::registerNatives(); });
 }
