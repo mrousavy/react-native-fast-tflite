@@ -1,5 +1,12 @@
 #!/bin/bash
 
+echo "Did you run ./configure in ./tensorflow/ already?"
+echo "Did you run ./configure in ./tensorflow/ already?"
+echo "Did you run ./configure in ./tensorflow/ already?"
+echo "Did you run ./configure in ./tensorflow/ already?"
+echo "Did you run ./configure in ./tensorflow/ already?"
+echo "Did you run ./configure in ./tensorflow/ already?"
+
 # Assumes the user ran ./configure in tensorflow/ already
 cd tensorflow
 
