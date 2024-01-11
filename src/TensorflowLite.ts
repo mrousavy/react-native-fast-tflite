@@ -32,7 +32,7 @@ console.log('Successfully installed!')
 
 export type TensorflowModelDelegate = 'default' | 'metal' | 'core-ml'
 
-interface Tensor {
+export interface Tensor {
   /**
    * The name of the Tensor.
    */

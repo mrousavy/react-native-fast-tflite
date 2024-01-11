@@ -7,13 +7,28 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native'
-import { useTensorflowModel } from 'react-native-fast-tflite'
+import {
+  Tensor,
+  TensorflowModel,
+  useTensorflowModel,
+} from 'react-native-fast-tflite'
 import {
   Camera,
   useCameraDevice,
   useCameraPermission,
   useFrameProcessor,
 } from 'react-native-vision-camera'
+
+function tensorToString(tensor: Tensor): string {
+  return `\n  - ${tensor.dataType} ${tensor.name}[${tensor.shape}]`
+}
+function modelToString(model: TensorflowModel): string {
+  return (
+    `TFLite Model (${model.delegate}):\n` +
+    `- Inputs: ${model.inputs.map(tensorToString).join('')}\n` +
+    `- Outputs: ${model.outputs.map(tensorToString).join('')}`
+  )
+}
 
 export default function App() {
   const { hasPermission, requestPermission } = useCameraPermission()
@@ -25,15 +40,20 @@ export default function App() {
   )
   const actualModel = model.state === 'loaded' ? model.model : undefined
 
+  React.useEffect(() => {
+    if (actualModel == null) return
+    console.log(`Model loaded! Shape:\n${modelToString(actualModel)}]`)
+  }, [actualModel])
+
   const frameProcessor = useFrameProcessor(
     (frame) => {
       'worklet'
-      console.log(frame.toString())
       if (actualModel == null) {
         // model is still loading...
         return
       }
 
+      console.log(`Running inference on ${frame}`)
       const data = frame.toArrayBuffer()
       const result = actualModel.runSync([data])
       console.log('Result: ' + result.length)
