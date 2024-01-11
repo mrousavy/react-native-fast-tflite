@@ -9,6 +9,9 @@
     "src"
   ],
   "compilerOptions": {
+    "paths": {
+      "react-native-fast-tflite": ["./src/index"]
+    },
     "baseUrl": "./",
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
