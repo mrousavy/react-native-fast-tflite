@@ -65,7 +65,7 @@ export default function App() {
       )}
 
       {model.state === 'error' && (
-        <Text>Failed to load model! {model.error}</Text>
+        <Text>Failed to load model! {model.error.message}</Text>
       )}
     </View>
   )
