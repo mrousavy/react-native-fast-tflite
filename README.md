@@ -81,21 +81,32 @@ In the description on [tfhub.dev](https://tfhub.dev) we can find the description
 
 From that we now know that we need a 192 x 192 input image with 3 bytes per pixel (meaning RGB).
 
+#### Usage (VisionCamera)
 
-If you were to use this model with a [VisionCamera](https://github.com/mrousavy/react-native-vision-camera) Frame Processor, you would need to convert the Frame to this 192 x 192 x 3 byte array.
-For example, here's how you can draw red rectangles around an object seen by the Camera in realtime:
+If you were to use this model with a [VisionCamera](https://github.com/mrousavy/react-native-vision-camera) Frame Processor, you would need to convert the Frame to a 192 x 192 x 3 byte array.
+To do the conversion, use [vision-camera-resize-plugin](https://github.com/mrousavy/vision-camera-resize-plugin):
 
 ```tsx
-const model = useTensorflowModel(require('object_detection.tflite'))
+const objectDetection = useTensorflowModel(require('object_detection.tflite'))
+const model = objectDetection.state === "loaded" ? objectDetection.model : undefined
 
 const frameProcessor = useFrameProcessor((frame) => {
     'worklet'
-    if (model.state !== "loaded") return
+    if (model == null) return
 
-    const data = frame.toArrayBuffer()
-    // do RGB conversion if the Frame is not already in RGB Format
-    const outputs = model.model.runSync([data])
+    // 1. Resize 4k Frame to 192x192x3 using vision-camera-resize-plugin
+    const data = resize(frame, {
+        size: {
+            width: 192,
+            height: 192,
+        },
+        pixelFormat: 'rgb (8-bit)'
+    })
 
+    // 2. Run model with given input buffer synchronously
+    const outputs = model.runSync([data])
+
+    // 3. Interpret outputs accordingly
     const detection_boxes = outputs[0]
     const detection_classes = outputs[1]
     const detection_scores = outputs[2]
@@ -105,7 +116,7 @@ const frameProcessor = useFrameProcessor((frame) => {
     for (let i = 0; i < detection_boxes.length; i += 4) {
         const confidence = detection_scores[i / 4]
         if (confidence > 0.7) {
-            // Draw a red box around the object!
+            // 4. Draw a red box around the detected object!
             const left = detection_boxes[i]
             const top = detection_boxes[i + 1]
             const right = detection_boxes[i + 2]
