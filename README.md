@@ -94,6 +94,8 @@ To do the conversion, use [vision-camera-resize-plugin](https://github.com/mrous
 const objectDetection = useTensorflowModel(require('object_detection.tflite'))
 const model = objectDetection.state === "loaded" ? objectDetection.model : undefined
 
+const { resize } = useResizePlugin()
+
 const frameProcessor = useFrameProcessor((frame) => {
     'worklet'
     if (model == null) return
@@ -104,7 +106,7 @@ const frameProcessor = useFrameProcessor((frame) => {
             width: 192,
             height: 192,
         },
-        pixelFormat: 'rgb (8-bit)'
+        pixelFormat: 'rgb-uint8'
     })
 
     // 2. Run model with given input buffer synchronously
