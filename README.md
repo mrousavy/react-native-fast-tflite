@@ -6,12 +6,14 @@
   </picture>
 </a>
 
+<br />
+
 A high-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library for React Native.
 
 * 🔥 Powered by JSI
 * 💨 Zero-copy ArrayBuffers
 * 🔧 Uses the low-level C/C++ TensorFlow Lite core API for direct memory access
-* 🔄 Supports fast-refresh for swapping out TensorFlow Models at runtime
+* 🔄 Supports swapping out TensorFlow Models at runtime
 * 🖥️ Supports GPU-accelerated delegates (CoreML/Metal/OpenGL)
 * 📸 Easy [VisionCamera](https://github.com/mrousavy/react-native-vision-camera) integration
 
