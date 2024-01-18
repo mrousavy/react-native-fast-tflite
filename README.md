@@ -6,9 +6,7 @@
   </picture>
 </a>
 
-# react-native-fast-tflite
-
-🔥 High-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library for React Native.
+A high-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library for React Native.
 
 * 🔥 Powered by JSI
 * 💨 Zero-copy ArrayBuffers
