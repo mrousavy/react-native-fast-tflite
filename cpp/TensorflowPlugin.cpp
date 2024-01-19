@@ -140,6 +140,7 @@ TensorflowPlugin::TensorflowPlugin(TfLiteInterpreter* interpreter, Buffer model,
   // Allocate memory for the model's input/output `TFLTensor`s.
   TfLiteStatus status = TfLiteInterpreterAllocateTensors(_interpreter);
   if (status != kTfLiteOk) {
+    [[unlikely]];
     throw std::runtime_error("Failed to allocate memory for input/output tensors! Status: " +
                              std::to_string(status));
   }
@@ -174,6 +175,7 @@ void TensorflowPlugin::copyInputBuffers(jsi::Runtime& runtime, jsi::Object input
   auto array = inputValues.asArray(runtime);
   size_t count = array.size(runtime);
   if (count != TfLiteInterpreterGetInputTensorCount(_interpreter)) {
+    [[unlikely]];
     throw std::runtime_error(
         "TFLite: Input Values have different size than there are input tensors!");
   }
@@ -203,6 +205,7 @@ void TensorflowPlugin::run() {
   // Run Model
   TfLiteStatus status = TfLiteInterpreterInvoke(_interpreter);
   if (status != kTfLiteOk) {
+    [[unlikely]];
     throw std::runtime_error("Failed to run TFLite Model! Status: " + std::to_string(status));
   }
 }
@@ -254,6 +257,7 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     for (size_t i = 0; i < size; i++) {
       TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
       if (tensor == nullptr) {
+        [[unlikely]];
         throw jsi::JSError(runtime, "Failed to get input tensor " + std::to_string(i) + "!");
       }
 
@@ -267,6 +271,7 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
     for (size_t i = 0; i < size; i++) {
       const TfLiteTensor* tensor = TfLiteInterpreterGetOutputTensor(_interpreter, i);
       if (tensor == nullptr) {
+        [[unlikely]];
         throw jsi::JSError(runtime, "Failed to get output tensor " + std::to_string(i) + "!");
       }
 
