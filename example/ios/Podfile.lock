@@ -374,7 +374,7 @@ PODS:
   - React-jsinspector (0.72.1)
   - React-logger (0.72.1):
     - glog
-  - react-native-fast-tflite (1.0.0):
+  - react-native-fast-tflite (1.1.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-worklets-core (0.2.4):
@@ -492,7 +492,10 @@ PODS:
     - React-logger (= 0.72.1)
     - React-perflogger (= 0.72.1)
   - SocketRocket (0.6.1)
-  - VisionCamera (3.7.0):
+  - vision-camera-resize-plugin (1.0.2):
+    - RCT-Folly (= 2021.07.22.00)
+    - React-Core
+  - VisionCamera (3.8.2):
     - React
     - React-callinvoker
     - React-Core
@@ -566,6 +569,7 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - vision-camera-resize-plugin (from `../node_modules/vision-camera-resize-plugin`)
   - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -668,6 +672,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  vision-camera-resize-plugin:
+    :path: "../node_modules/vision-camera-resize-plugin"
   VisionCamera:
     :path: "../node_modules/react-native-vision-camera"
   Yoga:
@@ -707,7 +713,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 184eae1ecdedc7a083194bd9ff809c93f08fd34c
   React-jsinspector: d0b5bfd1085599265f4212034321e829bdf83cc0
   React-logger: b8103c9b04e707b50cdd2b1aeb382483900cbb37
-  react-native-fast-tflite: 823498aab954834f709ddcaff82bc0e542fd08e3
+  react-native-fast-tflite: d143a19d41cf969cc30de7fab281738a2fd256e9
   react-native-worklets-core: b4094f51cb2bc649e297206425cb8956f4945e3e
   React-NativeModulesApple: 4f31a812364443cee6ef768d256c594ad3b20f53
   React-perflogger: 3d501f34c8d4b10cb75f348e43591765788525ad
@@ -727,7 +733,8 @@ SPEC CHECKSUMS:
   React-utils: 0a70ea97d4e2749f336b450c082905be1d389435
   ReactCommon: e593d19c9e271a6da4d0bd7f13b28cfeae5d164b
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  VisionCamera: 45f8d46c0657ceac3f58eb1a3116fe9afa8f4277
+  vision-camera-resize-plugin: bb83ad86c5c9e8fd865052c7203fa1b6634a2e84
+  VisionCamera: edbcd00e27a438b2228f67823e2b8d15a189065f
   Yoga: 65286bb6a07edce5e4fe8c90774da977ae8fc009
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 

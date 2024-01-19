@@ -13,6 +13,7 @@ import {
   useCameraPermission,
   useFrameProcessor,
 } from 'react-native-vision-camera'
+import { useResizePlugin } from 'vision-camera-resize-plugin'
 
 function tensorToString(tensor: Tensor): string {
   return `\n  - ${tensor.dataType} ${tensor.name}[${tensor.shape}]`
@@ -29,13 +30,17 @@ export default function App(): React.ReactNode {
   const { hasPermission, requestPermission } = useCameraPermission()
   const device = useCameraDevice('back')
 
-  const model = useTensorflowModel(require('../assets/object_detector.tflite'))
+  const model = useTensorflowModel(
+    require('../assets/pmx_card_detector.tflite')
+  )
   const actualModel = model.state === 'loaded' ? model.model : undefined
 
   React.useEffect(() => {
     if (actualModel == null) return
     console.log(`Model loaded! Shape:\n${modelToString(actualModel)}]`)
   }, [actualModel])
+
+  const { resize } = useResizePlugin()
 
   const frameProcessor = useFrameProcessor(
     (frame) => {
@@ -46,8 +51,14 @@ export default function App(): React.ReactNode {
       }
 
       console.log(`Running inference on ${frame}`)
-      const data = frame.toArrayBuffer()
-      const result = actualModel.runSync([data])
+      const resized = resize(frame, {
+        size: {
+          width: 640,
+          height: 640,
+        },
+        pixelFormat: 'rgb-uint8',
+      })
+      const result = actualModel.runSync([resized])
       console.log('Result: ' + result.length)
     },
     [actualModel]
