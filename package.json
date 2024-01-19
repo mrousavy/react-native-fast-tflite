@@ -116,6 +116,9 @@
       "@react-native-community",
       "prettier"
     ],
+    "parserOptions": {
+      "requireConfigFile": false
+    },
     "rules": {
       "prettier/prettier": [
         "error",
