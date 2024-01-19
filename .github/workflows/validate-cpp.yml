@@ -25,7 +25,10 @@ jobs:
         path:
           - 'cpp'
           - 'android/src/main/cpp'
+          - 'android/src/main/cpp/lib'
           - 'ios'
+          - '!ios/TensorFlowLiteC.framework'
+          - '!ios/TensorFlowLiteCCoreML.framework'
     steps:
       - uses: actions/checkout@v2
       - name: Run clang-format style check
