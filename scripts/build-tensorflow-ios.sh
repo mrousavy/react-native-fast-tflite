@@ -1,14 +1,7 @@
 #!/bin/bash
 
-echo "Did you run ./configure in ./tensorflow/ already?"
-echo "Did you run ./configure in ./tensorflow/ already?"
-echo "Did you run ./configure in ./tensorflow/ already?"
-echo "Did you run ./configure in ./tensorflow/ already?"
-echo "Did you run ./configure in ./tensorflow/ already?"
-echo "Did you run ./configure in ./tensorflow/ already?"
-
-# Assumes the user ran ./configure in tensorflow/ already
 cd tensorflow
+./configure
 
 bazel build --config=ios_fat -c opt --cxxopt=--std=c++17 //tensorflow/lite/ios:TensorFlowLiteC_framework
 bazel build --config=ios_fat -c opt --cxxopt=--std=c++17 //tensorflow/lite/ios:TensorFlowLiteCCoreML_framework
