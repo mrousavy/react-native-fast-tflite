@@ -142,7 +142,7 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
   }
 
   // count of bytes, may be larger than count of numbers (e.g. for float32)
-  size_t size = getTensorTotalLength(tensor) * getTFLTensorDataTypeSize(dataType);
+  int size = getTensorTotalLength(tensor) * getTFLTensorDataTypeSize(dataType);
 
   switch (dataType) {
     case kTfLiteFloat32:
@@ -194,12 +194,17 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
 void TensorHelpers::updateTensorFromJSBuffer(jsi::Runtime& runtime, TfLiteTensor* tensor,
                                              TypedArrayBase& jsBuffer) {
   auto name = std::string(TfLiteTensorName(tensor));
-  void* data = TfLiteTensorData(tensor);
-  if (data == nullptr) {
-    throw std::runtime_error("Failed to get data from tensor \"" + name + "\"!");
-  }
-
   auto buffer = jsBuffer.getBuffer(runtime);
+  
+#if DEBUG
+  int inputBufferSize = buffer.size(runtime);
+  int tensorSize = getTensorTotalLength(tensor) * getTFLTensorDataTypeSize(tensor->type);
+  if (tensorSize != inputBufferSize) {
+    throw std::runtime_error("Input Buffer size (" + std::to_string(inputBufferSize) + ") does not "
+                             "match the Input Tensor's expected size (" + std::to_string(tensorSize) + ")! "
+                             "Make sure to resize the input values accordingly.");
+  }
+#endif
 
   TfLiteTensorCopyFromBuffer(tensor, buffer.data(runtime) + jsBuffer.byteOffset(runtime),
                              buffer.size(runtime));
