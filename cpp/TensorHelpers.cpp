@@ -85,6 +85,7 @@ size_t TensorHelpers::getTFLTensorDataTypeSize(TfLiteType dataType) {
     case kTfLiteUInt16:
       return sizeof(uint16_t);
     default:
+      [[unlikely]];
       throw std::runtime_error("Unsupported output data type! " + dataTypeToString(dataType));
   }
 }
@@ -125,8 +126,8 @@ TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime,
       return TypedArray<TypedArrayKind::Uint16Array>(runtime, size);
     case kTfLiteUInt32:
       return TypedArray<TypedArrayKind::Uint32Array>(runtime, size);
-
     default:
+      [[unlikely]];
       throw std::runtime_error("Unsupported tensor data type! " + dataTypeToString(dataType));
   }
 }
@@ -138,6 +139,7 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
 
   void* data = TfLiteTensorData(tensor);
   if (data == nullptr) {
+    [[unlikely]];
     throw std::runtime_error("Failed to get data from tensor \"" + name + "\"!");
   }
 
@@ -185,8 +187,8 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
           .as<TypedArrayKind::Uint32Array>(runtime)
           .updateUnsafe(runtime, (uint32_t*)data, size);
       break;
-
     default:
+      [[unlikely]];
       throw jsi::JSError(runtime, "Unsupported output data type! " + dataTypeToString(dataType));
   }
 }
@@ -195,11 +197,12 @@ void TensorHelpers::updateTensorFromJSBuffer(jsi::Runtime& runtime, TfLiteTensor
                                              TypedArrayBase& jsBuffer) {
   auto name = std::string(TfLiteTensorName(tensor));
   auto buffer = jsBuffer.getBuffer(runtime);
-  
+
 #if DEBUG
   int inputBufferSize = buffer.size(runtime);
   int tensorSize = getTensorTotalLength(tensor) * getTFLTensorDataTypeSize(tensor->type);
   if (tensorSize != inputBufferSize) {
+    [[unlikely]];
     throw std::runtime_error("Input Buffer size (" + std::to_string(inputBufferSize) + ") does not "
                              "match the Input Tensor's expected size (" + std::to_string(tensorSize) + ")! "
                              "Make sure to resize the input values accordingly.");
