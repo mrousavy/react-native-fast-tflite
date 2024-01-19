@@ -68,7 +68,7 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
                 try {
                   // Fetch model from URL (JS bundle)
                   Buffer buffer = fetchURL(modelPath);
-                  
+
                   // Load Model into Tensorflow
                   auto model = TfLiteModelCreate(buffer.data, buffer.size);
                   if (model == nullptr) {
@@ -77,10 +77,10 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
                     });
                     return;
                   }
-                  
+
                   // Create TensorFlow Interpreter
                   auto options = TfLiteInterpreterOptionsCreate();
-                  
+
                   switch (delegateType) {
                     case Delegate::CoreML: {
 #if FAST_TFLITE_ENABLE_CORE_ML
@@ -104,9 +104,9 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
                       // use default CPU delegate.
                     }
                   }
-                  
+
                   auto interpreter = TfLiteInterpreterCreate(model, options);
-                  
+
                   if (interpreter == nullptr) {
                     callInvoker->invokeAsync([=]() {
                       promise->reject("Failed to create TFLite interpreter from model \"" +
@@ -114,16 +114,16 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
                     });
                     return;
                   }
-                  
+
                   // Initialize Model and allocate memory buffers
                   auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegateType,
                                                                    callInvoker);
-                  
+
                   callInvoker->invokeAsync([=, &runtime]() {
                     auto result = jsi::Object::createFromHostObject(runtime, plugin);
                     promise->resolve(std::move(result));
                   });
-                  
+
                   auto end = std::chrono::steady_clock::now();
                   log("Successfully loaded Tensorflow Model in %i ms!",
                       std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
@@ -276,7 +276,7 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
                       auto result = this->copyOutputBuffers(runtime);
                       promise->resolve(std::move(result));
                     });
-                  } catch (std::runtime_error error) {
+                  } catch (std::exception& error) {
                     promise->reject(error.what());
                   }
                 });
