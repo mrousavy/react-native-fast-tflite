@@ -71,8 +71,8 @@ jobs:
         run: "set -o pipefail && xcodebuild \
           CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
           -derivedDataPath build -UseModernBuildSystem=YES \
-          -workspace VisionCameraExample.xcworkspace \
-          -scheme VisionCameraExample \
+          -workspace TfliteExample.xcworkspace \
+          -scheme TfliteExample \
           -sdk iphonesimulator \
           -configuration Debug \
           -destination 'platform=iOS Simulator,name=iPhone 11 Pro' \
