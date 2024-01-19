@@ -25,12 +25,13 @@ jobs:
         path:
           - 'cpp'
           - 'android/src/main/cpp'
-          - 'android/src/main/cpp/lib'
           - 'ios'
-          - '!ios/TensorFlowLiteC.framework'
-          - '!ios/TensorFlowLiteCCoreML.framework'
     steps:
       - uses: actions/checkout@v2
+      - name: Remove lib folders before linting
+        run: |
+          rm -rf ios/*.framework
+          rm -rf android/src/main/cpp/lib
       - name: Run clang-format style check
         uses: jidicula/clang-format-action@v4.11.0
         with:
