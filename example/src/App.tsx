@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import * as React from 'react'
 
-import {
-  StyleSheet,
-  View,
-  Text,
-  Platform,
-  ActivityIndicator,
-} from 'react-native'
+import { StyleSheet, View, Text, ActivityIndicator } from 'react-native'
 import {
   Tensor,
   TensorflowModel,
@@ -94,10 +88,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
   },
 })
