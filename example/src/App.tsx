@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import * as React from 'react'
 
 import {
@@ -30,14 +31,11 @@ function modelToString(model: TensorflowModel): string {
   )
 }
 
-export default function App() {
+export default function App(): React.ReactNode {
   const { hasPermission, requestPermission } = useCameraPermission()
   const device = useCameraDevice('back')
 
-  const model = useTensorflowModel(
-    require('../assets/object_detection_mobile_object_localizer_v1_1_default_1.tflite'),
-    Platform.OS === 'ios' ? 'core-ml' : 'default'
-  )
+  const model = useTensorflowModel(require('../assets/object_detector.tflite'))
   const actualModel = model.state === 'loaded' ? model.model : undefined
 
   React.useEffect(() => {
