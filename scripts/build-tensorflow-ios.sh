@@ -7,7 +7,7 @@ echo "Did you run ./configure in ./tensorflow/ already?"
 echo "Did you run ./configure in ./tensorflow/ already?"
 echo "Did you run ./configure in ./tensorflow/ already?"
 
-read -p "Did you run ./configure in /tensorflow/ already? " -n 1 -r
+read -p "Did you run ./configure in /tensorflow/ already? [yN]: " -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
   # Assumes the user ran ./configure in tensorflow/ already
@@ -18,7 +18,6 @@ then
 
   cd ..
 
-  rm -rf ios/*.framework
   cp -f -r tensorflow/bazel-bin/tensorflow/lite/ios/ ios/
 
   unzip -o ios/TensorFlowLiteC_framework.zip -d ios
