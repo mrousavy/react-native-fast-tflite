@@ -161,6 +161,8 @@ std::string tfLiteStatusToString(TfLiteStatus status) {
       return "unresolved-ops";
     case kTfLiteCancelled:
       return "cancelled";
+    default:
+      return "unknown";
   }
 }
 
