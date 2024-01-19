@@ -17,6 +17,7 @@ declare global {
    * Loads the Model into memory. Path is fetchable resource, e.g.:
    * http://192.168.8.110:8081/assets/assets/model.tflite?platform=ios&hash=32e9958c83e5db7d0d693633a9f0b175
    */
+  // eslint-disable-next-line no-var
   var __loadTensorflowModel: (
     path: string,
     delegate: TensorflowModelDelegate
@@ -25,9 +26,9 @@ declare global {
 // Installs the JSI bindings into the global namespace.
 console.log('Installing bindings...')
 const result = TensorflowModule.install() as boolean
-if (result !== true) {
-  console.error(`Failed to install Tensorflow Lite bindings!`)
-}
+if (result !== true)
+  console.error('Failed to install Tensorflow Lite bindings!')
+
 console.log('Successfully installed!')
 
 export type TensorflowModelDelegate = 'default' | 'metal' | 'core-ml'

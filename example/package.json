@@ -6,7 +6,8 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "pods": "cd ios && bundle exec pod install"
+    "pods": "cd ios && bundle exec pod install",
+    "lint": "eslint \"**/*.{js,ts,tsx}\" --fix"
   },
   "dependencies": {
     "react": "18.2.0",
