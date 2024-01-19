@@ -65,73 +65,103 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
             Promise::createPromise(runtime, [=, &runtime](std::shared_ptr<Promise> promise) {
               // Launch async thread
               std::async(std::launch::async, [=, &runtime]() {
-                // Fetch model from URL (JS bundle)
-                Buffer buffer = fetchURL(modelPath);
-
-                // Load Model into Tensorflow
-                auto model = TfLiteModelCreate(buffer.data, buffer.size);
-                if (model == nullptr) {
-                  callInvoker->invokeAsync([=]() {
-                    promise->reject("Failed to load model from \"" + modelPath + "\"!");
-                  });
-                  return;
-                }
-
-                // Create TensorFlow Interpreter
-                auto options = TfLiteInterpreterOptionsCreate();
-
-                switch (delegateType) {
-                  case Delegate::CoreML: {
-#if FAST_TFLITE_ENABLE_CORE_ML
-                    TfLiteCoreMlDelegateOptions delegateOptions;
-                    auto delegate = TfLiteCoreMlDelegateCreate(&delegateOptions);
-                    TfLiteInterpreterOptionsAddDelegate(options, delegate);
-                    break;
-#else
-            callInvoker->invokeAsync([=]() {
-              promise->reject("CoreML Delegate is not enabled! Set $EnableCoreMLDelegate to true in Podfile and rebuild.");
-            });
-            return;
-#endif
-                  }
-                  case Delegate::Metal: {
-                    callInvoker->invokeAsync(
-                        [=]() { promise->reject("Metal Delegate is not supported!"); });
+                try {
+                  // Fetch model from URL (JS bundle)
+                  Buffer buffer = fetchURL(modelPath);
+                  
+                  // Load Model into Tensorflow
+                  auto model = TfLiteModelCreate(buffer.data, buffer.size);
+                  if (model == nullptr) {
+                    callInvoker->invokeAsync([=]() {
+                      promise->reject("Failed to load model from \"" + modelPath + "\"!");
+                    });
                     return;
                   }
-                  default: {
-                    // use default CPU delegate.
+                  
+                  // Create TensorFlow Interpreter
+                  auto options = TfLiteInterpreterOptionsCreate();
+                  
+                  switch (delegateType) {
+                    case Delegate::CoreML: {
+#if FAST_TFLITE_ENABLE_CORE_ML
+                      TfLiteCoreMlDelegateOptions delegateOptions;
+                      auto delegate = TfLiteCoreMlDelegateCreate(&delegateOptions);
+                      TfLiteInterpreterOptionsAddDelegate(options, delegate);
+                      break;
+#else
+                      callInvoker->invokeAsync([=]() {
+                        promise->reject("CoreML Delegate is not enabled! Set $EnableCoreMLDelegate to true in Podfile and rebuild.");
+                      });
+                      return;
+#endif
+                    }
+                    case Delegate::Metal: {
+                      callInvoker->invokeAsync(
+                                               [=]() { promise->reject("Metal Delegate is not supported!"); });
+                      return;
+                    }
+                    default: {
+                      // use default CPU delegate.
+                    }
                   }
-                }
-
-                auto interpreter = TfLiteInterpreterCreate(model, options);
-
-                if (interpreter == nullptr) {
-                  callInvoker->invokeAsync([=]() {
-                    promise->reject("Failed to create TFLite interpreter from model \"" +
-                                    modelPath + "\"!");
+                  
+                  auto interpreter = TfLiteInterpreterCreate(model, options);
+                  
+                  if (interpreter == nullptr) {
+                    callInvoker->invokeAsync([=]() {
+                      promise->reject("Failed to create TFLite interpreter from model \"" +
+                                      modelPath + "\"!");
+                    });
+                    return;
+                  }
+                  
+                  // Initialize Model and allocate memory buffers
+                  auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegateType,
+                                                                   callInvoker);
+                  
+                  callInvoker->invokeAsync([=, &runtime]() {
+                    auto result = jsi::Object::createFromHostObject(runtime, plugin);
+                    promise->resolve(std::move(result));
                   });
-                  return;
+                  
+                  auto end = std::chrono::steady_clock::now();
+                  log("Successfully loaded Tensorflow Model in %i ms!",
+                      std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+                } catch (std::exception& error) {
+                  std::string message = error.what();
+                  callInvoker->invokeAsync([=]() {
+                    promise->reject(message);
+                  });
                 }
-
-                // Initialize Model and allocate memory buffers
-                auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegateType,
-                                                                 callInvoker);
-
-                callInvoker->invokeAsync([=, &runtime]() {
-                  auto result = jsi::Object::createFromHostObject(runtime, plugin);
-                  promise->resolve(std::move(result));
-                });
-
-                auto end = std::chrono::steady_clock::now();
-                log("Successfully loaded Tensorflow Model in %i ms!",
-                    std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
               });
             });
         return promise;
       });
 
   runtime.global().setProperty(runtime, "__loadTensorflowModel", func);
+}
+
+std::string tfLiteStatusToString(TfLiteStatus status) {
+  switch (status) {
+    case kTfLiteOk:
+      return "ok";
+    case kTfLiteError:
+      return "error";
+    case kTfLiteDelegateError:
+      return "delegate-error";
+    case kTfLiteApplicationError:
+      return "application-error";
+    case kTfLiteDelegateDataNotFound:
+      return "delegate-data-not-found";
+    case kTfLiteDelegateDataWriteError:
+      return "delegate-data-write-error";
+    case kTfLiteDelegateDataReadError:
+      return "delegate-data-read-error";
+    case kTfLiteUnresolvedOps:
+      return "unresolved-ops";
+    case kTfLiteCancelled:
+      return "cancelled";
+  }
 }
 
 TensorflowPlugin::TensorflowPlugin(TfLiteInterpreter* interpreter, Buffer model, Delegate delegate,
@@ -142,7 +172,7 @@ TensorflowPlugin::TensorflowPlugin(TfLiteInterpreter* interpreter, Buffer model,
   if (status != kTfLiteOk) {
     [[unlikely]];
     throw std::runtime_error("Failed to allocate memory for input/output tensors! Status: " +
-                             std::to_string(status));
+                             tfLiteStatusToString(status));
   }
 
   log("Successfully created Tensorflow Plugin!");
@@ -206,7 +236,7 @@ void TensorflowPlugin::run() {
   TfLiteStatus status = TfLiteInterpreterInvoke(_interpreter);
   if (status != kTfLiteOk) {
     [[unlikely]];
-    throw std::runtime_error("Failed to run TFLite Model! Status: " + std::to_string(status));
+    throw std::runtime_error("Failed to run TFLite Model! Status: " + tfLiteStatusToString(status));
   }
 }
 
