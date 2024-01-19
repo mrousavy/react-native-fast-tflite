@@ -20,6 +20,8 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_CORE_C_C_API_EXPERIMENTAL_H_
 #define TENSORFLOW_LITE_CORE_C_C_API_EXPERIMENTAL_H_
 
+#include <stdint.h>
+
 #include "builtin_ops.h"
 #include "c_api_types.h"
 #include "c_api.h"
