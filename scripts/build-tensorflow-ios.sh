@@ -18,6 +18,7 @@ then
 
   cd ..
 
+  rm -rf ios/*.framework
   cp -f -r tensorflow/bazel-bin/tensorflow/lite/ios/ ios/
 
   unzip -o ios/TensorFlowLiteC_framework.zip -d ios
