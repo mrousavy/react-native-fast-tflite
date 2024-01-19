@@ -10,7 +10,7 @@
 
 namespace mrousavy {
 
-JavaVM *java_machine;
+JavaVM* java_machine;
 
 using namespace facebook;
 using namespace facebook::jni;
@@ -31,24 +31,23 @@ public:
     auto jsCallInvoker = jsCallInvokerHolder->cthis()->getCallInvoker();
 
     auto fetchByteDataFromUrl = [](std::string url) {
-
-      // Attaching Current Thread to JVM 
+      // Attaching Current Thread to JVM
       JNIEnv* env = nullptr;
       int getEnvStat = java_machine->GetEnv((void**)&env, JNI_VERSION_1_6);
       if (getEnvStat == JNI_EDETACHED) {
-          if (java_machine->AttachCurrentThread(&env, nullptr) != 0) {
-              throw std::runtime_error("Failed to attach thread to JVM");
-          }
+        if (java_machine->AttachCurrentThread(&env, nullptr) != 0) {
+          throw std::runtime_error("Failed to attach thread to JVM");
+        }
       }
 
       static const auto cls = javaClassStatic();
       static const auto method =
-        cls->getStaticMethod<jbyteArray(std::string)>("fetchByteDataFromUrl");
+          cls->getStaticMethod<jbyteArray(std::string)>("fetchByteDataFromUrl");
 
       auto byteData = method(cls, url);
-      
-      // TODO: to review by someone experienced much more in C++ 
-      // Detaching current thread causes app crash with exception: 
+
+      // TODO: to review by someone experienced much more in C++
+      // Detaching current thread causes app crash with exception:
       // "Unable to retrieve jni environment. is the thread attached?"
       // anyway, there is still a risk of memory leakage without calling the function below:
 
@@ -58,12 +57,8 @@ public:
       auto bytes = byteData->getRegion(0, size);
       void* data = malloc(size);
       memcpy(data, bytes.get(), size);
-        
-      return Buffer {
-        .data = data,
-        .size = size
-      };
-      
+
+      return Buffer{.data = data, .size = size};
     };
 
     try {
