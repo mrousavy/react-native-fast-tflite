@@ -59,6 +59,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "@jamesacarr/eslint-formatter-github-actions": "^0.2.0",
     "@react-native-community/eslint-config": "^3.0.2",
     "@release-it/conventional-changelog": "^8.0.1",
     "@types/jest": "^29.5.11",
@@ -68,7 +69,6 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "jest": "^29.7.0",
-    "pod-install": "^0.1.39",
     "prettier": "^3.1.1",
     "react": "18.2.0",
     "react-native": "0.73.2",
@@ -110,29 +110,6 @@
       }
     }
   },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@react-native-community",
-      "prettier"
-    ],
-    "rules": {
-      "prettier/prettier": [
-        "error",
-        {
-          "quoteProps": "consistent",
-          "singleQuote": true,
-          "tabWidth": 2,
-          "trailingComma": "es5",
-          "useTabs": false
-        }
-      ]
-    }
-  },
-  "eslintIgnore": [
-    "node_modules/",
-    "lib/"
-  ],
   "prettier": {
     "quoteProps": "consistent",
     "semi": false,

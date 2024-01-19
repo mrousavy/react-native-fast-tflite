@@ -203,9 +203,10 @@ void TensorHelpers::updateTensorFromJSBuffer(jsi::Runtime& runtime, TfLiteTensor
   int tensorSize = getTensorTotalLength(tensor) * getTFLTensorDataTypeSize(tensor->type);
   if (tensorSize != inputBufferSize) {
     [[unlikely]];
-    throw std::runtime_error("Input Buffer size (" + std::to_string(inputBufferSize) + ") does not "
-                             "match the Input Tensor's expected size (" + std::to_string(tensorSize) + ")! "
-                             "Make sure to resize the input values accordingly.");
+    throw std::runtime_error("Input Buffer size (" + std::to_string(inputBufferSize) +
+                             ") does not match the Input Tensor's expected size (" +
+                             std::to_string(tensorSize) +
+                             ")! Make sure to resize the input values accordingly.");
   }
 #endif
 
