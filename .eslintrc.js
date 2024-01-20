@@ -10,7 +10,14 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
-  ignorePatterns: ['scripts', 'lib', 'docs', 'example', 'tensorflow'],
+  ignorePatterns: [
+    'scripts',
+    'lib',
+    'docs',
+    'example',
+    'tensorflow',
+    'app.plugin.js',
+  ],
   plugins: ['@typescript-eslint'],
   extends: ['plugin:@typescript-eslint/recommended', '@react-native-community'],
   rules: {
