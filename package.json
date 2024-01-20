@@ -17,7 +17,8 @@
     "ios",
     "!ios/build",
     "cpp",
-    "*.podspec"
+    "*.podspec",
+    "app.plugin.js"
   ],
   "scripts": {
     "test": "jest",
