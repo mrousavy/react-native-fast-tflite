@@ -30,9 +30,7 @@ export default function App(): React.ReactNode {
   const { hasPermission, requestPermission } = useCameraPermission()
   const device = useCameraDevice('back')
 
-  const model = useTensorflowModel(
-    require('../assets/pmx_card_detector.tflite')
-  )
+  const model = useTensorflowModel(require('../assets/object_detector.tflite'))
   const actualModel = model.state === 'loaded' ? model.model : undefined
 
   React.useEffect(() => {
