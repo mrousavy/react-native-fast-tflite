@@ -97,7 +97,7 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
                     }
                     case Delegate::Metal: {
                       callInvoker->invokeAsync(
-                                               [=]() { promise->reject("Metal Delegate is not supported!"); });
+                          [=]() { promise->reject("Metal Delegate is not supported!"); });
                       return;
                     }
                     default: {
@@ -116,8 +116,8 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
                   }
 
                   // Initialize Model and allocate memory buffers
-                  auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer, delegateType,
-                                                                   callInvoker);
+                  auto plugin = std::make_shared<TensorflowPlugin>(interpreter, buffer,
+                                                                   delegateType, callInvoker);
 
                   callInvoker->invokeAsync([=, &runtime]() {
                     auto result = jsi::Object::createFromHostObject(runtime, plugin);
@@ -129,9 +129,7 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
                       std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
                 } catch (std::exception& error) {
                   std::string message = error.what();
-                  callInvoker->invokeAsync([=]() {
-                    promise->reject(message);
-                  });
+                  callInvoker->invokeAsync([=]() { promise->reject(message); });
                 }
               });
             });

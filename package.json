@@ -21,12 +21,14 @@
     "app.plugin.js"
   ],
   "scripts": {
+    "typescript": "tsc --noEmit",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "lint-cpp": "scripts/clang-format.sh",
     "prepare": "git submodule update --init --recursive",
     "update-submodule": "git submodule update --remote --merge",
+    "check-all": "scripts/check-all.sh",
     "prepack": "bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
