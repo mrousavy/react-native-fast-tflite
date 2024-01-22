@@ -144,7 +144,29 @@ GPU Delegates offer faster, GPU accelerated computation. There's multiple differ
 
 #### CoreML (iOS)
 
-To enable the CoreML Delegate, you need to include the CoreML/Metal code in your project:
+To enable the CoreML Delegate, you must configure react-native-fast-tflite to include it in the build.
+
+##### Expo
+
+For Expo, just use the config plugin in your expo config (`app.json`, `app.config.json` or `app.config.js`):
+
+```json
+{
+  "name": "my app",
+  "plugins": [
+    [
+      "react-native-fast-tflite",
+      {
+        "enableCoreMLDelegate": true
+      }
+    ]
+  ]
+}
+```
+
+##### Bare React Native
+
+If you are on bare React Native, you need to include the CoreML/Metal code in your project:
 
 1. Set `$EnableCoreMLDelegate` to true in your `Podfile`:
     ```ruby
