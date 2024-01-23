@@ -8,6 +8,7 @@ echo "Did you run ./configure in ./tensorflow/ already?"
 echo "Did you run ./configure in ./tensorflow/ already?"
 
 read -p "Did you run ./configure in /tensorflow/ already? [yN]: " -n 1 -r
+echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
   # Assumes the user ran ./configure in tensorflow/ already
