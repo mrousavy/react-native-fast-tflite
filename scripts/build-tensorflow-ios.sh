@@ -13,8 +13,8 @@ then
   # Assumes the user ran ./configure in tensorflow/ already
   cd tensorflow
 
-  bazel build --config=ios_fat -c opt --cxxopt=--std=c++17 //tensorflow/lite/ios:TensorFlowLiteC_framework
-  bazel build --config=ios_fat -c opt --cxxopt=--std=c++17 //tensorflow/lite/ios:TensorFlowLiteCCoreML_framework
+  bazel build --config=ios_fat --ios_multi_cpus=x86_64,arm64 -c opt --cxxopt=--std=c++17 //tensorflow/lite/ios:TensorFlowLiteC_framework
+  bazel build --config=ios_fat --ios_multi_cpus=x86_64,arm64 -c opt --cxxopt=--std=c++17 //tensorflow/lite/ios:TensorFlowLiteCCoreML_framework
 
   cd ..
 
