@@ -30,7 +30,8 @@ export default function App(): React.ReactNode {
   const { hasPermission, requestPermission } = useCameraPermission()
   const device = useCameraDevice('back')
 
-  const model = useTensorflowModel(require('../assets/object_detector.tflite'))
+  // from https://www.kaggle.com/models/tensorflow/efficientdet/frameworks/tfLite
+  const model = useTensorflowModel(require('../assets/efficientdet.tflite'))
   const actualModel = model.state === 'loaded' ? model.model : undefined
 
   React.useEffect(() => {
@@ -51,14 +52,15 @@ export default function App(): React.ReactNode {
       console.log(`Running inference on ${frame}`)
       const resized = resize(frame, {
         size: {
-          width: 640,
-          height: 640,
+          width: 320,
+          height: 320,
         },
         pixelFormat: 'rgb-uint8',
       })
       const typedArray = new Uint8Array(resized)
       const result = actualModel.runSync([typedArray])
-      console.log('Result: ' + result.length)
+      const num_detections = result[3]?.[0] ?? 0
+      console.log('Result: ' + num_detections)
     },
     [actualModel]
   )
