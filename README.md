@@ -110,7 +110,8 @@ const frameProcessor = useFrameProcessor((frame) => {
     })
 
     // 2. Run model with given input buffer synchronously
-    const outputs = model.runSync([data])
+    const input = new Uint8Array(data)
+    const outputs = model.runSync([input])
 
     // 3. Interpret outputs accordingly
     const detection_boxes = outputs[0]
@@ -128,7 +129,7 @@ const frameProcessor = useFrameProcessor((frame) => {
             const right = detection_boxes[i + 2]
             const bottom = detection_boxes[i + 3]
             const rect = SkRect.Make(left, top, right, bottom)
-            frame.drawRect(rect, SkColors.Red)
+            canvas.drawRect(rect, SkColors.Red)
         }
     }
 }, [model])
