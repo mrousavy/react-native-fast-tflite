@@ -171,8 +171,9 @@ TensorflowPlugin::TensorflowPlugin(TfLiteInterpreter* interpreter, Buffer model,
   TfLiteStatus status = TfLiteInterpreterAllocateTensors(_interpreter);
   if (status != kTfLiteOk) {
     [[unlikely]];
-    throw std::runtime_error("Failed to allocate memory for input/output tensors! Status: " +
-                             tfLiteStatusToString(status));
+    throw std::runtime_error(
+        "TFLite: Failed to allocate memory for input/output tensors! Status: " +
+        tfLiteStatusToString(status));
   }
 
   log("Successfully created Tensorflow Plugin!");
@@ -205,8 +206,8 @@ void TensorflowPlugin::copyInputBuffers(jsi::Runtime& runtime, jsi::Object input
 #if DEBUG
   if (!inputValues.isArray(runtime)) {
     [[unlikely]];
-    throw std::runtime_error(
-        "TFLite: Input Values must be an array, one item for each input tensor!");
+    throw jsi::JSError(runtime,
+                       "TFLite: Input Values must be an array, one item for each input tensor!");
   }
 #endif
 
@@ -214,14 +215,24 @@ void TensorflowPlugin::copyInputBuffers(jsi::Runtime& runtime, jsi::Object input
   size_t count = array.size(runtime);
   if (count != TfLiteInterpreterGetInputTensorCount(_interpreter)) {
     [[unlikely]];
-    throw std::runtime_error(
-        "TFLite: Input Values have different size than there are input tensors!");
+    throw jsi::JSError(runtime,
+                       "TFLite: Input Values have different size than there are input tensors!");
   }
 
   for (size_t i = 0; i < count; i++) {
     TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
-    jsi::Value value = array.getValueAtIndex(runtime, i);
-    TypedArrayBase inputBuffer = getTypedArray(runtime, value.asObject(runtime));
+    jsi::Object object = array.getValueAtIndex(runtime, i).asObject(runtime);
+
+#if DEBUG
+    if (!isTypedArray(runtime, object)) {
+      [[unlikely]];
+      throw jsi::JSError(
+          runtime,
+          "TFLite: Input value is not a TypedArray! (Uint8Array, Uint16Array, Float32Array, etc.)");
+    }
+#endif
+
+    TypedArrayBase inputBuffer = getTypedArray(runtime, std::move(object));
     TensorHelpers::updateTensorFromJSBuffer(runtime, tensor, inputBuffer);
   }
 }
@@ -244,7 +255,8 @@ void TensorflowPlugin::run() {
   TfLiteStatus status = TfLiteInterpreterInvoke(_interpreter);
   if (status != kTfLiteOk) {
     [[unlikely]];
-    throw std::runtime_error("Failed to run TFLite Model! Status: " + tfLiteStatusToString(status));
+    throw std::runtime_error("TFLite: Failed to run TFLite Model! Status: " +
+                             tfLiteStatusToString(status));
   }
 }
 
@@ -296,7 +308,8 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
       TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
       if (tensor == nullptr) {
         [[unlikely]];
-        throw jsi::JSError(runtime, "Failed to get input tensor " + std::to_string(i) + "!");
+        throw jsi::JSError(runtime,
+                           "TFLite: Failed to get input tensor " + std::to_string(i) + "!");
       }
 
       jsi::Object object = TensorHelpers::tensorToJSObject(runtime, tensor);
@@ -310,7 +323,8 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
       const TfLiteTensor* tensor = TfLiteInterpreterGetOutputTensor(_interpreter, i);
       if (tensor == nullptr) {
         [[unlikely]];
-        throw jsi::JSError(runtime, "Failed to get output tensor " + std::to_string(i) + "!");
+        throw jsi::JSError(runtime,
+                           "TFLite: Failed to get output tensor " + std::to_string(i) + "!");
       }
 
       jsi::Object object = TensorHelpers::tensorToJSObject(runtime, tensor);

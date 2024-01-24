@@ -110,7 +110,8 @@ size_t TensorHelpers::getTFLTensorDataTypeSize(TfLiteType dataType) {
       return sizeof(uint16_t);
     default:
       [[unlikely]];
-      throw std::runtime_error("Unsupported output data type! " + dataTypeToString(dataType));
+      throw std::runtime_error("TFLite: Unsupported output data type! " +
+                               dataTypeToString(dataType));
   }
 }
 
@@ -152,7 +153,8 @@ TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime,
       return TypedArray<TypedArrayKind::Uint32Array>(runtime, size);
     default:
       [[unlikely]];
-      throw std::runtime_error("Unsupported tensor data type! " + dataTypeToString(dataType));
+      throw std::runtime_error("TFLite: Unsupported tensor data type! " +
+                               dataTypeToString(dataType));
   }
 }
 
@@ -164,7 +166,7 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
   void* data = TfLiteTensorData(tensor);
   if (data == nullptr) {
     [[unlikely]];
-    throw std::runtime_error("Failed to get data from tensor \"" + name + "\"!");
+    throw std::runtime_error("TFLite: Failed to get data from tensor \"" + name + "\"!");
   }
 
   // count of bytes, may be larger than count of numbers (e.g. for float32)
@@ -213,19 +215,21 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
       break;
     default:
       [[unlikely]];
-      throw jsi::JSError(runtime, "Unsupported output data type! " + dataTypeToString(dataType));
+      throw jsi::JSError(runtime,
+                         "TFLite: Unsupported output data type! " + dataTypeToString(dataType));
   }
 }
 
 void TensorHelpers::updateTensorFromJSBuffer(jsi::Runtime& runtime, TfLiteTensor* tensor,
                                              TypedArrayBase& jsBuffer) {
 #if DEBUG
+  // Validate data-type
   TypedArrayKind kind = jsBuffer.getKind(runtime);
   TfLiteType receivedType = getTFLDataTypeForTypedArrayKind(kind);
   TfLiteType expectedType = TfLiteTensorType(tensor);
   if (receivedType != expectedType) {
     [[unlikely]];
-    throw std::runtime_error("Invalid input type! Model expected " +
+    throw std::runtime_error("TFLite: Invalid input type! Model expected " +
                              dataTypeToString(expectedType) + ", but received " +
                              dataTypeToString(receivedType) + "!");
   }
@@ -235,11 +239,12 @@ void TensorHelpers::updateTensorFromJSBuffer(jsi::Runtime& runtime, TfLiteTensor
   jsi::ArrayBuffer buffer = jsBuffer.getBuffer(runtime);
 
 #if DEBUG
+  // Validate size
   int inputBufferSize = buffer.size(runtime);
   int tensorSize = getTensorTotalLength(tensor) * getTFLTensorDataTypeSize(tensor->type);
   if (tensorSize != inputBufferSize) {
     [[unlikely]];
-    throw std::runtime_error("Input Buffer size (" + std::to_string(inputBufferSize) +
+    throw std::runtime_error("TFLite: Input Buffer size (" + std::to_string(inputBufferSize) +
                              ") does not match the Input Tensor's expected size (" +
                              std::to_string(tensorSize) +
                              ")! Make sure to resize the input values accordingly.");

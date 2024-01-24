@@ -129,7 +129,7 @@ export function loadTensorflowModel(
     uri = source.url
   } else {
     throw new Error(
-      'Invalid source passed! Source should be either a React Native require(..) or a `{ url: string }` object!'
+      'TFLite: Invalid source passed! Source should be either a React Native require(..) or a `{ url: string }` object!'
     )
   }
   return global.__loadTensorflowModel(uri, delegate)
