@@ -56,7 +56,8 @@ export default function App(): React.ReactNode {
         },
         pixelFormat: 'rgb-uint8',
       })
-      const result = actualModel.runSync([resized])
+      const typedArray = new Uint8Array(resized)
+      const result = actualModel.runSync([typedArray])
       console.log('Result: ' + result.length)
     },
     [actualModel]
