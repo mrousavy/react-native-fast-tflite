@@ -58,7 +58,31 @@ std::string dataTypeToString(TfLiteType dataType) {
     case kTfLiteInt4:
       return "int4";
     default:
+      [[unlikely]];
       return "invalid";
+  }
+}
+
+TfLiteType getTFLDataTypeForTypedArrayKind(TypedArrayKind kind) {
+  switch (kind) {
+    case TypedArrayKind::Int8Array:
+      return kTfLiteInt8;
+    case TypedArrayKind::Int16Array:
+      return kTfLiteInt16;
+    case TypedArrayKind::Int32Array:
+      return kTfLiteInt32;
+    case TypedArrayKind::Uint8Array:
+      return kTfLiteUInt8;
+    case TypedArrayKind::Uint8ClampedArray:
+      return kTfLiteUInt8;
+    case TypedArrayKind::Uint16Array:
+      return kTfLiteUInt16;
+    case TypedArrayKind::Uint32Array:
+      return kTfLiteUInt32;
+    case TypedArrayKind::Float32Array:
+      return kTfLiteFloat32;
+    case TypedArrayKind::Float64Array:
+      return kTfLiteFloat64;
   }
 }
 
@@ -195,8 +219,20 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
 
 void TensorHelpers::updateTensorFromJSBuffer(jsi::Runtime& runtime, TfLiteTensor* tensor,
                                              TypedArrayBase& jsBuffer) {
-  auto name = std::string(TfLiteTensorName(tensor));
-  auto buffer = jsBuffer.getBuffer(runtime);
+#if DEBUG
+  TypedArrayKind kind = jsBuffer.getKind(runtime);
+  TfLiteType receivedType = getTFLDataTypeForTypedArrayKind(kind);
+  TfLiteType expectedType = TfLiteTensorType(tensor);
+  if (receivedType != expectedType) {
+    [[unlikely]];
+    throw std::runtime_error("Invalid input type! Model expected " +
+                             dataTypeToString(expectedType) + ", but received " +
+                             dataTypeToString(receivedType) + "!");
+  }
+#endif
+
+  std::string name = TfLiteTensorName(tensor);
+  jsi::ArrayBuffer buffer = jsBuffer.getBuffer(runtime);
 
 #if DEBUG
   int inputBufferSize = buffer.size(runtime);

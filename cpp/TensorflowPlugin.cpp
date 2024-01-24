@@ -202,7 +202,15 @@ TensorflowPlugin::getOutputArrayForTensor(jsi::Runtime& runtime, const TfLiteTen
 
 void TensorflowPlugin::copyInputBuffers(jsi::Runtime& runtime, jsi::Object inputValues) {
   // Input has to be array in input tensor size
-  auto array = inputValues.asArray(runtime);
+#if DEBUG
+  if (!inputValues.isArray(runtime)) {
+    [[unlikely]];
+    throw std::runtime_error(
+        "TFLite: Input Values must be an array, one item for each input tensor!");
+  }
+#endif
+
+  jsi::Array array = inputValues.asArray(runtime);
   size_t count = array.size(runtime);
   if (count != TfLiteInterpreterGetInputTensorCount(_interpreter)) {
     [[unlikely]];
@@ -212,8 +220,8 @@ void TensorflowPlugin::copyInputBuffers(jsi::Runtime& runtime, jsi::Object input
 
   for (size_t i = 0; i < count; i++) {
     TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
-    auto value = array.getValueAtIndex(runtime, i);
-    auto inputBuffer = getTypedArray(runtime, value.asObject(runtime));
+    jsi::Value value = array.getValueAtIndex(runtime, i);
+    TypedArrayBase inputBuffer = getTypedArray(runtime, value.asObject(runtime));
     TensorHelpers::updateTensorFromJSBuffer(runtime, tensor, inputBuffer);
   }
 }
