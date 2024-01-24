@@ -23,24 +23,26 @@ std::string dataTypeToString(TfLiteType dataType) {
   switch (dataType) {
     case kTfLiteFloat32:
       return "float32";
-    case kTfLiteInt32:
-      return "int32";
-    case kTfLiteUInt8:
-      return "int8";
-    case kTfLiteInt64:
-      return "int64";
-    case kTfLiteInt16:
-      return "int16";
-    case kTfLiteInt8:
-      return "int8";
     case kTfLiteFloat64:
       return "float64";
+    case kTfLiteInt4:
+      return "int4";
+    case kTfLiteInt8:
+      return "int8";
+    case kTfLiteInt16:
+      return "int16";
+    case kTfLiteInt32:
+      return "int32";
+    case kTfLiteInt64:
+      return "int64";
+    case kTfLiteUInt8:
+      return "uint8";
+    case kTfLiteUInt16:
+      return "uint16";
+    case kTfLiteUInt32:
+      return "uint32";
     case kTfLiteUInt64:
       return "uint64";
-    case kTfLiteUInt32:
-      return "int32";
-    case kTfLiteUInt16:
-      return "int16";
     case kTfLiteNoType:
       return "none";
     case kTfLiteString:
@@ -55,8 +57,6 @@ std::string dataTypeToString(TfLiteType dataType) {
       return "resource";
     case kTfLiteVariant:
       return "variant";
-    case kTfLiteInt4:
-      return "int4";
     default:
       [[unlikely]];
       return "invalid";
