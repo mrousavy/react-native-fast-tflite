@@ -5952,10 +5952,10 @@ vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-vision-camera-resize-plugin@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/vision-camera-resize-plugin/-/vision-camera-resize-plugin-1.0.2.tgz#f1fecdfc7810bce4b30a6e2ffe7f540862c3dc3c"
-  integrity sha512-RdGO2S8nobu3J8V60h+zY8FT7ajWJOdkmIq5nXuduK7SLJg9A+pry5VVJQVtyYrBxHZx53vhvqRwdYyRrGwYxg==
+vision-camera-resize-plugin@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/vision-camera-resize-plugin/-/vision-camera-resize-plugin-1.2.2.tgz#550b85c6845639cacf5295c0c12f3a79bd2a5c43"
+  integrity sha512-9BEXlkm7j7d8yzW8ML/UuruUVeQxaJVBIcOXk0dcFRbas4P9nBZhkoZm6vEx5XWPCuC6UgBiM8jVX3tZ9xUGfQ==
 
 vlq@^1.0.0:
   version "1.0.1"

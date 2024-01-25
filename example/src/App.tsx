@@ -55,10 +55,10 @@ export default function App(): React.ReactNode {
           width: 320,
           height: 320,
         },
-        pixelFormat: 'rgb-uint8',
+        pixelFormat: 'rgb',
+        dataType: 'uint8',
       })
-      const typedArray = new Uint8Array(resized)
-      const result = actualModel.runSync([typedArray])
+      const result = actualModel.runSync([resized])
       const num_detections = result[3]?.[0] ?? 0
       console.log('Result: ' + num_detections)
     },
