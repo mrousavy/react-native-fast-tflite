@@ -64,7 +64,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pods-
       - name: Install Pods
-        run: bundle exec pod install
+        run: pod install
       - name: Install xcpretty
         run: gem install xcpretty
       - name: Build App
