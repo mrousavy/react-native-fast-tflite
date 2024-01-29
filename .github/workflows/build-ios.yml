@@ -54,17 +54,17 @@ jobs:
           working-directory: example/ios
 
       - name: Restore Pods cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             example/ios/Pods
             ~/Library/Caches/CocoaPods
             ~/.cocoapods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          key: ${{ runner.os }}-cocoapods-${{ hashFiles('**/Podfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pods-
+            ${{ runner.os }}-cocoapods-
       - name: Install Pods
-        run: bundle exec pod install
+        run: pod install
       - name: Install xcpretty
         run: gem install xcpretty
       - name: Build App
