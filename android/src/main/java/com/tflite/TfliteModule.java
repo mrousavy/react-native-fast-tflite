@@ -53,17 +53,18 @@ public class TfliteModule extends ReactContextBaseJavaModule {
   /** @noinspection unused*/
   @DoNotStrip
   public static byte[] fetchByteDataFromUrl(String url) throws Exception {
+    Log.i(NAME, "Loading byte data from URL: " + url + "...");
+
     Uri uri = null;
     Integer resourceId = null;
-    try {
+    if (url.contains("://")) {
+      Log.i(NAME, "Parsing URL...");
       uri = Uri.parse(url);
-      Log.i(NAME, "Fetching from URI: " + uri.toString() + "...");
-    } catch (Exception e) {
-      Log.e(NAME, "Failed to parse URI! Maybe this is a resourceId instead...", e);
-    }
-    if (uri == null || uri.getScheme() == null) {
+      Log.i(NAME, "Parsed URL: " + uri.toString());
+    } else {
+      Log.i(NAME, "Parsing resourceId...");
       resourceId = getResourceId(weakContext.get(), url);
-      Log.i(NAME, "Fetching from resourceId: " + resourceId + "...");
+      Log.i(NAME, "Parsed resourceId: " + resourceId);
     }
 
     if (uri != null) {
