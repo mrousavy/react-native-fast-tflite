@@ -13,7 +13,7 @@
     "react": "18.2.0",
     "react-native": "0.73.2",
     "react-native-vision-camera": "^3.8.2",
-    "react-native-worklets-core": "^0.2.4",
+    "react-native-worklets-core": "^0.3.0",
     "vision-camera-resize-plugin": "^2.0.1"
   },
   "devDependencies": {

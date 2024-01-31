@@ -79,6 +79,7 @@ export default function App(): React.ReactNode {
           style={StyleSheet.absoluteFill}
           isActive={true}
           frameProcessor={frameProcessor}
+          pixelFormat="yuv"
         />
       ) : (
         <Text>No Camera available.</Text>
