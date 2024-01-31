@@ -97,7 +97,8 @@ public class TfliteModule extends ReactContextBaseJavaModule {
       }
     } else {
       // It's a bird? it's a plane? not it's an error
-      throw new Exception("Input is neither a valid URL, nor a resourceId - cannot load TFLite model!");
+      throw new Exception("Input is neither a valid URL, nor a resourceId - " +
+              "cannot load TFLite model! (Input: " + url + ")");
     }
   }
 
