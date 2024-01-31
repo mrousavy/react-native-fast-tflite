@@ -1,17 +1,23 @@
 package com.tflite;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.facebook.proguard.annotations.DoNotStrip;
 import com.facebook.react.bridge.JavaScriptContextHolder;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -21,9 +27,12 @@ import okhttp3.Response;
 @ReactModule(name = TfliteModule.NAME)
 public class TfliteModule extends ReactContextBaseJavaModule {
   public static final String NAME = "Tflite";
+  private static WeakReference<ReactApplicationContext> weakContext;
+  private static final OkHttpClient client = new OkHttpClient();
 
   public TfliteModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    weakContext = new WeakReference<>(reactContext);
   }
 
   @Override
@@ -32,21 +41,64 @@ public class TfliteModule extends ReactContextBaseJavaModule {
     return NAME;
   }
 
+  @SuppressLint("DiscouragedApi")
+  private static int getResourceId(Context context, String name) {
+    return context.getResources().getIdentifier(
+            name,
+            "raw",
+            context.getPackageName()
+    );
+  }
+
+  /** @noinspection unused*/
   @DoNotStrip
-  public static byte[] fetchByteDataFromUrl(String url) {
-    OkHttpClient client = new OkHttpClient();
+  public static byte[] fetchByteDataFromUrl(String url) throws Exception {
+    Log.i(NAME, "Loading byte data from URL: " + url + "...");
 
-    Request request = new Request.Builder().url(url).build();
+    Uri uri = null;
+    Integer resourceId = null;
+    if (url.contains("://")) {
+      Log.i(NAME, "Parsing URL...");
+      uri = Uri.parse(url);
+      Log.i(NAME, "Parsed URL: " + uri.toString());
+    } else {
+      Log.i(NAME, "Parsing resourceId...");
+      resourceId = getResourceId(weakContext.get(), url);
+      Log.i(NAME, "Parsed resourceId: " + resourceId);
+    }
 
-    try (Response response = client.newCall(request).execute()) {
-      if (response.isSuccessful() && response.body() != null) {
-        return response.body().bytes();
-      } else {
-        throw new RuntimeException("Response was not successful!");
+    if (uri != null) {
+      // It's a URL/http resource
+      Request request = new Request.Builder().url(uri.toString()).build();
+      try (Response response = client.newCall(request).execute()) {
+        if (response.isSuccessful() && response.body() != null) {
+          return response.body().bytes();
+        } else {
+          throw new RuntimeException("Response was not successful!");
+        }
+      } catch (Exception ex) {
+        Log.e(NAME, "Failed to fetch URL " + url + "!", ex);
+        throw ex;
       }
-    } catch (Exception e) {
-      Log.e(NAME, "Failed to fetch URL " + url + "!", e);
-      return null;
+    } else if (resourceId != null) {
+      // It's bundled into the Android resources/assets
+      Context context = weakContext.get();
+      if (context == null) {
+        throw new Exception("React Context has already been destroyed!");
+      }
+      try (InputStream stream = context.getResources().openRawResource(resourceId)) {
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[2048];
+        int length;
+        while ((length = stream.read(buffer)) != -1) {
+          byteStream.write(buffer, 0, length);
+        }
+        return byteStream.toByteArray();
+      }
+    } else {
+      // It's a bird? it's a plane? not it's an error
+      throw new Exception("Input is neither a valid URL, nor a resourceId - " +
+              "cannot load TFLite model! (Input: " + url + ")");
     }
   }
 

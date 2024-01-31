@@ -51,7 +51,7 @@ export default function App(): React.ReactNode {
 
       console.log(`Running inference on ${frame}`)
       const resized = resize(frame, {
-        size: {
+        scale: {
           width: 320,
           height: 320,
         },
@@ -79,6 +79,7 @@ export default function App(): React.ReactNode {
           style={StyleSheet.absoluteFill}
           isActive={true}
           frameProcessor={frameProcessor}
+          pixelFormat="yuv"
         />
       ) : (
         <Text>No Camera available.</Text>
