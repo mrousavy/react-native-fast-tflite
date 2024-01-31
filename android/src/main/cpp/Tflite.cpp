@@ -46,13 +46,6 @@ public:
 
       auto byteData = method(cls, url);
 
-      // TODO: to review by someone experienced much more in C++
-      // Detaching current thread causes app crash with exception:
-      // "Unable to retrieve jni environment. is the thread attached?"
-      // anyway, there is still a risk of memory leakage without calling the function below:
-
-      // java_machine->DetachCurrentThread();
-
       auto size = byteData->size();
       auto bytes = byteData->getRegion(0, size);
       void* data = malloc(size);
