@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 
 import com.facebook.proguard.annotations.DoNotStrip;
 import com.facebook.react.bridge.JavaScriptContextHolder;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -51,6 +50,7 @@ public class TfliteModule extends ReactContextBaseJavaModule {
     );
   }
 
+  /** @noinspection unused*/
   @DoNotStrip
   public static byte[] fetchByteDataFromUrl(String url) throws Exception {
     Uri uri = null;
