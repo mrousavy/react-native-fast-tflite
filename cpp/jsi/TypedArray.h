@@ -29,6 +29,8 @@ enum class TypedArrayKind {
   Uint32Array,
   Float32Array,
   Float64Array,
+  BigInt64Array,
+  BigUint64Array,
 };
 
 template <TypedArrayKind T> class TypedArray;
@@ -60,6 +62,12 @@ template <> struct typedArrayTypeMap<TypedArrayKind::Float32Array> {
 };
 template <> struct typedArrayTypeMap<TypedArrayKind::Float64Array> {
   typedef double type;
+};
+template <> struct typedArrayTypeMap<TypedArrayKind::BigInt64Array> {
+  typedef int64_t type;
+};
+template <> struct typedArrayTypeMap<TypedArrayKind::BigUint64Array> {
+  typedef uint64_t type;
 };
 
 // Instance of this class will invalidate PropNameIDCache when destructor is called.
