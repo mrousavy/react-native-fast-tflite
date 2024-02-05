@@ -71,6 +71,8 @@ TfLiteType getTFLDataTypeForTypedArrayKind(TypedArrayKind kind) {
       return kTfLiteInt16;
     case TypedArrayKind::Int32Array:
       return kTfLiteInt32;
+    case TypedArrayKind::Int64Array:
+      return kTfLiteInt64;
     case TypedArrayKind::Uint8Array:
       return kTfLiteUInt8;
     case TypedArrayKind::Uint8ClampedArray:
@@ -145,6 +147,8 @@ TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime,
       return TypedArray<TypedArrayKind::Int16Array>(runtime, size);
     case kTfLiteInt32:
       return TypedArray<TypedArrayKind::Int32Array>(runtime, size);
+    case kTfLiteInt64:
+      return TypedArray<TypedArrayKind::Int64Array>(runtime, size);
     case kTfLiteUInt8:
       return TypedArray<TypedArrayKind::Uint8Array>(runtime, size);
     case kTfLiteUInt16:
@@ -197,6 +201,11 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
       getTypedArray(runtime, jsBuffer)
           .as<TypedArrayKind::Int32Array>(runtime)
           .updateUnsafe(runtime, (int32_t*)data, size);
+      break;
+    case kTfLiteInt64:
+      getTypedArray(runtime, jsBuffer)
+          .as<TypedArrayKind::Int64Array>(runtime)
+          .updateUnsafe(runtime, (int64_t*)data, size);
       break;
     case kTfLiteUInt8:
       getTypedArray(runtime, jsBuffer)

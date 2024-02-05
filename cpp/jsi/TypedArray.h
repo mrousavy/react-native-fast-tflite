@@ -23,6 +23,7 @@ enum class TypedArrayKind {
   Int8Array,
   Int16Array,
   Int32Array,
+  Int64Array,
   Uint8Array,
   Uint8ClampedArray,
   Uint16Array,
@@ -42,6 +43,9 @@ template <> struct typedArrayTypeMap<TypedArrayKind::Int16Array> {
 };
 template <> struct typedArrayTypeMap<TypedArrayKind::Int32Array> {
   typedef int32_t type;
+};
+template <> struct typedArrayTypeMap<TypedArrayKind::Int64Array> {
+  typedef int64_t type;
 };
 template <> struct typedArrayTypeMap<TypedArrayKind::Uint8Array> {
   typedef uint8_t type;

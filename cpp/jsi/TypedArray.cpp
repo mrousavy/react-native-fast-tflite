@@ -36,6 +36,7 @@ enum class Prop {
   Int8Array,         // "Int8Array"
   Int16Array,        // "Int16Array"
   Int32Array,        // "Int32Array"
+  Int64Array,        // "Int64Array"
   Uint8Array,        // "Uint8Array"
   Uint8ClampedArray, // "Uint8ClampedArray"
   Uint16Array,       // "Uint16Array"
@@ -248,6 +249,8 @@ const jsi::PropNameID& PropNameIDCache::getConstructorNameProp(jsi::Runtime& run
       return get(runtime, Prop::Int16Array);
     case TypedArrayKind::Int32Array:
       return get(runtime, Prop::Int32Array);
+    case TypedArrayKind::Int64Array:
+      return get(runtime, Prop::Int64Array);
     case TypedArrayKind::Uint8Array:
       return get(runtime, Prop::Uint8Array);
     case TypedArrayKind::Uint8ClampedArray:
@@ -292,6 +295,8 @@ jsi::PropNameID PropNameIDCache::createProp(jsi::Runtime& runtime, Prop prop) {
       return create("Int16Array");
     case Prop::Int32Array:
       return create("Int32Array");
+    case Prop::Int64Array:
+      return create("Int64Array");
     case Prop::Uint8Array:
       return create("Uint8Array");
     case Prop::Uint8ClampedArray:
@@ -311,6 +316,7 @@ std::unordered_map<std::string, TypedArrayKind> nameToKindMap = {
     {"Int8Array", TypedArrayKind::Int8Array},
     {"Int16Array", TypedArrayKind::Int16Array},
     {"Int32Array", TypedArrayKind::Int32Array},
+    {"Int64Array", TypedArrayKind::Int64Array},
     {"Uint8Array", TypedArrayKind::Uint8Array},
     {"Uint8ClampedArray", TypedArrayKind::Uint8ClampedArray},
     {"Uint16Array", TypedArrayKind::Uint16Array},
@@ -326,6 +332,7 @@ TypedArrayKind getTypedArrayKindForName(const std::string& name) {
 template class TypedArray<TypedArrayKind::Int8Array>;
 template class TypedArray<TypedArrayKind::Int16Array>;
 template class TypedArray<TypedArrayKind::Int32Array>;
+template class TypedArray<TypedArrayKind::Int64Array>;
 template class TypedArray<TypedArrayKind::Uint8Array>;
 template class TypedArray<TypedArrayKind::Uint8ClampedArray>;
 template class TypedArray<TypedArrayKind::Uint16Array>;
