@@ -42,6 +42,8 @@ enum class Prop {
   Uint32Array,       // "Uint32Array"
   Float32Array,      // "Float32Array"
   Float64Array,      // "Float64Array"
+  BigInt64Array,     // "BigInt64Array"
+  BigUint64Array,    // "BigUint64Array"
 };
 
 class PropNameIDCache {
@@ -260,6 +262,10 @@ const jsi::PropNameID& PropNameIDCache::getConstructorNameProp(jsi::Runtime& run
       return get(runtime, Prop::Float32Array);
     case TypedArrayKind::Float64Array:
       return get(runtime, Prop::Float64Array);
+    case TypedArrayKind::BigInt64Array:
+      return get(runtime, Prop::BigInt64Array);
+    case TypedArrayKind::BigUint64Array:
+      return get(runtime, Prop::BigUint64Array);
   }
 }
 
@@ -304,6 +310,10 @@ jsi::PropNameID PropNameIDCache::createProp(jsi::Runtime& runtime, Prop prop) {
       return create("Float32Array");
     case Prop::Float64Array:
       return create("Float64Array");
+    case Prop::BigInt64Array:
+      return create("BigInt64Array");
+    case Prop::BigUint64Array:
+      return create("BigUint64Array");
   }
 }
 
@@ -317,6 +327,8 @@ std::unordered_map<std::string, TypedArrayKind> nameToKindMap = {
     {"Uint32Array", TypedArrayKind::Uint32Array},
     {"Float32Array", TypedArrayKind::Float32Array},
     {"Float64Array", TypedArrayKind::Float64Array},
+    {"BigInt64Array", TypedArrayKind::BigInt64Array},
+    {"BigUint64Array", TypedArrayKind::BigUint64Array},
 };
 
 TypedArrayKind getTypedArrayKindForName(const std::string& name) {
@@ -332,5 +344,7 @@ template class TypedArray<TypedArrayKind::Uint16Array>;
 template class TypedArray<TypedArrayKind::Uint32Array>;
 template class TypedArray<TypedArrayKind::Float32Array>;
 template class TypedArray<TypedArrayKind::Float64Array>;
+template class TypedArray<TypedArrayKind::BigInt64Array>;
+template class TypedArray<TypedArrayKind::BigUint64Array>;
 
 } // namespace mrousavy

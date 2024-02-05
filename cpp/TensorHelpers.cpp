@@ -83,6 +83,10 @@ TfLiteType getTFLDataTypeForTypedArrayKind(TypedArrayKind kind) {
       return kTfLiteFloat32;
     case TypedArrayKind::Float64Array:
       return kTfLiteFloat64;
+    case TypedArrayKind::BigInt64Array:
+      return kTfLiteInt64;
+    case TypedArrayKind::BigUint64Array:
+      return kTfLiteUInt64;
   }
 }
 
@@ -151,6 +155,10 @@ TypedArrayBase TensorHelpers::createJSBufferForTensor(jsi::Runtime& runtime,
       return TypedArray<TypedArrayKind::Uint16Array>(runtime, size);
     case kTfLiteUInt32:
       return TypedArray<TypedArrayKind::Uint32Array>(runtime, size);
+    case kTfLiteInt64:
+      return TypedArray<TypedArrayKind::BigInt64Array>(runtime, size);
+    case kTfLiteUInt64:
+      return TypedArray<TypedArrayKind::BigUint64Array>(runtime, size);
     default:
       [[unlikely]];
       throw std::runtime_error("TFLite: Unsupported tensor data type! " +
@@ -212,6 +220,16 @@ void TensorHelpers::updateJSBufferFromTensor(jsi::Runtime& runtime, TypedArrayBa
       getTypedArray(runtime, jsBuffer)
           .as<TypedArrayKind::Uint32Array>(runtime)
           .updateUnsafe(runtime, (uint32_t*)data, size);
+      break;
+    case kTfLiteInt64:
+      getTypedArray(runtime, jsBuffer)
+          .as<TypedArrayKind::BigInt64Array>(runtime)
+          .updateUnsafe(runtime, (int64_t*)data, size);
+      break;
+    case kTfLiteUInt64:
+      getTypedArray(runtime, jsBuffer)
+          .as<TypedArrayKind::BigUint64Array>(runtime)
+          .updateUnsafe(runtime, (uint64_t*)data, size);
       break;
     default:
       [[unlikely]];
