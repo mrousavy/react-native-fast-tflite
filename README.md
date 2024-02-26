@@ -101,17 +101,17 @@ const frameProcessor = useFrameProcessor((frame) => {
     if (model == null) return
 
     // 1. Resize 4k Frame to 192x192x3 using vision-camera-resize-plugin
-    const data = resize(frame, {
-        size: {
-            width: 192,
-            height: 192,
+    const resized = resize(frame, {
+        scale: {
+          width: 192,
+          height: 192,
         },
-        pixelFormat: 'rgb-uint8'
+        pixelFormat: 'rgb',
+        dataType: 'uint8',
     })
 
     // 2. Run model with given input buffer synchronously
-    const input = new Uint8Array(data)
-    const outputs = model.runSync([input])
+    const outputs = model.runSync([resized])
 
     // 3. Interpret outputs accordingly
     const detection_boxes = outputs[0]
