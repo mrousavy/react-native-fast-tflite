@@ -123,9 +123,9 @@ dependencies {
   implementation "com.facebook.react:react-native:+"
 
   // Tensorflow Lite .aar (includes C API via prefabs)
-  implementation "org.tensorflow:tensorflow-lite:2.12.0"
-  extractHeaders("org.tensorflow:tensorflow-lite:2.12.0")
-  extractSO("org.tensorflow:tensorflow-lite:2.12.0")
+  implementation "org.tensorflow:tensorflow-lite:2.14.0"
+  extractHeaders("org.tensorflow:tensorflow-lite:2.14.0")
+  extractSO("org.tensorflow:tensorflow-lite:2.14.0")
 }
 
 task extractAARHeaders {
