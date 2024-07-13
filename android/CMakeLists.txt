@@ -9,11 +9,19 @@ find_package(ReactAndroid REQUIRED CONFIG)
 find_package(fbjni REQUIRED CONFIG)
 
 find_library(
-        TFLITE
-        tensorflowlite_jni
-        PATHS "./src/main/cpp/lib/tensorflow/jni/${ANDROID_ABI}"
-        NO_DEFAULT_PATH
-        NO_CMAKE_FIND_ROOT_PATH
+  TFLITE
+  tensorflowlite_jni
+  PATHS "./src/main/cpp/lib/tensorflow/jni/${ANDROID_ABI}"
+  NO_DEFAULT_PATH
+  NO_CMAKE_FIND_ROOT_PATH
+)
+
+find_library(
+  TFLITE_GPU
+  tensorflowlite_gpu_jni
+  PATHS "./src/main/cpp/lib/tensorflow/jni/${ANDROID_ABI}"
+  NO_DEFAULT_PATH
+  NO_CMAKE_FIND_ROOT_PATH
 )
 
 string(APPEND CMAKE_CXX_FLAGS " -DANDROID")
@@ -49,4 +57,5 @@ target_link_libraries(
   ReactAndroid::reactnativejni    # <-- CallInvokerImpl
   fbjni::fbjni                    # <-- fbjni.h
   ${TFLITE}
+  ${TFLITE_GPU}
 )
