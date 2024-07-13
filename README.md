@@ -190,6 +190,34 @@ If you are on bare React Native, you need to include the CoreML/Metal code in yo
 > [!NOTE]
 > Since some operations aren't supported on the CoreML delegate, make sure your Model is able to use the CoreML GPU delegate.
 
+#### Android GPU/NNAPI (Android)
+
+To enable GPU or NNAPI delegate in Android, you **may** need to include `OpenCL` library with `uses-native-library` on `application` scope in AndroidManifest.xml, starting from Android 12.
+
+```xml
+<!-- Like this -->
+<uses-native-library android:name="libOpenCL.so" android:required="false" />
+
+<!-- You may need one/all of the followings depends on your targeting devices -->
+<uses-native-library android:name="libOpenCL-pixel.so" android:required="false" />
+<uses-native-library android:name="libGLES_mali.so" android:required="false" />
+<uses-native-library android:name="libPVROCL.so" android:required="false" />
+```
+
+Then, you can just use it:
+```ts
+const model = await loadTensorflowModel(require('assets/my-model.tflite'), 'android-gpu')
+// or
+const model = await loadTensorflowModel(require('assets/my-model.tflite'), 'nnapi')
+```
+
+> [!WARNING]
+> NNAPI is deprecated on Android 15. Hence, it is not recommended in future projects.
+> Both has similiar performance, but GPU delegate has better initial loading time.
+
+> [!NOTE]
+> Android does not provide support for OpenCL officially, however, most gpu vendors do provide support for it.
+
 ## Community Discord
 
 [Join the Margelo Community Discord](https://discord.gg/6CSHz2qAvA) to chat about react-native-fast-tflite or other Margelo libraries.
