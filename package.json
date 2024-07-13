@@ -1,6 +1,6 @@
 {
   "name": "react-native-fast-tflite",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "High-performance TensorFlow Lite library for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
