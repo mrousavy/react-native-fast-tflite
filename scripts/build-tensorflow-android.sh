@@ -16,16 +16,11 @@ then
   # Assumes the user ran ./configure in tensorflow/ already
   cd tensorflow
 
-  bazel build --config=ios_fat -c opt --cxxopt=--std=c++17 //tensorflow/lite/ios:TensorFlowLiteC_framework
-  bazel build --config=ios_fat -c opt --cxxopt=--std=c++17 //tensorflow/lite/ios:TensorFlowLiteCCoreML_framework
+  bazel build --config=android # -c opt --cxxopt=--std=c++17 //tensorflow/lite/ios:TensorFlowLiteC_framework
 
   cd ..
 
-  cp -f -r tensorflow/bazel-bin/tensorflow/lite/ios/ ios/
+  cp -f -r tensorflow/bazel-bin/tensorflow/lite/android/ android/
 
-  unzip -o ios/TensorFlowLiteC_framework.zip -d ios
-  rm ios/TensorFlowLiteC_framework.zip
-
-  unzip -o ios/TensorFlowLiteCCoreML_framework.zip -d ios
-  rm ios/TensorFlowLiteCCoreML_framework.zip
+  echo "What now?"
 fi
