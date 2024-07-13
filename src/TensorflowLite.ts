@@ -33,7 +33,12 @@ if (result !== true)
 
 console.log('Successfully installed!')
 
-export type TensorflowModelDelegate = 'default' | 'metal' | 'core-ml'
+export type TensorflowModelDelegate =
+  | 'default'
+  | 'metal'
+  | 'core-ml'
+  | 'nnapi'
+  | 'android-gpu'
 
 export interface Tensor {
   /**

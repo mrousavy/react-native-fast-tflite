@@ -19,6 +19,8 @@
 
 #ifdef ANDROID
 #include <tensorflow/lite/c/c_api.h>
+#include <tensorflow/lite/delegates/gpu/delegate.h>
+#include <tensorflow/lite/delegates/nnapi/nnapi_delegate_c_api.h>
 #else
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
 
@@ -56,6 +58,10 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
             delegateType = Delegate::CoreML;
           } else if (delegate == "metal") {
             delegateType = Delegate::Metal;
+          } else if (delegate == "nnapi") {
+            delegateType = Delegate::NnApi;
+          } else if (delegate == "android-gpu") {
+            delegateType = Delegate::AndroidGPU;
           } else {
             delegateType = Delegate::Default;
           }
@@ -100,6 +106,31 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
                           [=]() { promise->reject("Metal Delegate is not supported!"); });
                       return;
                     }
+#ifdef ANDROID
+                    case Delegate::NnApi: {
+                      TfLiteNnapiDelegateOptions delegateOptions = TfLiteNnapiDelegateOptionsDefault();
+                      auto delegate = TfLiteNnapiDelegateCreate(&delegateOptions);
+                      TfLiteInterpreterOptionsAddDelegate(options, delegate);
+                      break;
+                    }
+                    case Delegate::AndroidGPU: {
+                      TfLiteGpuDelegateOptionsV2 delegateOptions = TfLiteGpuDelegateOptionsV2Default();
+                      auto delegate = TfLiteGpuDelegateV2Create(&delegateOptions);
+                      TfLiteInterpreterOptionsAddDelegate(options, delegate);
+                      break;
+                    }
+#else
+                    case Delegate::NnApi: {
+                      callInvoker->invokeAsync([=]() { 
+                        promise->reject("Nnapi Delegate is only supported on Android!"); 
+                      });
+                    }
+                    case Delegate::AndroidGPU: {
+                      callInvoker->invokeAsync([=]() { 
+                        promise->reject("Android-Gpu Delegate is not supported on Android!"); 
+                      });
+                    }
+#endif
                     default: {
                       // use default CPU delegate.
                     }
@@ -339,6 +370,10 @@ jsi::Value TensorflowPlugin::get(jsi::Runtime& runtime, const jsi::PropNameID& p
         return jsi::String::createFromUtf8(runtime, "core-ml");
       case Delegate::Metal:
         return jsi::String::createFromUtf8(runtime, "metal");
+      case Delegate::NnApi:
+        return jsi::String::createFromUtf8(runtime, "nnapi");
+      case Delegate::AndroidGPU:
+        return jsi::String::createFromUtf8(runtime, "android-gpu");
     }
   }
 
