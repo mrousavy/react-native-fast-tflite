@@ -9,6 +9,13 @@ if defined?($EnableCoreMLDelegate)
 end
 Pod::UI.puts "[TFLite] CoreML Delegate is set to #{enableCoreMLDelegate}! ($EnableCoreMLDelegate setting in Podfile)"
 
+enableMetalDelegate = false
+if defined?($EnableMetalDelegate)
+  enableMetalDelegate = $EnableMetalDelegate
+end
+Pod::UI.puts "[TFLite] Metal Delegate is set to #{enableMetalDelegate}! ($enableMetalDelegate setting in Podfile)"
+
+
 Pod::Spec.new do |s|
   s.name         = "react-native-fast-tflite"
   s.version      = package["version"]
@@ -28,8 +35,9 @@ Pod::Spec.new do |s|
   }
 
   s.ios.vendored_frameworks = [
-    'ios/TensorFlowLiteC.framework',
-    enableCoreMLDelegate ? 'ios/TensorFlowLiteCCoreML.framework' : ''
+    'ios/TensorFlowLiteC.xcframework',
+    enableCoreMLDelegate ? 'ios/TensorFlowLiteCCoreML.xcframework' : '',
+    enableMetalDelegate ? 'ios/TensorFlowLiteCMetal.xcframework' : '' # TODO: Enable and use Metal Delegate on iOS
   ]
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
