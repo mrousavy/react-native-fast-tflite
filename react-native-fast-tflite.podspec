@@ -13,7 +13,7 @@ enableMetalDelegate = false
 if defined?($EnableMetalDelegate)
   enableMetalDelegate = $EnableMetalDelegate
 end
-Pod::UI.puts "[TFLite] Metal Delegate is set to #{enableMetalDelegate}! ($enableMetalDelegate setting in Podfile)"
+# Pod::UI.puts "[TFLite] Metal Delegate is set to #{enableMetalDelegate}! ($EnableMetalDelegate setting in Podfile)"
 
 
 Pod::Spec.new do |s|
