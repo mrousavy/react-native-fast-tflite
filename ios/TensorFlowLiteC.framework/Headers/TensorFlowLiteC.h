@@ -4,8 +4,8 @@
 #import <TensorFlowLiteC/c_api_opaque.h>
 #import <TensorFlowLiteC/c_api_types.h>
 #import <TensorFlowLiteC/common.h>
+#import <TensorFlowLiteC/operator.h>
 #import <TensorFlowLiteC/profiler.h>
-#import <TensorFlowLiteC/registration_external.h>
 #import <TensorFlowLiteC/telemetry_setting.h>
 #import <TensorFlowLiteC/types.h>
 #import <TensorFlowLiteC/xnnpack_delegate.h>
