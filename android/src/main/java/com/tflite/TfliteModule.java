@@ -16,8 +16,12 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.Objects;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -68,17 +72,41 @@ public class TfliteModule extends ReactContextBaseJavaModule {
     }
 
     if (uri != null) {
-      // It's a URL/http resource
-      Request request = new Request.Builder().url(uri.toString()).build();
-      try (Response response = client.newCall(request).execute()) {
-        if (response.isSuccessful() && response.body() != null) {
-          return response.body().bytes();
-        } else {
-          throw new RuntimeException("Response was not successful!");
+      if (Objects.equals(uri.getScheme(), "file")) {
+        // It's a file URL
+        String path = Objects.requireNonNull(uri.getPath(), "File path cannot be null");
+        File file = new File(path);
+
+        // Check if file exists and is readable
+        if (!file.exists() || !file.canRead()) {
+          throw new IOException("File does not exist or is not readable: " + path);
         }
-      } catch (Exception ex) {
-        Log.e(NAME, "Failed to fetch URL " + url + "!", ex);
-        throw ex;
+
+        try (FileInputStream fis = new FileInputStream(file);
+             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+          byte[] buffer = new byte[8192]; // Larger buffer for efficiency
+          int bytesRead;
+          while ((bytesRead = fis.read(buffer)) != -1) {
+            bos.write(buffer, 0, bytesRead);
+          }
+          return bos.toByteArray();
+        } catch (IOException e) {
+          Log.e(NAME, "Error reading file: " + path, e);
+          throw new RuntimeException("Failed to read file: " + path, e);
+        }
+      } else {
+        // It's a network URL/http resource
+        Request request = new Request.Builder().url(uri.toString()).build();
+        try (Response response = client.newCall(request).execute()) {
+          if (response.isSuccessful() && response.body() != null) {
+            return response.body().bytes();
+          } else {
+            throw new RuntimeException("Response was not successful!");
+          }
+        } catch (Exception ex) {
+          Log.e(NAME, "Failed to fetch URL " + url + "!", ex);
+          throw ex;
+        }
       }
     } else if (resourceId != null) {
       // It's bundled into the Android resources/assets
