@@ -123,28 +123,12 @@ dependencies {
   implementation "com.facebook.react:react-native:+"
 
   // Tensorflow Lite .aar (includes C API via prefabs)
-  implementation "org.tensorflow:tensorflow-lite:2.12.0"
-  extractHeaders("org.tensorflow:tensorflow-lite:2.12.0")
-  extractSO("org.tensorflow:tensorflow-lite:2.12.0")
+  implementation "org.tensorflow:tensorflow-lite:2.16.1"
+  extractSO("org.tensorflow:tensorflow-lite:2.16.1")
 
   // Tensorflow Lite GPU delegate
-  implementation "org.tensorflow:tensorflow-lite-gpu:2.12.0"
-  extractHeaders("org.tensorflow:tensorflow-lite-gpu:2.12.0")
-  extractSO("org.tensorflow:tensorflow-lite-gpu:2.12.0")
-}
-
-task extractAARHeaders {
-  doLast {
-    configurations.extractHeaders.files.each {
-      def file = it.absoluteFile
-      def packageName = file.name.tokenize('-')[0]
-      copy {
-        from zipTree(file)
-        into "src/main/cpp/lib/$packageName/"
-        include "**/*.h"
-      }
-    }
-  }
+  implementation "org.tensorflow:tensorflow-lite-gpu:2.16.1"
+  extractSO("org.tensorflow:tensorflow-lite-gpu:2.16.1")
 }
 
 task extractSOFiles {
@@ -182,6 +166,5 @@ def nativeBuildDependsOn(dependsOnTask) {
 }
 
 afterEvaluate {
-  nativeBuildDependsOn(extractAARHeaders)
   nativeBuildDependsOn(extractSOFiles)
 }
