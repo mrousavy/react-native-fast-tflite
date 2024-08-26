@@ -890,6 +890,8 @@ PODS:
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
+    - TensorFlowLiteC (= 2.17.0)
+    - TensorFlowLiteC/CoreML (= 2.17.0)
   - react-native-worklets-core (1.2.0):
     - React
     - React-callinvoker
@@ -1062,6 +1064,11 @@ PODS:
     - React-logger (= 0.73.3)
     - React-perflogger (= 0.73.3)
   - SocketRocket (0.6.1)
+  - TensorFlowLiteC (2.17.0):
+    - TensorFlowLiteC/Core (= 2.17.0)
+  - TensorFlowLiteC/Core (2.17.0)
+  - TensorFlowLiteC/CoreML (2.17.0):
+    - TensorFlowLiteC/Core
   - vision-camera-resize-plugin (3.1.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
@@ -1143,6 +1150,7 @@ SPEC REPOS:
     - fmt
     - libevent
     - SocketRocket
+    - TensorFlowLiteC
 
 EXTERNAL SOURCES:
   boost:
@@ -1304,6 +1312,7 @@ SPEC CHECKSUMS:
   React-utils: b22b4a51aa578b3aac1e7c19501c0b9ba358ed79
   ReactCommon: e708b8be8cb317b83e31c6ccfeda8bf6c0d1a2b3
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
+  TensorFlowLiteC: eac6d689a8d391d1b202dc59e3d9165ba64aaf73
   vision-camera-resize-plugin: 525763ad8f20ff9e58984ee4d5aceb50ec22ce4c
   VisionCamera: b633f90960feab2669b7a1c51f8a201dd0a5bfc3
   Yoga: ff0382b894475dba0b4d2a5fda860bfee5a9afad
