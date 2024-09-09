@@ -33,8 +33,7 @@
     "release": "release-it",
     "example": "yarn --cwd example",
     "configure": "git submodule update --init --recursive && cd tensorflow && ./configure",
-    "bootstrap": "yarn && yarn example && yarn example pods && yarn configure",
-    "build-tflite-ios": "./scripts/build-tensorflow-ios.sh"
+    "bootstrap": "yarn && yarn example && yarn example pods && yarn configure"
   },
   "keywords": [
     "react-native",

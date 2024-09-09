@@ -886,11 +886,13 @@ PODS:
   - React-Mapbuffer (0.73.3):
     - glog
     - React-debug
-  - react-native-fast-tflite (1.2.0):
+  - react-native-fast-tflite (1.3.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-  - react-native-worklets-core (0.3.0):
+    - TensorFlowLiteC (= 2.17.0)
+    - TensorFlowLiteC/CoreML (= 2.17.0)
+  - react-native-worklets-core (1.2.0):
     - React
     - React-callinvoker
     - React-Core
@@ -1062,16 +1064,28 @@ PODS:
     - React-logger (= 0.73.3)
     - React-perflogger (= 0.73.3)
   - SocketRocket (0.6.1)
-  - vision-camera-resize-plugin (2.0.1):
+  - TensorFlowLiteC (2.17.0):
+    - TensorFlowLiteC/Core (= 2.17.0)
+  - TensorFlowLiteC/Core (2.17.0)
+  - TensorFlowLiteC/CoreML (2.17.0):
+    - TensorFlowLiteC/Core
+  - vision-camera-resize-plugin (3.1.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
     - VisionCamera
-  - VisionCamera (3.8.2):
+  - VisionCamera (4.0.3):
+    - VisionCamera/Core (= 4.0.3)
+    - VisionCamera/FrameProcessors (= 4.0.3)
+    - VisionCamera/React (= 4.0.3)
+  - VisionCamera/Core (4.0.3)
+  - VisionCamera/FrameProcessors (4.0.3):
     - React
     - React-callinvoker
-    - React-Core
     - react-native-worklets-core
+  - VisionCamera/React (4.0.3):
+    - React-Core
+    - VisionCamera/FrameProcessors
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -1136,6 +1150,7 @@ SPEC REPOS:
     - fmt
     - libevent
     - SocketRocket
+    - TensorFlowLiteC
 
 EXTERNAL SOURCES:
   boost:
@@ -1274,8 +1289,8 @@ SPEC CHECKSUMS:
   React-jsinspector: 6fad0fe14882fb6b1c32e5cc8a4bd3d33a8b6790
   React-logger: cb0dd15ac67b00e7b771ef15203edcb29d4a3f8e
   React-Mapbuffer: d59258be3b0d2280c6ba8964ab6e36ec69211871
-  react-native-fast-tflite: a9574c72f0d3e9efb916953926d089f65326c66b
-  react-native-worklets-core: a894d572639fcf37c6d284cc799882d25d00c93d
+  react-native-fast-tflite: b39b2ff96fea7891006ba5cedda261c39fd748b2
+  react-native-worklets-core: a316975bba20b73d47aa4d41bffb0ca984ba592e
   React-nativeconfig: 4d3076dc3dc498ec49819e4e4225b55d3507f902
   React-NativeModulesApple: 46f14baf36010b22ffd84fd89d5586e4148edfb3
   React-perflogger: 27ccacf853ba725524ef2b4e444f14e34d0837b0
@@ -1297,10 +1312,11 @@ SPEC CHECKSUMS:
   React-utils: b22b4a51aa578b3aac1e7c19501c0b9ba358ed79
   ReactCommon: e708b8be8cb317b83e31c6ccfeda8bf6c0d1a2b3
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  vision-camera-resize-plugin: 536345c29f42e04438d34d0cada7b4992a8fc104
-  VisionCamera: edbcd00e27a438b2228f67823e2b8d15a189065f
-  Yoga: 08cd7601462818c4985bda7b205b9e6a92a7e66a
+  TensorFlowLiteC: eac6d689a8d391d1b202dc59e3d9165ba64aaf73
+  vision-camera-resize-plugin: 525763ad8f20ff9e58984ee4d5aceb50ec22ce4c
+  VisionCamera: b633f90960feab2669b7a1c51f8a201dd0a5bfc3
+  Yoga: ff0382b894475dba0b4d2a5fda860bfee5a9afad
 
 PODFILE CHECKSUM: 33c2f84b68c18fe6787cbe3e723675d15fcc7e66
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2
