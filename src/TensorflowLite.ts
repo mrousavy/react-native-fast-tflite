@@ -95,7 +95,7 @@ export interface TensorflowModel {
 
 // In React Native, `require(..)` returns a number.
 type Require = number // ReturnType<typeof require>
-type ModelSource = Require | { url: string }
+type ModelSource = Require | { url: string } | string
 
 export type TensorflowPlugin =
   | {
@@ -132,11 +132,14 @@ export function loadTensorflowModel(
     const asset = Image.resolveAssetSource(source)
     uri = asset.uri
     console.log(`Resolved Model path: ${asset.uri}`)
+  } else if (typeof source === 'string' && source.startsWith('file')) {
+    console.log(`Loading Tensorflow Lite Model locally ${source}`)
+    uri = source
   } else if (typeof source === 'object' && 'url' in source) {
     uri = source.url
   } else {
     throw new Error(
-      'TFLite: Invalid source passed! Source should be either a React Native require(..) or a `{ url: string }` object!'
+      'TFLite: Invalid source passed! Source should be either a React Native require(..), file:// or a `{ url: string }` object!'
     )
   }
   return global.__loadTensorflowModel(uri, delegate)
