@@ -62,9 +62,9 @@ Models can be loaded either from the React Native bundle using a `require(..)` s
 // Asset from React Native Bundle
 loadTensorflowModel(require('assets/my-model.tflite'))
 // File on the local filesystem
-loadTensorflowModel('file:///var/mobile/.../my-model.tflite')
+loadTensorflowModel({ url: 'file:///var/mobile/.../my-model.tflite' })
 // Remote URL
-loadTensorflowModel('https://tfhub.dev/google/lite-model/object_detection_v1.tflite')
+loadTensorflowModel({ url: 'https://tfhub.dev/google/lite-model/object_detection_v1.tflite' })
 ```
 
 Loading a Model is asynchronous since Buffers need to be allocated. Make sure to check for any potential errors when loading a Model.
