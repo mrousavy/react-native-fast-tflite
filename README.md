@@ -33,7 +33,11 @@ A high-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library fo
     ```
     This allows you to drop `.tflite` files into your app and swap them out at runtime without having to rebuild anything! 🔥
 3. (Optional) If you want to enable the GPU Delegate, see ["Using GPU Delegates"](#using-gpu-delegates) down below.
-4. Run your app (`yarn android` / `npx pod-install && yarn ios`)
+4. Run your app:
+   - For Android: `yarn android`
+   - For iOS:
+       - If you're using Apple silicon (M1, M2, or M3), Since the current stable version of TensorFlow Lite doesn't support the `arm64` simulators, you'll need to use the following command to run the app on `x86_64` architecture: `npx pod-install && yarn ios --destination arch=x86_64`
+       - Otherwise, use this command: `npx pod-install && yarn ios`
 
 ## Usage
 
