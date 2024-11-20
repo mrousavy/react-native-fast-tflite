@@ -192,7 +192,45 @@ If you are on bare React Native, you need to include the CoreML/Metal code in yo
 
 #### Android GPU/NNAPI (Android)
 
-To enable GPU or NNAPI delegate in Android, you **may** need to include `OpenCL` library with `uses-native-library` on `application` scope in AndroidManifest.xml, starting from Android 12.
+To enable GPU or NNAPI delegate in Android, you **may** need to include some native libraries, starting from Android 12.
+
+##### Expo
+
+For Expo, just use the config plugin in your expo config (`app.json`, `app.config.json` or `app.config.js`) with `enableAndroidGpuLibraries`:
+
+```json
+{
+  "name": "my app",
+  "plugins": [
+    [
+      "react-native-fast-tflite",
+      {
+        "enableAndroidGpuLibraries": true
+      }
+    ]
+  ]
+}
+```
+
+By default, when enabled, `libOpenCl.so` will be included in your AndroidManifest.xml. You can also include more libraries by passing an array of string:
+
+```json
+{
+  "name": "my app",
+  "plugins": [
+    [
+      "react-native-fast-tflite",
+      {
+        "enableAndroidGpuLibraries": ["libOpenCL-pixel.so", "libGLES_mali.so"]
+      }
+    ]
+  ]
+}
+```
+
+##### Bare React Native
+
+If you are on bare React Native, you will need to include all needed libraries with `uses-native-library` on `application` scope in AndroidManifest.xml.
 
 ```xml
 <!-- Like this -->
