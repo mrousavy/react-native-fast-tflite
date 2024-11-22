@@ -19,11 +19,14 @@ function addUsesNativeLibraryItemToMainApplication(
     $: prefixAndroidKeys(item),
   } as AndroidConfig.Manifest.ManifestUsesLibrary
 
-  if (mainApplication['uses-native-library'] != null) {
+  if (mainApplication['uses-native-library'] !== undefined) {
     existingMetaDataItem = mainApplication['uses-native-library'].filter(
       (e) => e.$['android:name'] === item.name
     )
-    if (existingMetaDataItem.length > 0 && existingMetaDataItem[0] != null)
+    if (
+      existingMetaDataItem.length > 0 &&
+      existingMetaDataItem[0] !== undefined
+    )
       existingMetaDataItem[0].$ = newItem.$
     else mainApplication['uses-native-library'].push(newItem)
   } else {
