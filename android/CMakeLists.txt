@@ -11,7 +11,7 @@ find_package(fbjni REQUIRED CONFIG)
 find_library(
   TFLITE
   tensorflowlite_jni
-  PATHS "./src/main/cpp/lib/tensorflow/jni/${ANDROID_ABI}"
+  PATHS "./src/main/cpp/lib/litert/jni/${ANDROID_ABI}"
   NO_DEFAULT_PATH
   NO_CMAKE_FIND_ROOT_PATH
 )
@@ -19,7 +19,7 @@ find_library(
 find_library(
   TFLITE_GPU
   tensorflowlite_gpu_jni
-  PATHS "./src/main/cpp/lib/tensorflow/jni/${ANDROID_ABI}"
+  PATHS "./src/main/cpp/lib/litert/jni/${ANDROID_ABI}"
   NO_DEFAULT_PATH
   NO_CMAKE_FIND_ROOT_PATH
 )
@@ -42,7 +42,7 @@ target_include_directories(
   PRIVATE
   "../cpp"
   "src/main/cpp"
-  "../tensorflow/"
+  "src/main/cpp/lib/litert/headers"
   "${NODE_MODULES_DIR}/react-native/ReactCommon"
   "${NODE_MODULES_DIR}/react-native/ReactCommon/callinvoker"
   "${NODE_MODULES_DIR}/react-native/ReactAndroid/src/main/jni/react/turbomodule" # <-- CallInvokerHolder JNI wrapper

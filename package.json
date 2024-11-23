@@ -11,6 +11,7 @@
     "src",
     "lib",
     "android/src",
+    "!android/src/main/cpp/lib",
     "android/build.gradle",
     "android/CMakeLists.txt",
     "android/gradle.properties",
