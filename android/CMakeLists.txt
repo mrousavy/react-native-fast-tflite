@@ -54,8 +54,19 @@ target_link_libraries(
   ${PACKAGE_NAME}
   android                         # <-- log
   ReactAndroid::jsi               # <-- jsi.h
-  ReactAndroid::reactnativejni    # <-- CallInvokerImpl
   fbjni::fbjni                    # <-- fbjni.h
   ${TFLITE}
   ${TFLITE_GPU}
 )
+
+if(ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    ReactAndroid::reactnative     # <-- RN merged so
+  )
+else()
+  target_link_libraries(
+    ${PACKAGE_NAME}
+    ReactAndroid::reactnativejni  # <-- CallInvokerImpl
+  )
+endif()
