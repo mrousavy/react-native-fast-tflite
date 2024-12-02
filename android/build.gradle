@@ -80,6 +80,7 @@ android {
             "**/libc++_shared.so",
             "**/libfbjni.so",
             "**/libjsi.so",
+            "**/libreactnative.so",
             "**/libreactnativejni.so",
             "**/libturbomodulejsijni.so",
             "**/libreact_nativemodule_core.so",
