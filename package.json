@@ -11,6 +11,7 @@
     "src",
     "lib",
     "android/src",
+    "!android/src/main/cpp/lib",
     "android/build.gradle",
     "android/CMakeLists.txt",
     "android/gradle.properties",
@@ -26,14 +27,11 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "lint-cpp": "scripts/clang-format.sh",
-    "prepare": "git submodule update --init --recursive",
-    "update-submodule": "git submodule update --remote --merge",
     "check-all": "scripts/check-all.sh",
     "prepack": "bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
-    "configure": "git submodule update --init --recursive && cd tensorflow && ./configure",
-    "bootstrap": "yarn && yarn example && yarn example pods && yarn configure"
+    "bootstrap": "yarn && yarn example && yarn example pods"
   },
   "keywords": [
     "react-native",
