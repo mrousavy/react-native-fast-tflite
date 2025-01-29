@@ -1,0 +1,1 @@
+{"version":3,"names":["_NativeRNTflite","_interopRequireDefault","require","obj","__esModule","default"],"sourceRoot":"../../src","sources":["TensorflowModule.ts"],"mappings":";;;;;;;;;;;AAAA,IAAAA,eAAA,GAAAC,sBAAA,CAAAC,OAAA;AAAoE,SAAAD,uBAAAE,GAAA,WAAAA,GAAA,IAAAA,GAAA,CAAAC,UAAA,GAAAD,GAAA,KAAAE,OAAA,EAAAF,GAAA"}
