@@ -5,4 +5,4 @@ export interface Spec extends TurboModule {
   install(): boolean
 }
 
-export default TurboModuleRegistry.get<Spec>('Tflite')
+export default TurboModuleRegistry.getEnforcing<Spec>('Tflite')
