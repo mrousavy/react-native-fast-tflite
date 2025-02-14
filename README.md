@@ -10,28 +10,28 @@
 
 A high-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library for React Native.
 
-* 🔥 Powered by JSI
-* 💨 Zero-copy ArrayBuffers
-* 🔧 Uses the low-level C/C++ TensorFlow Lite core API for direct memory access
-* 🔄 Supports swapping out TensorFlow Models at runtime
-* 🖥️ Supports GPU-accelerated delegates (CoreML/Metal/OpenGL)
-* 📸 Easy [VisionCamera](https://github.com/mrousavy/react-native-vision-camera) integration
+- 🔥 Powered by JSI
+- 💨 Zero-copy ArrayBuffers
+- 🔧 Uses the low-level C/C++ TensorFlow Lite core API for direct memory access
+- 🔄 Supports swapping out TensorFlow Models at runtime
+- 🖥️ Supports GPU-accelerated delegates (CoreML/Metal/OpenGL)
+- 📸 Easy [VisionCamera](https://github.com/mrousavy/react-native-vision-camera) integration
 
 ## Installation
 
 1. Add the npm package
-    ```sh
-    yarn add react-native-fast-tflite
-    ```
+   ```sh
+   yarn add react-native-fast-tflite
+   ```
 2. In `metro.config.js`, add `tflite` as a supported asset extension:
-    ```js
-    module.exports = {
-        // ...
-        resolver: {
-            assetExts: ['tflite', // ...
-            // ...
-    ```
-    This allows you to drop `.tflite` files into your app and swap them out at runtime without having to rebuild anything! 🔥
+   ```js
+   module.exports = {
+       // ...
+       resolver: {
+           assetExts: ['tflite', // ...
+           // ...
+   ```
+   This allows you to drop `.tflite` files into your app and swap them out at runtime without having to rebuild anything! 🔥
 3. (Optional) If you want to enable the GPU Delegate, see ["Using GPU Delegates"](#using-gpu-delegates) down below.
 4. Run your app (`yarn android` / `npx pod-install && yarn ios`)
 
@@ -40,19 +40,21 @@ A high-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library fo
 1. Find a TensorFlow Lite (`.tflite`) model you want to use. There's thousands of public models on [tfhub.dev](https://tfhub.dev).
 2. Drag your TensorFlow Lite model into your React Native app's asset folder (e.g. `src/assets/my-model.tflite`)
 3. Load the Model:
-    ```ts
-    // Option A: Standalone Function
-    const model = await loadTensorflowModel(require('assets/my-model.tflite'))
 
-    // Option B: Hook in a Function Component
-    const plugin = useTensorflowModel(require('assets/my-model.tflite'))
-    ```
+   ```ts
+   // Option A: Standalone Function
+   const model = await loadTensorflowModel(require('assets/my-model.tflite'))
+
+   // Option B: Hook in a Function Component
+   const plugin = useTensorflowModel(require('assets/my-model.tflite'))
+   ```
+
 4. Call the Model:
-    ```ts
-    const inputData = ...
-    const outputData = await model.run(inputData)
-    console.log(outputData)
-    ```
+   ```ts
+   const inputData = ...
+   const outputData = await model.run(inputData)
+   console.log(outputData)
+   ```
 
 ### Loading Models
 
@@ -64,7 +66,9 @@ loadTensorflowModel(require('assets/my-model.tflite'))
 // File on the local filesystem
 loadTensorflowModel({ url: 'file:///var/mobile/.../my-model.tflite' })
 // Remote URL
-loadTensorflowModel({ url: 'https://tfhub.dev/google/lite-model/object_detection_v1.tflite' })
+loadTensorflowModel({
+  url: 'https://tfhub.dev/google/lite-model/object_detection_v1.tflite',
+})
 ```
 
 Loading a Model is asynchronous since Buffers need to be allocated. Make sure to check for any potential errors when loading a Model.
@@ -92,22 +96,24 @@ To do the conversion, use [vision-camera-resize-plugin](https://github.com/mrous
 
 ```tsx
 const objectDetection = useTensorflowModel(require('object_detection.tflite'))
-const model = objectDetection.state === "loaded" ? objectDetection.model : undefined
+const model =
+  objectDetection.state === 'loaded' ? objectDetection.model : undefined
 
 const { resize } = useResizePlugin()
 
-const frameProcessor = useFrameProcessor((frame) => {
+const frameProcessor = useFrameProcessor(
+  (frame) => {
     'worklet'
     if (model == null) return
 
     // 1. Resize 4k Frame to 192x192x3 using vision-camera-resize-plugin
     const resized = resize(frame, {
-        scale: {
-          width: 192,
-          height: 192,
-        },
-        pixelFormat: 'rgb',
-        dataType: 'uint8',
+      scale: {
+        width: 192,
+        height: 192,
+      },
+      pixelFormat: 'rgb',
+      dataType: 'uint8',
     })
 
     // 2. Run model with given input buffer synchronously
@@ -121,22 +127,22 @@ const frameProcessor = useFrameProcessor((frame) => {
     console.log(`Detected ${num_detections[0]} objects!`)
 
     for (let i = 0; i < detection_boxes.length; i += 4) {
-        const confidence = detection_scores[i / 4]
-        if (confidence > 0.7) {
-            // 4. Draw a red box around the detected object!
-            const left = detection_boxes[i]
-            const top = detection_boxes[i + 1]
-            const right = detection_boxes[i + 2]
-            const bottom = detection_boxes[i + 3]
-            const rect = SkRect.Make(left, top, right, bottom)
-            canvas.drawRect(rect, SkColors.Red)
-        }
+      const confidence = detection_scores[i / 4]
+      if (confidence > 0.7) {
+        // 4. Draw a red box around the detected object!
+        const left = detection_boxes[i]
+        const top = detection_boxes[i + 1]
+        const right = detection_boxes[i + 2]
+        const bottom = detection_boxes[i + 3]
+        const rect = SkRect.Make(left, top, right, bottom)
+        canvas.drawRect(rect, SkColors.Red)
+      }
     }
-}, [model])
-
-return (
-    <Camera frameProcessor={frameProcessor} {...otherProps} />
+  },
+  [model]
 )
+
+return <Camera frameProcessor={frameProcessor} {...otherProps} />
 ```
 
 ### Using GPU Delegates
@@ -170,29 +176,75 @@ For Expo, just use the config plugin in your expo config (`app.json`, `app.confi
 If you are on bare React Native, you need to include the CoreML/Metal code in your project:
 
 1. Set `$EnableCoreMLDelegate` to true in your `Podfile`:
-    ```ruby
-    $EnableCoreMLDelegate=true
 
-    # rest of your podfile...
-    ```
+   ```ruby
+   $EnableCoreMLDelegate=true
+
+   # rest of your podfile...
+   ```
+
 2. Open your iOS project in Xcode and add the `CoreML` framework to your project:
-    ![Xcode > xcodeproj > General > Frameworks, Libraries and Embedded Content > CoreML](ios/../img/ios-coreml-guide.png)
+   ![Xcode > xcodeproj > General > Frameworks, Libraries and Embedded Content > CoreML](ios/../img/ios-coreml-guide.png)
 3. Re-install Pods and build your app:
-    ```sh
-    cd ios && pod install && cd ..
-    yarn ios
-    ```
+   ```sh
+   cd ios && pod install && cd ..
+   yarn ios
+   ```
 4. Use the CoreML Delegate:
-    ```ts
-    const model = await loadTensorflowModel(require('assets/my-model.tflite'), 'core-ml')
-    ```
+   ```ts
+   const model = await loadTensorflowModel(
+     require('assets/my-model.tflite'),
+     'core-ml'
+   )
+   ```
 
 > [!NOTE]
 > Since some operations aren't supported on the CoreML delegate, make sure your Model is able to use the CoreML GPU delegate.
 
 #### Android GPU/NNAPI (Android)
 
-To enable GPU or NNAPI delegate in Android, you **may** need to include `OpenCL` library with `uses-native-library` on `application` scope in AndroidManifest.xml, starting from Android 12.
+To enable GPU or NNAPI delegate in Android, you **may** need to include some native libraries, starting from Android 12.
+
+##### Expo
+
+For Expo, just use the config plugin in your expo config (`app.json`, `app.config.json` or `app.config.js`) with `enableAndroidGpuLibraries`:
+
+```json
+{
+  "name": "my app",
+  "plugins": [
+    [
+      "react-native-fast-tflite",
+      {
+        "enableAndroidGpuLibraries": true
+      }
+    ]
+  ]
+}
+```
+
+By default, when enabled, `libOpenCl.so` will be included in your AndroidManifest.xml. You can also include more libraries by passing an array of string:
+
+```json
+{
+  "name": "my app",
+  "plugins": [
+    [
+      "react-native-fast-tflite",
+      {
+        "enableAndroidGpuLibraries": ["libOpenCL-pixel.so", "libGLES_mali.so"]
+      }
+    ]
+  ]
+}
+```
+
+> [!NOTE]
+> For expo app, remember to run prebuild if the cpu library is not yet included in your AndroidManifest.xml.
+
+##### Bare React Native
+
+If you are on bare React Native, you will need to include all needed libraries with `uses-native-library` on `application` scope in AndroidManifest.xml.
 
 ```xml
 <!-- Like this -->
@@ -205,10 +257,17 @@ To enable GPU or NNAPI delegate in Android, you **may** need to include `OpenCL`
 ```
 
 Then, you can just use it:
+
 ```ts
-const model = await loadTensorflowModel(require('assets/my-model.tflite'), 'android-gpu')
+const model = await loadTensorflowModel(
+  require('assets/my-model.tflite'),
+  'android-gpu'
+)
 // or
-const model = await loadTensorflowModel(require('assets/my-model.tflite'), 'nnapi')
+const model = await loadTensorflowModel(
+  require('assets/my-model.tflite'),
+  'nnapi'
+)
 ```
 
 > [!WARNING]
@@ -238,8 +297,8 @@ If you're integrating react-native-fast-tflite in a production app, consider [fu
 2. Make sure you have installed Xcode CLI tools such as `gcc`, `cmake` and `python`/`python3`. See the TensorFlow documentation on what you need exactly.
 3. Run `yarn bootstrap` and select `y` (yes) on all iOS and Android related questions.
 4. Open the Example app and start developing
-   * iOS: `example/ios/TfliteExample.xcworkspace`
-   * Android: `example/android`
+   - iOS: `example/ios/TfliteExample.xcworkspace`
+   - Android: `example/android`
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
 
