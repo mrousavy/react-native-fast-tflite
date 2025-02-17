@@ -15,9 +15,9 @@
 using namespace facebook;
 
 @implementation Tflite
-RCT_EXPORT_MODULE()
+RCT_EXPORT_MODULE(Tflite)
 
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
+- (NSNumber *)install {
   RCTBridge* bridge = [RCTBridge currentBridge];
   RCTCxxBridge* cxxBridge = (RCTCxxBridge*)bridge;
   if (!cxxBridge.runtime) {
@@ -50,7 +50,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams&)params {
-  return std::make_shared<facebook::react::NativeTfliteSpecJSI>(params);
+  return std::make_shared<facebook::react::NativeRNTfliteSpecJSI>(params);
 }
 #endif
 
