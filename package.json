@@ -143,5 +143,6 @@
     "name": "RNTfliteSpec",
     "type": "modules",
     "jsSrcsDir": "spec"
-  }
+  },
+  "dependencies": {}
 }
