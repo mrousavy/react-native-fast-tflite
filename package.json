@@ -19,7 +19,8 @@
     "!ios/build",
     "cpp",
     "*.podspec",
-    "app.plugin.js"
+    "app.plugin.js",
+    "spec"
   ],
   "scripts": {
     "typescript": "tsc --noEmit",
