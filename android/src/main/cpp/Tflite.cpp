@@ -30,6 +30,16 @@ public:
     }
     auto jsCallInvoker = jsCallInvokerHolder->cthis()->getCallInvoker();
 
+
+    // Adds the PropNameIDCache object to the Runtime. If the Runtime gets
+    // destroyed, the Object gets destroyed and the cache gets invalidated.
+    auto propNameIdCache = std::make_shared<InvalidateCacheOnDestroy>(runtime);
+    runtime.global().setProperty(
+      runtime,
+      "tfPluginPropNameIdCache",
+      jsi::Object::createFromHostObject(runtime, propNameIdCache)
+    );
+
     auto fetchByteDataFromUrl = [](std::string url) {
       // Attaching Current Thread to JVM
       JNIEnv* env = nullptr;
