@@ -134,6 +134,10 @@ dependencies {
   implementation "com.google.ai.edge.litert:litert-gpu:1.0.1"
   extractSO("com.google.ai.edge.litert:litert-gpu:1.0.1")
   extractHeaders("com.google.ai.edge.litert:litert-gpu:1.0.1")
+  
+  implementation "com.google.ai.edge.litert:litert-gpu-api:1.0.1"
+  extractSO("com.google.ai.edge.litert:litert-gpu-api:1.0.1")
+  extractHeaders("com.google.ai.edge.litert:litert-gpu-api:1.0.1")
 }
 
 task extractAARHeaders {
