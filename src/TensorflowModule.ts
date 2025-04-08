@@ -1,1 +1,1 @@
-export { default as TensorflowModule } from '../spec/NativeRNTflite'
+export * from './NativeRNTflite'

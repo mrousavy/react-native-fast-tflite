@@ -19,8 +19,7 @@
     "!ios/build",
     "cpp",
     "*.podspec",
-    "app.plugin.js",
-    "spec"
+    "app.plugin.js"
   ],
   "scripts": {
     "typescript": "tsc --noEmit",
@@ -143,7 +142,7 @@
   "codegenConfig": {
     "name": "RNTfliteSpec",
     "type": "modules",
-    "jsSrcsDir": "spec"
+    "jsSrcsDir": "src"
   },
   "dependencies": {}
 }
