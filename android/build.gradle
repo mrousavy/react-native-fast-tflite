@@ -127,25 +127,77 @@ dependencies {
   implementation "com.facebook.react:react-native:+"
 
   // Tensorflow Lite .aar (includes C API via prefabs)
-  implementation "com.google.ai.edge.litert:litert:1.0.1"
-  extractSO("com.google.ai.edge.litert:litert:1.0.1")
-  extractHeaders("com.google.ai.edge.litert:litert:1.0.1")
+  implementation "com.google.ai.edge.litert:litert:1.4.0"
+  extractSO("com.google.ai.edge.litert:litert:1.4.0")
+  extractHeaders("com.google.ai.edge.litert:litert:1.4.0")
 
   // Tensorflow Lite GPU delegate
-  implementation "com.google.ai.edge.litert:litert-gpu:1.0.1"
-  extractSO("com.google.ai.edge.litert:litert-gpu:1.0.1")
-  extractHeaders("com.google.ai.edge.litert:litert-gpu:1.0.1")
+  implementation "com.google.ai.edge.litert:litert-gpu:1.4.0"
+  extractSO("com.google.ai.edge.litert:litert-gpu:1.4.0")
+  extractHeaders("com.google.ai.edge.litert:litert-gpu:1.4.0")
 }
 
+/**
+ * Custom task to delete the 'src/main/cpp/lib/headers' directory.
+ */
+task cleanEmptyDirectories(type: Delete) {
+  // Specify the directory to be deleted.
+  delete 'src/main/cpp/lib/headers'
+  delete 'src/main/cpp/lib/res'
+}
+
+/**
+ * Custom task to copy C++ header files (.h) from AAR packages.
+ * This task iterates through each AAR file in the 'extractHeaders' configuration.
+ * For each AAR, it extracts and copies header files to specific destinations:
+ * - Headers found under 'external/org_tensorflow/tensorflow/' inside the AAR
+ * are copied to 'src/main/cpp/lib/tensorflow/'.
+ * - All other headers are copied to 'src/main/cpp/lib/{packageName}/', where
+ * '{packageName}' is derived from the AAR's filename.
+ */
 task extractAARHeaders {
+
+  finalizedBy cleanEmptyDirectories
+
   doLast {
-    configurations.extractHeaders.files.each {
-      def file = it.absoluteFile
-      def packageName = file.name.tokenize('-')[0]
+    // Iterate over each AAR file defined in the 'extractHeaders' configuration
+    configurations.extractHeaders.files.each { aarFile ->
+      // Extract the package name from the AAR filename (e.g., 'my-lib-1.0.aar' -> 'my-lib')
+      def packageName = aarFile.name.tokenize('-')[0]
+
+      // Create a copy operation for the current AAR
       copy {
-        from zipTree(file)
-        into "src/main/cpp/lib/$packageName/"
-        include "**/*.h"
+        // Source: the contents of the AAR treated as a zip archive
+        from zipTree(aarFile)
+        // Base destination directory for all copied files from this AAR.
+        // The 'eachFile' closure will then modify the relative path within this base.
+        into "src/main/cpp/lib/"
+        include "**/*.h" // Ensure only header files are included
+
+        // Process each file found within the AAR's zipTree
+        eachFile { fileCopyDetails ->
+          // Check if the current file is a C++ header file (.h)
+          if (fileCopyDetails.name.endsWith(".h")) {
+            // Get the original relative path of the file within the AAR
+            def originalRelativePath = fileCopyDetails.relativePath.toString()
+
+            // Check if the header belongs to the special TensorFlow path
+            if (originalRelativePath.startsWith("headers/external/org_tensorflow/tensorflow/")) {
+              // For TensorFlow headers, set the new relative path to start with 'tensorflow/'
+              // and remove the 'external/org_tensorflow/' prefix.
+              def newRelativePath = packageName + "/headers/" + originalRelativePath.substring("headers/external/org_tensorflow/".length())
+              fileCopyDetails.relativePath = new RelativePath(true, newRelativePath.split('/'))
+            } else {
+              // For all other headers, set the new relative path to include the 'packageName'
+              // derived from the AAR filename, followed by its original path.
+              def newRelativePath = packageName + "/" + originalRelativePath
+              fileCopyDetails.relativePath = new RelativePath(true, newRelativePath.split('/'))
+            }
+          } else {
+            // If the file is not a .h file, exclude it from the copy operation
+            fileCopyDetails.exclude()
+          }
+        }
       }
     }
   }
