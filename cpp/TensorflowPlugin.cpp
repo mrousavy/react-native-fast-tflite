@@ -18,9 +18,9 @@
 #include <thread>
 
 #ifdef ANDROID
-#include <tensorflow/lite/c/c_api.h>
-#include <tensorflow/lite/delegates/gpu/delegate.h>
-#include <tensorflow/lite/delegates/nnapi/nnapi_delegate_c_api.h>
+#include <tflite/c/c_api.h>
+#include <tflite/delegates/gpu/delegate.h>
+#include <tflite/delegates/nnapi/nnapi_delegate_c_api.h>
 #else
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
 
