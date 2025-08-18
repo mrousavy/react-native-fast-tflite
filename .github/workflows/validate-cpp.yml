@@ -27,7 +27,7 @@ jobs:
           - 'android/src/main/cpp'
           - 'ios'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Remove lib folders before linting
         run: |
           rm -rf ios/*.framework
