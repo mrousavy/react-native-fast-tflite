@@ -126,15 +126,15 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
 
-  // Tensorflow Lite .aar (includes C API via prefabs)
-  implementation "com.google.ai.edge.litert:litert:1.0.1"
-  extractSO("com.google.ai.edge.litert:litert:1.0.1")
-  extractHeaders("com.google.ai.edge.litert:litert:1.0.1")
+  // Tensorflow Lite .aar (includes C API via prefabs) - Updated to 1.4.0 for 16 KB page alignment support
+  implementation "com.google.ai.edge.litert:litert:1.4.0"
+  extractSO("com.google.ai.edge.litert:litert:1.4.0")
+  extractHeaders("com.google.ai.edge.litert:litert:1.4.0")
 
   // Tensorflow Lite GPU delegate
-  implementation "com.google.ai.edge.litert:litert-gpu:1.0.1"
-  extractSO("com.google.ai.edge.litert:litert-gpu:1.0.1")
-  extractHeaders("com.google.ai.edge.litert:litert-gpu:1.0.1")
+  implementation "com.google.ai.edge.litert:litert-gpu:1.4.0"
+  extractSO("com.google.ai.edge.litert:litert-gpu:1.4.0")
+  extractHeaders("com.google.ai.edge.litert:litert-gpu:1.4.0")
 }
 
 task extractAARHeaders {
