@@ -16,7 +16,7 @@
 
 #ifdef ANDROID
 #include <ReactCommon/CallInvoker.h>
-#include <tensorflow/lite/c/c_api.h>
+#include <tflite/c/c_api.h>
 #else
 #include <React-callinvoker/ReactCommon/CallInvoker.h>
 #include <TensorFlowLiteC/TensorFlowLiteC.h>

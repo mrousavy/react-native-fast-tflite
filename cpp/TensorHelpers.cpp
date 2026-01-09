@@ -9,7 +9,7 @@
 #include "TensorHelpers.h"
 
 #ifdef ANDROID
-#include <tensorflow/lite/c/c_api.h>
+#include <tflite/c/c_api.h>
 #else
 #include <TensorFlowLiteC/TensorFlowLiteC.h>
 #endif

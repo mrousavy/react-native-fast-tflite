@@ -1,4 +1,5 @@
 import java.nio.file.Paths
+import org.gradle.api.file.RelativePath
 
 buildscript {
   repositories {
@@ -127,25 +128,44 @@ dependencies {
   implementation "com.facebook.react:react-native:+"
 
   // Tensorflow Lite .aar (includes C API via prefabs)
-  implementation "com.google.ai.edge.litert:litert:1.0.1"
-  extractSO("com.google.ai.edge.litert:litert:1.0.1")
-  extractHeaders("com.google.ai.edge.litert:litert:1.0.1")
+  implementation "com.google.ai.edge.litert:litert:1.4.0"
+  extractSO("com.google.ai.edge.litert:litert:1.4.0")
+  extractHeaders("com.google.ai.edge.litert:litert:1.4.0")
 
   // Tensorflow Lite GPU delegate
-  implementation "com.google.ai.edge.litert:litert-gpu:1.0.1"
-  extractSO("com.google.ai.edge.litert:litert-gpu:1.0.1")
-  extractHeaders("com.google.ai.edge.litert:litert-gpu:1.0.1")
+  implementation "com.google.ai.edge.litert:litert-gpu:1.4.0"
+  extractSO("com.google.ai.edge.litert:litert-gpu:1.4.0")
+  extractHeaders("com.google.ai.edge.litert:litert-gpu:1.4.0")
+}
+
+task cleanEmptyDirectories(type: Delete) {
+  delete 'src/main/cpp/lib/headers'
+  delete 'src/main/cpp/lib/res'
 }
 
 task extractAARHeaders {
+  finalizedBy cleanEmptyDirectories
   doLast {
-    configurations.extractHeaders.files.each {
-      def file = it.absoluteFile
-      def packageName = file.name.tokenize('-')[0]
+    configurations.extractHeaders.files.each { aarFile ->
+      def packageName = aarFile.name.tokenize('-')[0]
       copy {
-        from zipTree(file)
-        into "src/main/cpp/lib/$packageName/"
+        from zipTree(aarFile)
+        into "src/main/cpp/lib/"
         include "**/*.h"
+        eachFile { fileCopyDetails ->
+          if (fileCopyDetails.name.endsWith(".h")) {
+            def originalRelativePath = fileCopyDetails.relativePath.toString()
+            if (originalRelativePath.startsWith("headers/external/org_tensorflow/tensorflow/")) {
+              def newRelativePath = packageName + "/headers/" + originalRelativePath.substring("headers/external/org_tensorflow/".length())
+              fileCopyDetails.relativePath = new RelativePath(true, newRelativePath.split('/'))
+            } else {
+              def newRelativePath = packageName + "/" + originalRelativePath
+              fileCopyDetails.relativePath = new RelativePath(true, newRelativePath.split('/'))
+            }
+          } else {
+            exclude fileCopyDetails.name
+          }
+        }
       }
     }
   }
