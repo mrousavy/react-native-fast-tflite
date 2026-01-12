@@ -36,6 +36,12 @@ add_library(
   src/main/cpp/Tflite.cpp
 )
 
+target_link_options(${PACKAGE_NAME}
+    PRIVATE
+    "-Wl,-z,max-page-size=16384"
+    "-Wl,-z,common-page-size=16384"
+)
+
 # Specifies a path to native header files.
 target_include_directories(
   ${PACKAGE_NAME}
@@ -43,6 +49,7 @@ target_include_directories(
   "../cpp"
   "src/main/cpp"
   "src/main/cpp/lib/litert/headers"
+  "src/main/cpp/lib/litert/headers/tflite"
   "${NODE_MODULES_DIR}/react-native/ReactCommon"
   "${NODE_MODULES_DIR}/react-native/ReactCommon/callinvoker"
   "${NODE_MODULES_DIR}/react-native/ReactAndroid/src/main/jni/react/turbomodule" # <-- CallInvokerHolder JNI wrapper
