@@ -1,6 +1,6 @@
 #ifdef RCT_NEW_ARCH_ENABLED
 
-#import "RNTfliteSpec.h"
+#import <RNTfliteSpec/RNTfliteSpec.h>
 @interface Tflite : NSObject <NativeRNTfliteSpec>
 @end
 
