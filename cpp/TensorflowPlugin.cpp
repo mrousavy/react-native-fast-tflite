@@ -89,7 +89,7 @@ void TensorflowPlugin::installToRuntime(jsi::Runtime& runtime,
               switch (delegateType) {
                 case Delegate::CoreML: {
 #if FAST_TFLITE_ENABLE_CORE_ML
-                  TfLiteCoreMlDelegateOptions delegateOptions;
+                  TfLiteCoreMlDelegateOptions delegateOptions = { TfLiteCoreMlDelegateAllDevices };
                   auto delegate = TfLiteCoreMlDelegateCreate(&delegateOptions);
                   TfLiteInterpreterOptionsAddDelegate(options, delegate);
                   break;
