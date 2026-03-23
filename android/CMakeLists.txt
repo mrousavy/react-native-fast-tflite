@@ -1,13 +1,11 @@
-project(VisionCameraTflite)
+project(NitroTflite)
 cmake_minimum_required(VERSION 3.9.0)
 
+set (PACKAGE_NAME NitroTflite)
 set (CMAKE_VERBOSE_MAKEFILE ON)
-set (PACKAGE_NAME "VisionCameraTflite")
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 20)
 
-find_package(ReactAndroid REQUIRED CONFIG)
-find_package(fbjni REQUIRED CONFIG)
-
+# Find TFLite libraries
 find_library(
   TFLITE
   tensorflowlite_jni
@@ -24,56 +22,42 @@ find_library(
   NO_CMAKE_FIND_ROOT_PATH
 )
 
+# -DANDROID flag
 string(APPEND CMAKE_CXX_FLAGS " -DANDROID")
 
-add_library(
-  ${PACKAGE_NAME}
-  SHARED
-  ../cpp/jsi/Promise.cpp
-  ../cpp/jsi/TypedArray.cpp
-  ../cpp/TensorflowPlugin.cpp
-  ../cpp/TensorHelpers.cpp
-  src/main/cpp/Tflite.cpp
+# Define C++ library and add all sources
+add_library(${PACKAGE_NAME} SHARED
+        src/main/cpp/cpp-adapter.cpp
+        ../cpp/HybridTfliteModel.cpp
+        ../cpp/HybridTfliteModule.cpp
+        ../cpp/TfliteHelpers.cpp
 )
 
+# Add Nitrogen specs :)
+include(${CMAKE_SOURCE_DIR}/../nitrogen/generated/android/NitroTflite+autolinking.cmake)
+
+# Page size linker options
 target_link_options(${PACKAGE_NAME}
     PRIVATE
     "-Wl,-z,max-page-size=16384"
     "-Wl,-z,common-page-size=16384"
 )
 
-# Specifies a path to native header files.
-target_include_directories(
-  ${PACKAGE_NAME}
-  PRIVATE
-  "../cpp"
-  "src/main/cpp"
-  "src/main/cpp/lib/litert/headers"
-  "src/main/cpp/lib/litert/headers/tflite"
-  "${NODE_MODULES_DIR}/react-native/ReactCommon"
-  "${NODE_MODULES_DIR}/react-native/ReactCommon/callinvoker"
-  "${NODE_MODULES_DIR}/react-native/ReactAndroid/src/main/jni/react/turbomodule" # <-- CallInvokerHolder JNI wrapper
+# Set up local includes
+include_directories(
+        "src/main/cpp"
+        "../cpp"
+        "src/main/cpp/lib/litert/headers"
+        "src/main/cpp/lib/litert/headers/tflite"
 )
 
-set_target_properties(${PACKAGE_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+find_library(LOG_LIB log)
 
+# Link all libraries together
 target_link_libraries(
-  ${PACKAGE_NAME}
-  android                         # <-- log
-  ReactAndroid::jsi               # <-- jsi.h
-  fbjni::fbjni                    # <-- fbjni.h
-  ${TFLITE}
-  ${TFLITE_GPU}
+        ${PACKAGE_NAME}
+        ${LOG_LIB}
+        android
+        ${TFLITE}
+        ${TFLITE_GPU}
 )
-
-if(ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
-  target_link_libraries(
-    ${PACKAGE_NAME}
-    ReactAndroid::reactnative     # <-- RN merged so
-  )
-else()
-  target_link_libraries(
-    ${PACKAGE_NAME}
-    ReactAndroid::reactnativejni  # <-- CallInvokerImpl
-  )
-endif()

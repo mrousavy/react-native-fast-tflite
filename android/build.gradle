@@ -1,4 +1,3 @@
-import java.nio.file.Paths
 import org.gradle.api.file.RelativePath
 
 buildscript {
@@ -8,8 +7,13 @@ buildscript {
   }
 
   dependencies {
-    classpath "com.android.tools.build:gradle:7.2.2"
+    classpath "com.android.tools.build:gradle:9.1.0"
   }
+}
+
+def reactNativeArchitectures() {
+  def value = rootProject.getProperties().get("reactNativeArchitectures")
+  return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
 def isNewArchitectureEnabled() {
@@ -17,87 +21,90 @@ def isNewArchitectureEnabled() {
 }
 
 apply plugin: "com.android.library"
-
-
-def appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
+apply plugin: 'org.jetbrains.kotlin.android'
+apply from: '../nitrogen/generated/android/NitroTflite+autolinking.gradle'
+apply from: "./fix-prefab.gradle"
 
 if (isNewArchitectureEnabled()) {
   apply plugin: "com.facebook.react"
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["Tflite_" + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["NitroTflite_" + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["Tflite_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["NitroTflite_" + name]).toInteger()
 }
-
-static def findNodeModules(baseDir) {
-  def basePath = baseDir.toPath().normalize()
-  // Node's module resolution algorithm searches up to the root directory,
-  // after which the base path will be null
-  while (basePath) {
-    def nodeModulesPath = Paths.get(basePath.toString(), "node_modules")
-    def reactNativePath = Paths.get(nodeModulesPath.toString(), "react-native")
-    if (nodeModulesPath.toFile().exists() && reactNativePath.toFile().exists()) {
-      return nodeModulesPath.toString()
-    }
-    basePath = basePath.getParent()
-  }
-  throw new GradleException("react-native-fast-tflite: Failed to find node_modules/ path!")
-}
-
-def nodeModules = findNodeModules(projectDir)
 
 android {
+  namespace "com.margelo.nitro.nitrotflite"
+
   ndkVersion getExtOrDefault("ndkVersion")
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
-  namespace "com.tflite"
 
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+
     externalNativeBuild {
       cmake {
-        arguments "-DANDROID_STL=c++_shared",
-                "-DNODE_MODULES_DIR=${nodeModules}",
-                "-DIS_NEW_ARCHITECTURE_ENABLED=${isNewArchitectureEnabled()}",
-                "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
-        cppFlags "-O2 -frtti -fexceptions -Wall -fstack-protector-all"
-        abiFilters "x86", "x86_64", "armeabi-v7a", "arm64-v8a"
+        cppFlags "-frtti -fexceptions -Wall -Wextra -fstack-protector-all"
+        arguments "-DANDROID_STL=c++_shared", "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+        abiFilters (*reactNativeArchitectures())
+
+        buildTypes {
+          debug {
+            cppFlags "-O1 -g"
+          }
+          release {
+            cppFlags "-O2"
+          }
+        }
       }
     }
   }
+
   externalNativeBuild {
     cmake {
       path "CMakeLists.txt"
     }
   }
+
   packagingOptions {
     excludes = [
             "META-INF",
             "META-INF/**",
             "**/libc++_shared.so",
+            "**/libNitroModules.so",
             "**/libfbjni.so",
             "**/libjsi.so",
+            "**/libfolly_json.so",
+            "**/libfolly_runtime.so",
+            "**/libglog.so",
+            "**/libhermes.so",
+            "**/libhermes-executor-debug.so",
+            "**/libhermes_executor.so",
             "**/libreactnative.so",
             "**/libreactnativejni.so",
             "**/libturbomodulejsijni.so",
             "**/libreact_nativemodule_core.so",
+            "**/libjscexecutor.so",
             "**/libtensorflowlite_jni.so",
-            "**/libtensorflowlite_gpu_jni.so",
+            "**/libtensorflowlite_gpu_jni.so"
     ]
   }
+
+  buildFeatures {
+    buildConfig true
+    prefab true
+  }
+
   buildTypes {
     release {
       minifyEnabled false
     }
-  }
-
-  buildFeatures {
-    prefab true
   }
 
   lintOptions {
@@ -109,9 +116,15 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
-  configurations {
-    extractHeaders
-    extractSO
+  sourceSets {
+    main {
+      if (isNewArchitectureEnabled()) {
+        java.srcDirs += [
+          // React Codegen files
+          "${project.buildDir}/generated/source/codegen/java"
+        ]
+      }
+    }
   }
 }
 
@@ -121,11 +134,20 @@ repositories {
 }
 
 
+// AAR extraction configurations
+configurations {
+  extractHeaders
+  extractSO
+}
+
 dependencies {
   // For < 0.71, this will be from the local maven repo
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
+
+  // Add a dependency on NitroModules
+  implementation project(":react-native-nitro-modules")
 
   // Tensorflow Lite .aar (includes C API via prefabs)
   implementation "com.google.ai.edge.litert:litert:1.4.0"
@@ -138,11 +160,13 @@ dependencies {
   extractHeaders("com.google.ai.edge.litert:litert-gpu:1.4.0")
 }
 
+// Clean leftover empty directories
 task cleanEmptyDirectories(type: Delete) {
   delete 'src/main/cpp/lib/headers'
   delete 'src/main/cpp/lib/res'
 }
 
+// Extract .h headers from AARs
 task extractAARHeaders {
   finalizedBy cleanEmptyDirectories
   doLast {
@@ -171,6 +195,7 @@ task extractAARHeaders {
   }
 }
 
+// Extract .so files from AARs
 task extractSOFiles {
   doLast {
     configurations.extractSO.files.each {
@@ -185,15 +210,7 @@ task extractSOFiles {
   }
 }
 
-if (isNewArchitectureEnabled()) {
-  react {
-    jsRootDir = file("../src/")
-    libraryName = "Tflite"
-    codegenJavaPackageName = "com.tflite"
-  }
-}
-
-
+// Ensure AAR extraction runs before native build
 def nativeBuildDependsOn(dependsOnTask) {
   def buildTasks = tasks.findAll({ task -> (
           !task.name.contains("Clean")
@@ -209,3 +226,4 @@ afterEvaluate {
   nativeBuildDependsOn(extractAARHeaders)
   nativeBuildDependsOn(extractSOFiles)
 }
+

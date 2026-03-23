@@ -7,6 +7,7 @@ import {
   TensorflowModel,
   useTensorflowModel,
 } from 'react-native-fast-tflite'
+import { NitroModules } from 'react-native-nitro-modules'
 import {
   Camera,
   useCameraDevice,
@@ -33,6 +34,14 @@ export default function App(): React.ReactNode {
   // from https://www.kaggle.com/models/tensorflow/efficientdet/frameworks/tfLite
   const model = useTensorflowModel(require('../assets/efficientdet.tflite'))
   const actualModel = model.state === 'loaded' ? model.model : undefined
+  // Nitro HybridObjects use jsi::NativeState which is not directly accessible
+  // in VisionCamera's worklet runtime. Boxing converts the HybridObject into a
+  // jsi::HostObject so it can safely cross the worklet boundary. Call .unbox()
+  // inside the worklet to recover the full TfliteModel.
+  const boxedModel = React.useMemo(
+    () => (actualModel != null ? NitroModules.box(actualModel) : undefined),
+    [actualModel]
+  )
 
   React.useEffect(() => {
     if (actualModel == null) return
@@ -44,11 +53,13 @@ export default function App(): React.ReactNode {
   const frameProcessor = useFrameProcessor(
     (frame) => {
       'worklet'
-      if (actualModel == null) {
+      if (boxedModel == null) {
         // model is still loading...
         return
       }
 
+      // Unbox the HybridObject inside the worklet to access runSync
+      const tflite = boxedModel.unbox()
       console.log(`Running inference on ${frame}`)
       const resized = resize(frame, {
         scale: {
@@ -58,11 +69,12 @@ export default function App(): React.ReactNode {
         pixelFormat: 'rgb',
         dataType: 'uint8',
       })
-      const result = actualModel.runSync([resized])
-      const num_detections = result[3]?.[0] ?? 0
+      const inputBuffer = resized.buffer.slice(resized.byteOffset, resized.byteOffset + resized.byteLength)
+      const result = tflite.runSync([inputBuffer])
+      const num_detections = new Float32Array(result[3])[0] ?? 0
       console.log('Result: ' + num_detections)
     },
-    [actualModel]
+    [boxedModel]
   )
 
   React.useEffect(() => {

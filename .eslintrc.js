@@ -17,6 +17,7 @@ module.exports = {
     'example',
     'tensorflow',
     'app.plugin.js',
+    'react-native.config.js',
   ],
   plugins: ['@typescript-eslint'],
   extends: ['plugin:@typescript-eslint/recommended', '@react-native-community'],
