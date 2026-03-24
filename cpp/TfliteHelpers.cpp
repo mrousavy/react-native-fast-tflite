@@ -103,7 +103,8 @@ size_t getTFLTensorDataTypeSize(TfLiteType dataType) {
 
 int getTensorTotalLength(const TfLiteTensor* tensor) {
   int dimensions = TfLiteTensorNumDims(tensor);
-  if (dimensions < 1) return 0;
+  if (dimensions < 1)
+    return 0;
   int size = 1;
   for (size_t i = 0; i < dimensions; i++) {
     size *= TfLiteTensorDim(tensor, i);

@@ -33,8 +33,8 @@ HybridTfliteModule::createModel(const std::shared_ptr<ArrayBuffer>& data,
       TfLiteInterpreterOptionsAddDelegate(options, coremlDelegate);
       break;
 #else
-      throw std::runtime_error(
-          "CoreML Delegate is not enabled! Set $EnableCoreMLDelegate to true in Podfile and rebuild.");
+      throw std::runtime_error("CoreML Delegate is not enabled! Set $EnableCoreMLDelegate to true "
+                               "in Podfile and rebuild.");
 #endif
     }
     case TensorflowModelDelegate::METAL: {

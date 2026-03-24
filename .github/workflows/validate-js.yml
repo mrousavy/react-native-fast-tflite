@@ -35,6 +35,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
     - name: Install reviewdog
       uses: reviewdog/action-setup@v1
 
@@ -72,6 +77,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
