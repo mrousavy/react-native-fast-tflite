@@ -22,7 +22,7 @@ namespace NitroModules { class ArrayBufferHolder; }
 
 #include "NitroTflite-Swift-Cxx-Umbrella.hpp"
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   /**
    * The C++ part of HybridAssetLoaderSpec_cxx.swift.
@@ -83,4 +83,4 @@ namespace margelo::nitro::nitrotflite {
     NitroTflite::HybridAssetLoaderSpec_cxx _swiftPart;
   };
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

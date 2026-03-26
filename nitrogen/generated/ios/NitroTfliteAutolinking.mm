@@ -20,7 +20,7 @@
 
 + (void) load {
   using namespace margelo::nitro;
-  using namespace margelo::nitro::nitrotflite;
+  using namespace margelo::nitro::tflite;
 
   HybridObjectRegistry::registerHybridObjectConstructor(
     "TfliteModule",

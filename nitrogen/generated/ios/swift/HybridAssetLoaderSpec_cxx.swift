@@ -18,11 +18,11 @@ import NitroModules
  */
 open class HybridAssetLoaderSpec_cxx {
   /**
-   * The Swift <> C++ bridge's namespace (`margelo::nitro::nitrotflite::bridge::swift`)
+   * The Swift <> C++ bridge's namespace (`margelo::nitro::tflite::bridge::swift`)
    * from `NitroTflite-Swift-Cxx-Bridge.hpp`.
    * This contains specialized C++ templates, and C++ helper functions that can be accessed from Swift.
    */
-  public typealias bridge = margelo.nitro.nitrotflite.bridge.swift
+  public typealias bridge = margelo.nitro.tflite.bridge.swift
 
   /**
    * Holds an instance of the `HybridAssetLoaderSpec` Swift protocol.

@@ -7,5 +7,5 @@
 
 #include "HybridAssetLoaderSpecSwift.hpp"
 
-namespace margelo::nitro::nitrotflite {
-} // namespace margelo::nitro::nitrotflite
+namespace margelo::nitro::tflite {
+} // namespace margelo::nitro::tflite

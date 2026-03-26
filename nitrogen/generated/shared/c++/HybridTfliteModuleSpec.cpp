@@ -7,7 +7,7 @@
 
 #include "HybridTfliteModuleSpec.hpp"
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   void HybridTfliteModuleSpec::loadHybridMethods() {
     // load base methods/properties
@@ -18,4 +18,4 @@ namespace margelo::nitro::nitrotflite {
     });
   }
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

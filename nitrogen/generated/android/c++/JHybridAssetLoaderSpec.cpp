@@ -15,7 +15,7 @@
 #include <NitroModules/JArrayBuffer.hpp>
 #include <string>
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   std::shared_ptr<JHybridAssetLoaderSpec> JHybridAssetLoaderSpec::JavaPart::getJHybridAssetLoaderSpec() {
     auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
@@ -65,4 +65,4 @@ namespace margelo::nitro::nitrotflite {
     }();
   }
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

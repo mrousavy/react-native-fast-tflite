@@ -14,17 +14,17 @@
 #endif
 
 // Forward declaration of `TensorflowModelDelegate` to properly resolve imports.
-namespace margelo::nitro::nitrotflite { enum class TensorflowModelDelegate; }
+namespace margelo::nitro::tflite { enum class TensorflowModelDelegate; }
 // Forward declaration of `Tensor` to properly resolve imports.
-namespace margelo::nitro::nitrotflite { struct Tensor; }
+namespace margelo::nitro::tflite { struct Tensor; }
 
 #include "TensorflowModelDelegate.hpp"
-#include "Tensor.hpp"
 #include <vector>
+#include "Tensor.hpp"
 #include <NitroModules/ArrayBuffer.hpp>
 #include <NitroModules/Promise.hpp>
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   using namespace margelo::nitro;
 
@@ -51,7 +51,7 @@ namespace margelo::nitro::nitrotflite {
 
     public:
       // Properties
-      virtual TensorflowModelDelegate getDelegate() = 0;
+      virtual std::vector<TensorflowModelDelegate> getDelegates() = 0;
       virtual std::vector<Tensor> getInputs() = 0;
       virtual std::vector<Tensor> getOutputs() = 0;
 
@@ -69,4 +69,4 @@ namespace margelo::nitro::nitrotflite {
       static constexpr auto TAG = "TfliteModel";
   };
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

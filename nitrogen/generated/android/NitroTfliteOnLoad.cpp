@@ -19,16 +19,16 @@
 #include "HybridTfliteModule.hpp"
 #include <NitroModules/DefaultConstructableObject.hpp>
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
 int initialize(JavaVM* vm) {
   return facebook::jni::initialize(vm, []() {
-    ::margelo::nitro::nitrotflite::registerAllNatives();
+    ::margelo::nitro::tflite::registerAllNatives();
   });
 }
 
 struct JHybridAssetLoaderSpecImpl: public jni::JavaClass<JHybridAssetLoaderSpecImpl, JHybridAssetLoaderSpec::JavaPart> {
-  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/nitrotflite/HybridAssetLoader;";
+  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/tflite/HybridAssetLoader;";
   static std::shared_ptr<JHybridAssetLoaderSpec> create() {
     static const auto constructorFn = javaClassStatic()->getConstructor<JHybridAssetLoaderSpecImpl::javaobject()>();
     jni::local_ref<JHybridAssetLoaderSpec::JavaPart> javaPart = javaClassStatic()->newObject(constructorFn);
@@ -38,10 +38,10 @@ struct JHybridAssetLoaderSpecImpl: public jni::JavaClass<JHybridAssetLoaderSpecI
 
 void registerAllNatives() {
   using namespace margelo::nitro;
-  using namespace margelo::nitro::nitrotflite;
+  using namespace margelo::nitro::tflite;
 
   // Register native JNI methods
-  margelo::nitro::nitrotflite::JHybridAssetLoaderSpec::CxxPart::registerNatives();
+  margelo::nitro::tflite::JHybridAssetLoaderSpec::CxxPart::registerNatives();
 
   // Register Nitro Hybrid Objects
   HybridObjectRegistry::registerHybridObjectConstructor(
@@ -61,4 +61,4 @@ void registerAllNatives() {
   );
 }
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

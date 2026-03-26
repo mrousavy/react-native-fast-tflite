@@ -9,7 +9,7 @@
 
 // Forward declarations of C++ defined types
 // Forward declaration of `HybridAssetLoaderSpec` to properly resolve imports.
-namespace margelo::nitro::nitrotflite { class HybridAssetLoaderSpec; }
+namespace margelo::nitro::tflite { class HybridAssetLoaderSpec; }
 
 // Include C++ defined types
 #include "HybridAssetLoaderSpec.hpp"

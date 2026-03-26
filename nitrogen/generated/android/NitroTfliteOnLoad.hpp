@@ -9,7 +9,7 @@
 #include <functional>
 #include <NitroModules/NitroDefines.hpp>
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   [[deprecated("Use registerNatives() instead.")]]
   int initialize(JavaVM* vm);
@@ -23,7 +23,7 @@ namespace margelo::nitro::nitrotflite {
    * JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
    *   return facebook::jni::initialize(vm, []() {
    *     // register all NitroTflite HybridObjects
-   *     margelo::nitro::nitrotflite::registerNatives();
+   *     margelo::nitro::tflite::registerNatives();
    *     // any other custom registrations go here.
    *   });
    * }
@@ -31,4 +31,4 @@ namespace margelo::nitro::nitrotflite {
    */
   void registerAllNatives();
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

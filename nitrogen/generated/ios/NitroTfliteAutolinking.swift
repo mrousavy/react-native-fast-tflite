@@ -10,7 +10,7 @@ import NitroModules
 // TODO: Use empty enums once Swift supports exporting them as namespaces
 //       See: https://github.com/swiftlang/swift/pull/83616
 public final class NitroTfliteAutolinking {
-  public typealias bridge = margelo.nitro.nitrotflite.bridge.swift
+  public typealias bridge = margelo.nitro.tflite.bridge.swift
 
   public static func createAssetLoader() -> bridge.std__shared_ptr_HybridAssetLoaderSpec_ {
     let hybridObject = HybridAssetLoader()

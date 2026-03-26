@@ -1,14 +1,14 @@
 {
   "$schema": "https://nitro.margelo.com/nitro.schema.json",
   "cxxNamespace": [
-    "nitrotflite"
+    "tflite"
   ],
   "ios": {
     "iosModuleName": "NitroTflite"
   },
   "android": {
     "androidNamespace": [
-      "nitrotflite"
+      "tflite"
     ],
     "androidCxxLibName": "NitroTflite"
   },

@@ -19,7 +19,7 @@
 #include <NitroModules/Promise.hpp>
 #include <string>
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   using namespace margelo::nitro;
 
@@ -61,4 +61,4 @@ namespace margelo::nitro::nitrotflite {
       static constexpr auto TAG = "AssetLoader";
   };
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

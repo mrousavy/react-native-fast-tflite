@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "TfliteExampleNew.app"
-               BlueprintName = "TfliteExampleNew"
-               ReferencedContainer = "container:TfliteExampleNew.xcodeproj">
+               BuildableName = "TfliteExample.app"
+               BlueprintName = "TfliteExample"
+               ReferencedContainer = "container:TfliteExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "TfliteExampleNewTests.xctest"
-               BlueprintName = "TfliteExampleNewTests"
-               ReferencedContainer = "container:TfliteExampleNew.xcodeproj">
+               BuildableName = "TfliteExampleTests.xctest"
+               BlueprintName = "TfliteExampleTests"
+               ReferencedContainer = "container:TfliteExample.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "TfliteExampleNew.app"
-            BlueprintName = "TfliteExampleNew"
-            ReferencedContainer = "container:TfliteExampleNew.xcodeproj">
+            BuildableName = "TfliteExample.app"
+            BlueprintName = "TfliteExample"
+            ReferencedContainer = "container:TfliteExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "TfliteExampleNew.app"
-            BlueprintName = "TfliteExampleNew"
-            ReferencedContainer = "container:TfliteExampleNew.xcodeproj">
+            BuildableName = "TfliteExample.app"
+            BlueprintName = "TfliteExample"
+            ReferencedContainer = "container:TfliteExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

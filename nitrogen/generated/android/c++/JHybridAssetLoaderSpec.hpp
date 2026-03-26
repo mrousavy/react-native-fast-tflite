@@ -14,18 +14,18 @@
 
 
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   using namespace facebook;
 
   class JHybridAssetLoaderSpec: public virtual HybridAssetLoaderSpec, public virtual JHybridObject {
   public:
     struct JavaPart: public jni::JavaClass<JavaPart, JHybridObject::JavaPart> {
-      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/nitrotflite/HybridAssetLoaderSpec;";
+      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/tflite/HybridAssetLoaderSpec;";
       std::shared_ptr<JHybridAssetLoaderSpec> getJHybridAssetLoaderSpec();
     };
     struct CxxPart: public jni::HybridClass<CxxPart, JHybridObject::CxxPart> {
-      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/nitrotflite/HybridAssetLoaderSpec$CxxPart;";
+      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/tflite/HybridAssetLoaderSpec$CxxPart;";
       static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
       static void registerNatives();
       using HybridBase::HybridBase;
@@ -60,4 +60,4 @@ namespace margelo::nitro::nitrotflite {
     jni::global_ref<JHybridAssetLoaderSpec::JavaPart> _javaPart;
   };
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

@@ -14,16 +14,17 @@
 #endif
 
 // Forward declaration of `HybridTfliteModelSpec` to properly resolve imports.
-namespace margelo::nitro::nitrotflite { class HybridTfliteModelSpec; }
+namespace margelo::nitro::tflite { class HybridTfliteModelSpec; }
 // Forward declaration of `TensorflowModelDelegate` to properly resolve imports.
-namespace margelo::nitro::nitrotflite { enum class TensorflowModelDelegate; }
+namespace margelo::nitro::tflite { enum class TensorflowModelDelegate; }
 
 #include <memory>
 #include "HybridTfliteModelSpec.hpp"
 #include <NitroModules/ArrayBuffer.hpp>
 #include "TensorflowModelDelegate.hpp"
+#include <vector>
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   using namespace margelo::nitro;
 
@@ -54,7 +55,7 @@ namespace margelo::nitro::nitrotflite {
 
     public:
       // Methods
-      virtual std::shared_ptr<HybridTfliteModelSpec> createModel(const std::shared_ptr<ArrayBuffer>& data, TensorflowModelDelegate delegate) = 0;
+      virtual std::shared_ptr<HybridTfliteModelSpec> createModel(const std::shared_ptr<ArrayBuffer>& modelData, const std::vector<TensorflowModelDelegate>& delegates) = 0;
 
     protected:
       // Hybrid Setup
@@ -65,4 +66,4 @@ namespace margelo::nitro::nitrotflite {
       static constexpr auto TAG = "TfliteModule";
   };
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

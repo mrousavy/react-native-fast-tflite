@@ -23,9 +23,8 @@ std::string tfLiteStatusToString(TfLiteStatus status) {
       return "unresolved-ops";
     case kTfLiteCancelled:
       return "cancelled";
-    default:
-      return "unknown";
   }
+  return "unknown";
 }
 
 std::string dataTypeToString(TfLiteType dataType) {
@@ -66,10 +65,8 @@ std::string dataTypeToString(TfLiteType dataType) {
       return "resource";
     case kTfLiteVariant:
       return "variant";
-    default:
-      [[unlikely]];
-      return "invalid";
   }
+  return "invalid";
 }
 
 size_t getTFLTensorDataTypeSize(TfLiteType dataType) {
@@ -94,11 +91,8 @@ size_t getTFLTensorDataTypeSize(TfLiteType dataType) {
       return sizeof(uint32_t);
     case kTfLiteUInt16:
       return sizeof(uint16_t);
-    default:
-      [[unlikely]];
-      throw std::runtime_error("TFLite: Unsupported output data type! " +
-                               dataTypeToString(dataType));
   }
+  throw std::runtime_error("TFLite: Unsupported output data type! " + dataTypeToString(dataType));
 }
 
 int getTensorTotalLength(const TfLiteTensor* tensor) {

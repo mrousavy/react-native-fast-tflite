@@ -1,4 +1,4 @@
-package com.margelo.nitro.nitrotflite
+package com.margelo.nitro.tflite
 
 import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
@@ -12,7 +12,7 @@ class HybridAssetLoader : HybridAssetLoaderSpec() {
   override fun loadAsset(path: String): Promise<ArrayBuffer> {
     return Promise.async {
       val bytes = URL(path).readBytes()
-      ArrayBuffer.copy(bytes)
+      return@async ArrayBuffer.copy(bytes)
     }
   }
 }

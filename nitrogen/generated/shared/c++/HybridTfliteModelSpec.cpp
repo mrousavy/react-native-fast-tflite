@@ -7,14 +7,14 @@
 
 #include "HybridTfliteModelSpec.hpp"
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   void HybridTfliteModelSpec::loadHybridMethods() {
     // load base methods/properties
     HybridObject::loadHybridMethods();
     // load custom methods/properties
     registerHybrids(this, [](Prototype& prototype) {
-      prototype.registerHybridGetter("delegate", &HybridTfliteModelSpec::getDelegate);
+      prototype.registerHybridGetter("delegates", &HybridTfliteModelSpec::getDelegates);
       prototype.registerHybridGetter("inputs", &HybridTfliteModelSpec::getInputs);
       prototype.registerHybridGetter("outputs", &HybridTfliteModelSpec::getOutputs);
       prototype.registerHybridMethod("runSync", &HybridTfliteModelSpec::runSync);
@@ -22,4 +22,4 @@ namespace margelo::nitro::nitrotflite {
     });
   }
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

@@ -5,7 +5,7 @@
 /// Copyright © Marc Rousavy @ Margelo
 ///
 
-package com.margelo.nitro.nitrotflite
+package com.margelo.nitro.tflite
 
 import android.util.Log
 

@@ -11,7 +11,7 @@
 // Forward declaration of `ArrayBufferHolder` to properly resolve imports.
 namespace NitroModules { class ArrayBufferHolder; }
 // Forward declaration of `HybridAssetLoaderSpec` to properly resolve imports.
-namespace margelo::nitro::nitrotflite { class HybridAssetLoaderSpec; }
+namespace margelo::nitro::tflite { class HybridAssetLoaderSpec; }
 
 // Forward declarations of Swift defined types
 // Forward declaration of `HybridAssetLoaderSpec_cxx` to properly resolve imports.
@@ -32,7 +32,7 @@ namespace NitroTflite { class HybridAssetLoaderSpec_cxx; }
  * Contains specialized versions of C++ templated types so they can be accessed from Swift,
  * as well as helper functions to interact with those C++ types from Swift.
  */
-namespace margelo::nitro::nitrotflite::bridge::swift {
+namespace margelo::nitro::tflite::bridge::swift {
 
   // pragma MARK: std::shared_ptr<Promise<std::shared_ptr<ArrayBuffer>>>
   /**
@@ -111,4 +111,4 @@ namespace margelo::nitro::nitrotflite::bridge::swift {
     return Result<std::shared_ptr<Promise<std::shared_ptr<ArrayBuffer>>>>::withError(error);
   }
 
-} // namespace margelo::nitro::nitrotflite::bridge::swift
+} // namespace margelo::nitro::tflite::bridge::swift

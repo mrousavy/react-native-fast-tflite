@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   /**
    * A struct which can be represented as a JavaScript object (Tensor).
@@ -52,22 +52,22 @@ namespace margelo::nitro::nitrotflite {
     friend bool operator==(const Tensor& lhs, const Tensor& rhs) = default;
   };
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite
 
 namespace margelo::nitro {
 
   // C++ Tensor <> JS Tensor (object)
   template <>
-  struct JSIConverter<margelo::nitro::nitrotflite::Tensor> final {
-    static inline margelo::nitro::nitrotflite::Tensor fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+  struct JSIConverter<margelo::nitro::tflite::Tensor> final {
+    static inline margelo::nitro::tflite::Tensor fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       jsi::Object obj = arg.asObject(runtime);
-      return margelo::nitro::nitrotflite::Tensor(
+      return margelo::nitro::tflite::Tensor(
         JSIConverter<std::string>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "name"))),
         JSIConverter<std::string>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "dataType"))),
         JSIConverter<std::vector<double>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "shape")))
       );
     }
-    static inline jsi::Value toJSI(jsi::Runtime& runtime, const margelo::nitro::nitrotflite::Tensor& arg) {
+    static inline jsi::Value toJSI(jsi::Runtime& runtime, const margelo::nitro::tflite::Tensor& arg) {
       jsi::Object obj(runtime);
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "name"), JSIConverter<std::string>::toJSI(runtime, arg.name));
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "dataType"), JSIConverter<std::string>::toJSI(runtime, arg.dataType));

@@ -76,8 +76,8 @@ jobs:
         run: "set -o pipefail && xcodebuild \
           CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
           -derivedDataPath build -UseModernBuildSystem=YES \
-          -workspace TfliteExampleNew.xcworkspace \
-          -scheme TfliteExampleNew \
+          -workspace TfliteExample.xcworkspace \
+          -scheme TfliteExample \
           -sdk iphonesimulator \
           -configuration Debug \
           -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \

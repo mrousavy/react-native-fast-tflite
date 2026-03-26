@@ -5,12 +5,13 @@
 #include <NitroModules/Promise.hpp>
 #include <string>
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
 HybridTfliteModel::HybridTfliteModel(TfLiteInterpreter* interpreter,
                                      std::shared_ptr<ArrayBuffer> modelData,
-                                     TensorflowModelDelegate delegate)
-    : HybridObject(TAG), _interpreter(interpreter), _delegate(delegate), _modelData(modelData) {
+                                     std::vector<TensorflowModelDelegate> delegates)
+    : HybridObject(TAG), _interpreter(interpreter), _delegates(std::move(delegates)),
+      _modelData(modelData) {
   TfLiteStatus status = TfLiteInterpreterAllocateTensors(_interpreter);
   if (status != kTfLiteOk) {
     throw std::runtime_error(
@@ -27,8 +28,8 @@ HybridTfliteModel::~HybridTfliteModel() {
   // _modelData (shared_ptr<ArrayBuffer>) is automatically freed
 }
 
-TensorflowModelDelegate HybridTfliteModel::getDelegate() {
-  return _delegate;
+std::vector<TensorflowModelDelegate> HybridTfliteModel::getDelegates() {
+  return _delegates;
 }
 
 std::vector<Tensor> HybridTfliteModel::getInputs() {
@@ -75,7 +76,7 @@ std::vector<Tensor> HybridTfliteModel::getOutputs() {
 
 void HybridTfliteModel::copyInputBuffers(const std::vector<std::shared_ptr<ArrayBuffer>>& input) {
   size_t inputCount = TfLiteInterpreterGetInputTensorCount(_interpreter);
-  if (input.size() != inputCount) {
+  if (input.size() != inputCount) [[unlikely]] {
     throw std::runtime_error("TFLite: Input array size (" + std::to_string(input.size()) +
                              ") does not match input tensor count (" + std::to_string(inputCount) +
                              ")!");
@@ -83,7 +84,7 @@ void HybridTfliteModel::copyInputBuffers(const std::vector<std::shared_ptr<Array
 
   for (size_t i = 0; i < inputCount; i++) {
     TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
-    auto& buffer = input[i];
+    const std::shared_ptr<ArrayBuffer>& buffer = input[i];
     TfLiteTensorCopyFromBuffer(tensor, buffer->data(), buffer->size());
   }
 }
@@ -91,9 +92,9 @@ void HybridTfliteModel::copyInputBuffers(const std::vector<std::shared_ptr<Array
 // Pre-allocates a buffer per output tensor, reuses on subsequent calls.
 std::shared_ptr<ArrayBuffer>
 HybridTfliteModel::getOutputBufferForTensor(const TfLiteTensor* tensor) {
-  auto name = std::string(TfLiteTensorName(tensor));
+  std::string name = TfLiteTensorName(tensor);
   if (_outputBuffers.find(name) == _outputBuffers.end()) {
-    auto dataType = TfLiteTensorType(tensor);
+    TfLiteType dataType = TfLiteTensorType(tensor);
     int totalLength = getTensorTotalLength(tensor);
     size_t byteSize = totalLength * getTFLTensorDataTypeSize(dataType);
     _outputBuffers[name] = ArrayBuffer::allocate(byteSize);
@@ -108,10 +109,9 @@ std::vector<std::shared_ptr<ArrayBuffer>> HybridTfliteModel::copyOutputBuffers()
 
   for (size_t i = 0; i < outputCount; i++) {
     const TfLiteTensor* tensor = TfLiteInterpreterGetOutputTensor(_interpreter, i);
-    auto outputBuffer = getOutputBufferForTensor(tensor);
+    std::shared_ptr<ArrayBuffer> outputBuffer = getOutputBufferForTensor(tensor);
 
-    auto name = std::string(TfLiteTensorName(tensor));
-    auto dataType = TfLiteTensorType(tensor);
+    std::string name = TfLiteTensorName(tensor);
 
     void* tensorData = TfLiteTensorData(tensor);
     if (tensorData == nullptr) {
@@ -119,9 +119,7 @@ std::vector<std::shared_ptr<ArrayBuffer>> HybridTfliteModel::copyOutputBuffers()
       throw std::runtime_error("TFLite: Failed to get data from tensor \"" + name + "\"!");
     }
 
-    // Recalculate size from tensor each time (not from cached buffer).
-    int size = getTensorTotalLength(tensor) * getTFLTensorDataTypeSize(dataType);
-    memcpy(outputBuffer->data(), tensorData, size);
+    memcpy(outputBuffer->data(), tensorData, outputBuffer->size());
     results.push_back(outputBuffer);
   }
 
@@ -148,11 +146,12 @@ HybridTfliteModel::run(const std::vector<std::shared_ptr<ArrayBuffer>>& input) {
   // Copy input buffers on caller (JS) thread first — input ArrayBuffers are
   // non-owning JS buffers that may be GC'd if we access them async.
   copyInputBuffers(input);
+  std::shared_ptr<HybridTfliteModel> sharedThis = shared_cast<HybridTfliteModel>();
   return Promise<std::vector<std::shared_ptr<ArrayBuffer>>>::async(
-      [this]() -> std::vector<std::shared_ptr<ArrayBuffer>> {
-        invoke();
-        return copyOutputBuffers();
+      [sharedThis]() -> std::vector<std::shared_ptr<ArrayBuffer>> {
+        sharedThis->invoke();
+        return sharedThis->copyOutputBuffers();
       });
 }
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite

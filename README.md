@@ -77,6 +77,16 @@ TensorFlow uses _tensors_ as input and output. Since TensorFlow Lite is optimize
 
 Input and output values are passed as `ArrayBuffer`. To inspect tensor shapes, open your model in [Netron](https://netron.app).
 
+For example, the `object_detection_mobile_object_localizer_v1_1_default_1.tflite` model on [tfhub.dev](https://tfhub.dev) has **1 input tensor** and **4 output tensors**:
+
+![Screenshot of netron.app inspecting the model](./img/netron-inspect-model.png)
+
+In the description on [tfhub.dev](https://tfhub.dev) we can find the description of all tensors:
+
+![Screenshot of tfhub.dev inspecting the model](./img/tfhub-description.png)
+
+From that we know we need a 192 x 192 input image with 3 bytes per pixel (RGB).
+
 #### Usage (VisionCamera)
 
 > [!NOTE]
@@ -150,6 +160,24 @@ GPU Delegates offer faster, GPU-accelerated computation. There are multiple dele
 
 #### CoreML (iOS)
 
+##### Expo
+
+Use the config plugin in your expo config (`app.json`, `app.config.json` or `app.config.js`):
+
+```json
+{
+  "name": "my app",
+  "plugins": [
+    [
+      "react-native-fast-tflite",
+      {
+        "enableCoreMLDelegate": true
+      }
+    ]
+  ]
+}
+```
+
 ##### Bare React Native
 
 1. Set `$EnableCoreMLDelegate` to `true` in your `Podfile`:
@@ -170,20 +198,55 @@ GPU Delegates offer faster, GPU-accelerated computation. There are multiple dele
    ```ts
    const model = await loadTensorflowModel(
      require('assets/my-model.tflite'),
-     'core-ml'
+     ['core-ml']
    )
    ```
 
 > [!NOTE]
 > Not all model operations are supported on the CoreML delegate. Make sure your model is compatible.
 
-#### Metal (iOS)
-
-Same setup as CoreML, but use `$EnableMetalDelegate=true` and pass `'metal'` as the delegate.
-
 #### Android GPU/NNAPI (Android)
 
 To enable GPU or NNAPI on Android, you **may** need to include native libraries, especially on Android 12+.
+
+##### Expo
+
+Use the config plugin in your expo config (`app.json`, `app.config.json` or `app.config.js`) with `enableAndroidGpuLibraries`:
+
+```json
+{
+  "name": "my app",
+  "plugins": [
+    [
+      "react-native-fast-tflite",
+      {
+        "enableAndroidGpuLibraries": true
+      }
+    ]
+  ]
+}
+```
+
+By default, when enabled, `libOpenCL.so` will be included in your `AndroidManifest.xml`. You can also include more libraries by passing an array:
+
+```json
+{
+  "name": "my app",
+  "plugins": [
+    [
+      "react-native-fast-tflite",
+      {
+        "enableAndroidGpuLibraries": ["libOpenCL-pixel.so", "libGLES_mali.so"]
+      }
+    ]
+  ]
+}
+```
+
+> [!NOTE]
+> For Expo, remember to run prebuild if the library is not yet included in your `AndroidManifest.xml`.
+
+##### Bare React Native
 
 Add any needed entries to your `AndroidManifest.xml`:
 
@@ -199,12 +262,12 @@ Then use the delegate:
 ```ts
 const model = await loadTensorflowModel(
   require('assets/my-model.tflite'),
-  'android-gpu'
+  ['android-gpu']
 )
 // or
 const model = await loadTensorflowModel(
   require('assets/my-model.tflite'),
-  'nnapi'
+  ['nnapi']
 )
 ```
 
@@ -231,11 +294,13 @@ If you're integrating react-native-fast-tflite in a production app, consider [fu
 ## Contributing
 
 1. Clone the repo
-2. Make sure you have installed Xcode CLI tools such as `gcc`, `cmake` and `python`/`python3`.
+2. Make sure you have installed Xcode CLI tools such as `gcc`, `cmake` and `python`/`python3`. See the TensorFlow documentation on what you need exactly.
 3. Run `yarn bootstrap` and select `y` on all iOS and Android related questions.
 4. Open the example app and start developing
-   - iOS: `example/ios/TfliteExampleNew.xcworkspace`
+   - iOS: `example/ios/TfliteExample.xcworkspace`
    - Android: `example/android`
+
+See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
 
 ## License
 

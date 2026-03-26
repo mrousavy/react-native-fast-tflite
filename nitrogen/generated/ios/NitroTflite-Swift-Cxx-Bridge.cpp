@@ -12,7 +12,7 @@
 #include "NitroTflite-Swift-Cxx-Umbrella.hpp"
 #include <NitroModules/NitroDefines.hpp>
 
-namespace margelo::nitro::nitrotflite::bridge::swift {
+namespace margelo::nitro::tflite::bridge::swift {
 
   // pragma MARK: std::function<void(const std::shared_ptr<ArrayBuffer>& /* result */)>
   Func_void_std__shared_ptr_ArrayBuffer_ create_Func_void_std__shared_ptr_ArrayBuffer_(void* NON_NULL swiftClosureWrapper) noexcept {
@@ -33,10 +33,10 @@ namespace margelo::nitro::nitrotflite::bridge::swift {
   // pragma MARK: std::shared_ptr<HybridAssetLoaderSpec>
   std::shared_ptr<HybridAssetLoaderSpec> create_std__shared_ptr_HybridAssetLoaderSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
     NitroTflite::HybridAssetLoaderSpec_cxx swiftPart = NitroTflite::HybridAssetLoaderSpec_cxx::fromUnsafe(swiftUnsafePointer);
-    return std::make_shared<margelo::nitro::nitrotflite::HybridAssetLoaderSpecSwift>(swiftPart);
+    return std::make_shared<margelo::nitro::tflite::HybridAssetLoaderSpecSwift>(swiftPart);
   }
   void* NON_NULL get_std__shared_ptr_HybridAssetLoaderSpec_(std__shared_ptr_HybridAssetLoaderSpec_ cppType) {
-    std::shared_ptr<margelo::nitro::nitrotflite::HybridAssetLoaderSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::nitrotflite::HybridAssetLoaderSpecSwift>(cppType);
+    std::shared_ptr<margelo::nitro::tflite::HybridAssetLoaderSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::tflite::HybridAssetLoaderSpecSwift>(cppType);
     #ifdef NITRO_DEBUG
     if (swiftWrapper == nullptr) [[unlikely]] {
       throw std::runtime_error("Class \"HybridAssetLoaderSpec\" is not implemented in Swift!");
@@ -46,4 +46,4 @@ namespace margelo::nitro::nitrotflite::bridge::swift {
     return swiftPart.toUnsafe();
   }
 
-} // namespace margelo::nitro::nitrotflite::bridge::swift
+} // namespace margelo::nitro::tflite::bridge::swift

@@ -15,7 +15,7 @@ export interface Tensor {
 
 export interface TfliteModel
   extends HybridObject<{ ios: 'c++'; android: 'c++' }> {
-  readonly delegate: TensorflowModelDelegate
+  readonly delegates: TensorflowModelDelegate[]
   readonly inputs: Tensor[]
   readonly outputs: Tensor[]
   runSync(input: ArrayBuffer[]): ArrayBuffer[]
@@ -24,7 +24,10 @@ export interface TfliteModel
 
 export interface TfliteModule
   extends HybridObject<{ ios: 'c++'; android: 'c++' }> {
-  createModel(data: ArrayBuffer, delegate: TensorflowModelDelegate): TfliteModel
+  createModel(
+    modelData: ArrayBuffer,
+    delegates: TensorflowModelDelegate[]
+  ): TfliteModel
 }
 
 export interface AssetLoader

@@ -1,4 +1,4 @@
-package com.margelo.nitro.nitrotflite
+package com.margelo.nitro.tflite
 
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext

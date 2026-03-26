@@ -23,7 +23,7 @@
 #error NitroModules cannot be found! Are you sure you installed NitroModules properly?
 #endif
 
-namespace margelo::nitro::nitrotflite {
+namespace margelo::nitro::tflite {
 
   /**
    * An enum which can be represented as a JavaScript union (TensorflowModelDelegate).
@@ -36,32 +36,32 @@ namespace margelo::nitro::nitrotflite {
     ANDROID_GPU      SWIFT_NAME(androidGpu) = 4,
   } CLOSED_ENUM;
 
-} // namespace margelo::nitro::nitrotflite
+} // namespace margelo::nitro::tflite
 
 namespace margelo::nitro {
 
   // C++ TensorflowModelDelegate <> JS TensorflowModelDelegate (union)
   template <>
-  struct JSIConverter<margelo::nitro::nitrotflite::TensorflowModelDelegate> final {
-    static inline margelo::nitro::nitrotflite::TensorflowModelDelegate fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
+  struct JSIConverter<margelo::nitro::tflite::TensorflowModelDelegate> final {
+    static inline margelo::nitro::tflite::TensorflowModelDelegate fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       std::string unionValue = JSIConverter<std::string>::fromJSI(runtime, arg);
       switch (hashString(unionValue.c_str(), unionValue.size())) {
-        case hashString("default"): return margelo::nitro::nitrotflite::TensorflowModelDelegate::DEFAULT;
-        case hashString("metal"): return margelo::nitro::nitrotflite::TensorflowModelDelegate::METAL;
-        case hashString("core-ml"): return margelo::nitro::nitrotflite::TensorflowModelDelegate::CORE_ML;
-        case hashString("nnapi"): return margelo::nitro::nitrotflite::TensorflowModelDelegate::NNAPI;
-        case hashString("android-gpu"): return margelo::nitro::nitrotflite::TensorflowModelDelegate::ANDROID_GPU;
+        case hashString("default"): return margelo::nitro::tflite::TensorflowModelDelegate::DEFAULT;
+        case hashString("metal"): return margelo::nitro::tflite::TensorflowModelDelegate::METAL;
+        case hashString("core-ml"): return margelo::nitro::tflite::TensorflowModelDelegate::CORE_ML;
+        case hashString("nnapi"): return margelo::nitro::tflite::TensorflowModelDelegate::NNAPI;
+        case hashString("android-gpu"): return margelo::nitro::tflite::TensorflowModelDelegate::ANDROID_GPU;
         default: [[unlikely]]
           throw std::invalid_argument("Cannot convert \"" + unionValue + "\" to enum TensorflowModelDelegate - invalid value!");
       }
     }
-    static inline jsi::Value toJSI(jsi::Runtime& runtime, margelo::nitro::nitrotflite::TensorflowModelDelegate arg) {
+    static inline jsi::Value toJSI(jsi::Runtime& runtime, margelo::nitro::tflite::TensorflowModelDelegate arg) {
       switch (arg) {
-        case margelo::nitro::nitrotflite::TensorflowModelDelegate::DEFAULT: return JSIConverter<std::string>::toJSI(runtime, "default");
-        case margelo::nitro::nitrotflite::TensorflowModelDelegate::METAL: return JSIConverter<std::string>::toJSI(runtime, "metal");
-        case margelo::nitro::nitrotflite::TensorflowModelDelegate::CORE_ML: return JSIConverter<std::string>::toJSI(runtime, "core-ml");
-        case margelo::nitro::nitrotflite::TensorflowModelDelegate::NNAPI: return JSIConverter<std::string>::toJSI(runtime, "nnapi");
-        case margelo::nitro::nitrotflite::TensorflowModelDelegate::ANDROID_GPU: return JSIConverter<std::string>::toJSI(runtime, "android-gpu");
+        case margelo::nitro::tflite::TensorflowModelDelegate::DEFAULT: return JSIConverter<std::string>::toJSI(runtime, "default");
+        case margelo::nitro::tflite::TensorflowModelDelegate::METAL: return JSIConverter<std::string>::toJSI(runtime, "metal");
+        case margelo::nitro::tflite::TensorflowModelDelegate::CORE_ML: return JSIConverter<std::string>::toJSI(runtime, "core-ml");
+        case margelo::nitro::tflite::TensorflowModelDelegate::NNAPI: return JSIConverter<std::string>::toJSI(runtime, "nnapi");
+        case margelo::nitro::tflite::TensorflowModelDelegate::ANDROID_GPU: return JSIConverter<std::string>::toJSI(runtime, "android-gpu");
         default: [[unlikely]]
           throw std::invalid_argument("Cannot convert TensorflowModelDelegate to JS - invalid value: "
                                     + std::to_string(static_cast<int>(arg)) + "!");
