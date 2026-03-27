@@ -114,7 +114,8 @@ size_t getTFLTensorDataTypeSize(TfLiteType dataType) {
     case kTfLiteUInt16:
       return sizeof(uint16_t);
     default:
-      throw std::runtime_error("Tensor DataType \"" + dataTypeToString(dataType) + "\" is not supported!");
+      throw std::runtime_error("Tensor DataType \"" + dataTypeToString(dataType) +
+                               "\" is not supported!");
   }
 }
 
