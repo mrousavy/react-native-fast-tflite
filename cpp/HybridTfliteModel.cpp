@@ -36,7 +36,7 @@ std::vector<Tensor> HybridTfliteModel::getInputs() {
   int count = TfLiteInterpreterGetInputTensorCount(_interpreter);
   std::vector<Tensor> tensors;
   tensors.reserve(count);
-  for (size_t i = 0; i < count; i++) {
+  for (int32_t i = 0; i < count; i++) {
     TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
     if (tensor == nullptr) {
       throw std::runtime_error("TFLite: Failed to get input tensor " + std::to_string(i) + "!");
@@ -44,8 +44,9 @@ std::vector<Tensor> HybridTfliteModel::getInputs() {
     int dimensions = TfLiteTensorNumDims(tensor);
     std::vector<double> shape;
     shape.reserve(dimensions);
-    for (size_t d = 0; d < dimensions; d++) {
-      shape.push_back(static_cast<double>(TfLiteTensorDim(tensor, d)));
+    for (int32_t d = 0; d < dimensions; d++) {
+      int32_t size = TfLiteTensorDim(tensor, d);
+      shape.push_back(static_cast<double>(size));
     }
     tensors.push_back(Tensor(std::string(TfLiteTensorName(tensor)),
                              dataTypeToString(TfLiteTensorType(tensor)), std::move(shape)));
@@ -57,7 +58,7 @@ std::vector<Tensor> HybridTfliteModel::getOutputs() {
   int count = TfLiteInterpreterGetOutputTensorCount(_interpreter);
   std::vector<Tensor> tensors;
   tensors.reserve(count);
-  for (size_t i = 0; i < count; i++) {
+  for (int32_t i = 0; i < count; i++) {
     const TfLiteTensor* tensor = TfLiteInterpreterGetOutputTensor(_interpreter, i);
     if (tensor == nullptr) {
       throw std::runtime_error("TFLite: Failed to get output tensor " + std::to_string(i) + "!");
@@ -65,8 +66,9 @@ std::vector<Tensor> HybridTfliteModel::getOutputs() {
     int dimensions = TfLiteTensorNumDims(tensor);
     std::vector<double> shape;
     shape.reserve(dimensions);
-    for (size_t d = 0; d < dimensions; d++) {
-      shape.push_back(static_cast<double>(TfLiteTensorDim(tensor, d)));
+    for (int32_t d = 0; d < dimensions; d++) {
+      int32_t size = TfLiteTensorDim(tensor, d);
+      shape.push_back(static_cast<double>(size));
     }
     tensors.push_back(Tensor(std::string(TfLiteTensorName(tensor)),
                              dataTypeToString(TfLiteTensorType(tensor)), std::move(shape)));
@@ -82,7 +84,7 @@ void HybridTfliteModel::copyInputBuffers(const std::vector<std::shared_ptr<Array
                              ")!");
   }
 
-  for (size_t i = 0; i < inputCount; i++) {
+  for (int32_t i = 0; i < inputCount; i++) {
     TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
     const std::shared_ptr<ArrayBuffer>& buffer = input[i];
     TfLiteTensorCopyFromBuffer(tensor, buffer->data(), buffer->size());
@@ -107,7 +109,7 @@ std::vector<std::shared_ptr<ArrayBuffer>> HybridTfliteModel::copyOutputBuffers()
   std::vector<std::shared_ptr<ArrayBuffer>> results;
   results.reserve(outputCount);
 
-  for (size_t i = 0; i < outputCount; i++) {
+  for (int32_t i = 0; i < outputCount; i++) {
     const TfLiteTensor* tensor = TfLiteInterpreterGetOutputTensor(_interpreter, i);
     std::shared_ptr<ArrayBuffer> outputBuffer = getOutputBufferForTensor(tensor);
 
