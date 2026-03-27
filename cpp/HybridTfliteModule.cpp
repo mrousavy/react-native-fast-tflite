@@ -31,7 +31,8 @@ TfLiteDelegate* getDelegate(TensorflowModelDelegate delegateType) {
     case TensorflowModelDelegate::ANDROID_GPU:
       return getAndroidGPUDelegate();
   }
-  throw std::runtime_error("Unknown Delegate \"" + std::to_string(static_cast<int>(delegateType)) + "\"!");
+  throw std::runtime_error("Unknown Delegate \"" + std::to_string(static_cast<int>(delegateType)) +
+                           "\"!");
 }
 
 std::shared_ptr<HybridTfliteModelSpec>
@@ -44,7 +45,7 @@ HybridTfliteModule::createModel(const std::shared_ptr<ArrayBuffer>& modelData,
 
   // Configure interpreter via options
   TfLiteInterpreterOptions* options = TfLiteInterpreterOptionsCreate();
-  
+
   // Add all hardware accelerated delegates (e.g. GPU, NPU, ...)
   // if any. The default CPU delegate will always be available.
   for (const TensorflowModelDelegate& delegateType : delegates) {
@@ -67,6 +68,5 @@ HybridTfliteModule::createModel(const std::shared_ptr<ArrayBuffer>& modelData,
   // Wrap in HybridTfliteModel — stores shared_ptr<ArrayBuffer> to keep model data bytes alive
   return std::make_shared<HybridTfliteModel>(interpreter, modelData, delegates);
 }
-
 
 } // namespace margelo::nitro::tflite

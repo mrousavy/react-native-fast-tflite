@@ -126,7 +126,6 @@ int getTensorTotalLength(const TfLiteTensor* tensor) {
   return size;
 }
 
-
 TfLiteDelegate* getCoreMLDelegate() {
 #ifdef __APPLE__
 #if FAST_TFLITE_ENABLE_CORE_ML
@@ -138,7 +137,8 @@ TfLiteDelegate* getCoreMLDelegate() {
                            "Set `$EnableCoreMLDelegate` to `true` in your Podfile, and rebuild.");
 #endif
 #else // __APPLE__
-  throw std::runtime_error("The CoreML Delegate (\"core-ml\") is only supported on Apple Platforms!");
+  throw std::runtime_error(
+      "The CoreML Delegate (\"core-ml\") is only supported on Apple Platforms!");
 #endif
 }
 
@@ -161,8 +161,9 @@ TfLiteDelegate* getAndroidGPUDelegate() {
   TfLiteGpuDelegateOptionsV2 delegateOptions = TfLiteGpuDelegateOptionsV2Default();
   TfLiteDelegate* gpuDelegate = TfLiteGpuDelegateV2Create(&delegateOptions);
 #else // ANDROID
-  throw std::runtime_error("The Android GPU Delegate (\"android-gpu\") is only supported on Android!");
+  throw std::runtime_error(
+      "The Android GPU Delegate (\"android-gpu\") is only supported on Android!");
 #endif
 }
 
-}
+} // namespace margelo::nitro::tflite
