@@ -93,7 +93,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
 
       - name: Install npm dependencies
-        run: bun install
+        run: yarn install --frozen-lockfile --cwd ..
 
       - name: Install Ccache
         uses: hendrikmuhs/ccache-action@v1.2
@@ -146,8 +146,8 @@ jobs:
           xcodebuild \
             CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
             -derivedDataPath build -UseModernBuildSystem=YES \
-            -workspace NitroFetchExample.xcworkspace \
-            -scheme NitroFetchExample \
+            -workspace TfliteExample.xcworkspace \
+            -scheme TfliteExample \
             -sdk iphonesimulator \
             -configuration Debug \
             -destination 'platform=iOS Simulator,name=${{ env.DEVICE_MODEL }}' \
