@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include "TensorDataType.hpp"
+#include <string>
 
 #if defined(ANDROID)
 #include <tflite/c/c_api.h>
@@ -23,4 +23,4 @@ TfLiteDelegate* getMetalDelegate();
 TfLiteDelegate* getNNAPIDelegate();
 TfLiteDelegate* getAndroidGPUDelegate();
 
-}
+} // namespace margelo::nitro::tflite
