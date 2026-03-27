@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "TensorDataType.hpp"
 
 #if defined(ANDROID)
 #include <tflite/c/c_api.h>
@@ -13,7 +14,7 @@
 namespace margelo::nitro::tflite {
 
 std::string tfLiteStatusToString(TfLiteStatus status);
-std::string dataTypeToString(TfLiteType dataType);
+TensorDataType getTensorDataType(TfLiteType dataType);
 size_t getTFLTensorDataTypeSize(TfLiteType dataType);
 int getTensorTotalLength(const TfLiteTensor* tensor);
 

@@ -12,7 +12,7 @@ class HybridAssetLoader : HybridAssetLoaderSpec() {
   override fun loadAsset(path: String): Promise<ArrayBuffer> {
     return Promise.async {
       val bytes = URL(path).readBytes()
-      return@async ArrayBuffer.copy(bytes)
+      return@async ArrayBuffer.wrap(bytes)
     }
   }
 }
