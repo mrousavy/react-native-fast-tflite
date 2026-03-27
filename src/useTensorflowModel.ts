@@ -29,7 +29,7 @@ export type TensorflowPlugin =
  */
 export function useTensorflowModel(
   source: ModelSource,
-  delegates: TensorflowModelDelegate[] = ['default']
+  delegates: TensorflowModelDelegate[]
 ): TensorflowPlugin {
   const [state, setState] = useState<TensorflowPlugin>({
     model: undefined,

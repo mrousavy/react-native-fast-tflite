@@ -27,7 +27,7 @@ const tfliteModule =
  */
 export async function loadTensorflowModel(
   source: ModelSource,
-  delegates: TensorflowModelDelegate[] = ['default']
+  delegates: TensorflowModelDelegate[]
 ): Promise<TfliteModel> {
   let uri: string
   if (typeof source === 'number') {
