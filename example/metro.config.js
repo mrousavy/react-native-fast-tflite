@@ -38,6 +38,17 @@ const config = {
           filePath: require.resolve(moduleName, { paths: [__dirname] }),
         };
       }
+      // Library sources live under ../src; Babel emits @babel/runtime/* imports that
+      // must resolve from the example app (watchFolders alone does not fix this).
+      if (
+        moduleName === '@babel/runtime' ||
+        moduleName.startsWith('@babel/runtime/')
+      ) {
+        return {
+          type: 'sourceFile',
+          filePath: require.resolve(moduleName, { paths: [__dirname] }),
+        };
+      }
       return context.resolveRequest(context, moduleName, platform);
     },
   },
