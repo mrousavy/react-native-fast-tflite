@@ -107,7 +107,7 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           max-size: 1.5G
-          key: ${{ runner.os }}-ccache-nitrofetch-ios
+          key: ${{ runner.os }}-ccache-fasttflite-ios
           create-symlink: true
 
       - name: Setup ccache behavior
@@ -131,9 +131,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: example/ios/Pods
-          key: ${{ runner.os }}-pods-nitrofetch-${{ hashFiles('**/Podfile.lock', '**/Gemfile.lock') }}
+          key: ${{ runner.os }}-pods-fasttflite-${{ hashFiles('**/Podfile.lock', '**/Gemfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pods-nitrofetch-
+            ${{ runner.os }}-pods-fasttflite-
 
       - name: Install Pods
         working-directory: example
@@ -143,9 +143,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: example/ios/build
-          key: ${{ runner.os }}-dd-nitrofetch-${{ hashFiles('**/Podfile.lock', '**/Gemfile.lock', '**/package.json', '**/bun.lock') }}-xcode${{ env.XCODE_VERSION }}
+          key: ${{ runner.os }}-dd-fasttflite-${{ hashFiles('**/Podfile.lock', '**/Gemfile.lock', '**/package.json', '**/bun.lock') }}-xcode${{ env.XCODE_VERSION }}
           restore-keys: |
-            ${{ runner.os }}-dd-nitrofetch-
+            ${{ runner.os }}-dd-fasttflite-
 
       - name: Build iOS app
         working-directory: example/ios
