@@ -1,7 +1,6 @@
 import type { HybridObject } from 'react-native-nitro-modules'
 
 export type TensorflowModelDelegate =
-  | 'default'
   | 'metal'
   | 'core-ml'
   | 'nnapi'
@@ -24,6 +23,15 @@ export interface TfliteModel
 
 export interface TfliteModule
   extends HybridObject<{ ios: 'c++'; android: 'c++' }> {
+  /**
+   * Create a new {@linkcode TfliteModel} with the given
+   * {@linkcode modelData} (a binary representation of the
+   * TFLite model), and optionally a list of hardware
+   * accelerating {@linkcode TensorflowModelDelegate}s.
+   *
+   * If {@linkcode delegates} is empty (`[]`), the default
+   * CPU delegate will be used.
+   */
   createModel(
     modelData: ArrayBuffer,
     delegates: TensorflowModelDelegate[]
@@ -32,5 +40,9 @@ export interface TfliteModule
 
 export interface AssetLoader
   extends HybridObject<{ ios: 'swift'; android: 'kotlin' }> {
+  /**
+   * Load an asset from the given {@linkcode path} and
+   * return its contents as an {@linkcode ArrayBuffer}.
+   */
   loadAsset(path: string): Promise<ArrayBuffer>
 }

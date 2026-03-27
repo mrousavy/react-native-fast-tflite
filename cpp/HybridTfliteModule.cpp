@@ -5,19 +5,34 @@
 #include <tflite/c/c_api.h>
 #include <tflite/delegates/gpu/delegate.h>
 #include <tflite/delegates/nnapi/nnapi_delegate_c_api.h>
-#else
-#include <TensorFlowLiteC/TensorFlowLiteC.h>
+#endif
 
+#ifdef __APPLE__
+#include <TensorFlowLiteC/TensorFlowLiteC.h>
 #if FAST_TFLITE_ENABLE_CORE_ML
 #include <TensorFlowLiteCCoreML/TensorFlowLiteCCoreML.h>
 #endif
 #endif
 
-#define WRONG_PLATFORM_HINT                                                                        \
-  " Make sure you are using the correct delegates for the current platform "                       \
-  "(e.g. CoreML/Metal on iOS, GPU/NNAPI on Android)."
-
 namespace margelo::nitro::tflite {
+
+/**
+ * Return a Hardware accelerated delegate, or throws
+ * if the given delegate type is not available.
+ */
+TfLiteDelegate* getDelegate(TensorflowModelDelegate delegateType) {
+  switch (delegateType) {
+    case TensorflowModelDelegate::CORE_ML:
+      return getCoreMLDelegate();
+    case TensorflowModelDelegate::METAL:
+      return getMetalDelegate();
+    case TensorflowModelDelegate::NNAPI:
+      return getNNAPIDelegate();
+    case TensorflowModelDelegate::ANDROID_GPU:
+      return getAndroidGPUDelegate();
+  }
+  throw std::runtime_error("Unknown Delegate \"" + std::to_string(static_cast<int>(delegateType)) + "\"!");
+}
 
 std::shared_ptr<HybridTfliteModelSpec>
 HybridTfliteModule::createModel(const std::shared_ptr<ArrayBuffer>& modelData,
@@ -27,52 +42,14 @@ HybridTfliteModule::createModel(const std::shared_ptr<ArrayBuffer>& modelData,
     throw std::runtime_error("Failed to create TFLite model from data!");
   }
 
+  // Configure interpreter via options
   TfLiteInterpreterOptions* options = TfLiteInterpreterOptionsCreate();
-
-  for (const TensorflowModelDelegate& delegate : delegates) {
-    switch (delegate) {
-      case TensorflowModelDelegate::CORE_ML: {
-#if FAST_TFLITE_ENABLE_CORE_ML
-        TfLiteCoreMlDelegateOptions delegateOptions;
-        TfLiteDelegate* coremlDelegate = TfLiteCoreMlDelegateCreate(&delegateOptions);
-        TfLiteInterpreterOptionsAddDelegate(options, coremlDelegate);
-        break;
-#else
-        throw std::runtime_error("CoreML Delegate is not enabled! "
-                                 "Set $EnableCoreMLDelegate to true in Podfile and rebuild.");
-#endif
-      }
-      case TensorflowModelDelegate::METAL: {
-        throw std::runtime_error("Metal Delegate is not supported!");
-      }
-#ifdef ANDROID
-      case TensorflowModelDelegate::NNAPI: {
-        TfLiteNnapiDelegateOptions delegateOptions = TfLiteNnapiDelegateOptionsDefault();
-        TfLiteDelegate* nnapiDelegate = TfLiteNnapiDelegateCreate(&delegateOptions);
-        TfLiteInterpreterOptionsAddDelegate(options, nnapiDelegate);
-        break;
-      }
-      case TensorflowModelDelegate::ANDROID_GPU: {
-        TfLiteGpuDelegateOptionsV2 delegateOptions = TfLiteGpuDelegateOptionsV2Default();
-        TfLiteDelegate* gpuDelegate = TfLiteGpuDelegateV2Create(&delegateOptions);
-        TfLiteInterpreterOptionsAddDelegate(options, gpuDelegate);
-        break;
-      }
-#else
-      case TensorflowModelDelegate::NNAPI: {
-        throw std::runtime_error(
-            "NNAPI Delegate is only supported on Android!" WRONG_PLATFORM_HINT);
-      }
-      case TensorflowModelDelegate::ANDROID_GPU: {
-        throw std::runtime_error(
-            "Android-GPU Delegate is only supported on Android!" WRONG_PLATFORM_HINT);
-      }
-#endif
-      default: {
-        // use default CPU delegate.
-        break;
-      }
-    }
+  
+  // Add all hardware accelerated delegates (e.g. GPU, NPU, ...)
+  // if any. The default CPU delegate will always be available.
+  for (const TensorflowModelDelegate& delegateType : delegates) {
+    TfLiteDelegate* delegate = getDelegate(delegateType);
+    TfLiteInterpreterOptionsAddDelegate(options, delegate);
   }
 
   TfLiteInterpreter* interpreter = TfLiteInterpreterCreate(model, options);
@@ -87,8 +64,9 @@ HybridTfliteModule::createModel(const std::shared_ptr<ArrayBuffer>& modelData,
     throw std::runtime_error("Failed to create TFLite interpreter!");
   }
 
-  // Wrap in HybridTfliteModel — stores shared_ptr<ArrayBuffer> to keep bytes alive
+  // Wrap in HybridTfliteModel — stores shared_ptr<ArrayBuffer> to keep model data bytes alive
   return std::make_shared<HybridTfliteModel>(interpreter, modelData, delegates);
 }
+
 
 } // namespace margelo::nitro::tflite

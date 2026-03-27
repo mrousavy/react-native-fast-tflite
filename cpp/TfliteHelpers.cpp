@@ -1,5 +1,21 @@
 #include "TfliteHelpers.hpp"
 
+#ifdef ANDROID
+#include <tflite/c/c_api.h>
+#include <tflite/delegates/gpu/delegate.h>
+#include <tflite/delegates/nnapi/nnapi_delegate_c_api.h>
+#endif
+
+#ifdef __APPLE__
+#include <TensorFlowLiteC/TensorFlowLiteC.h>
+#if FAST_TFLITE_ENABLE_CORE_ML
+#include <TensorFlowLiteCCoreML/TensorFlowLiteCCoreML.h>
+#endif
+#endif
+
+namespace margelo::nitro::tflite {
+
+// TODO: Remove this, this doesn't seem like a good idea at all.
 typedef float float32_t;
 typedef double float64_t;
 
@@ -29,10 +45,14 @@ std::string tfLiteStatusToString(TfLiteStatus status) {
 
 std::string dataTypeToString(TfLiteType dataType) {
   switch (dataType) {
+    case kTfLiteFloat16:
+      return "float16";
     case kTfLiteFloat32:
       return "float32";
     case kTfLiteFloat64:
       return "float64";
+    case kTfLiteBFloat16:
+      return "bfloat16";
     case kTfLiteInt4:
       return "int4";
     case kTfLiteInt8:
@@ -104,4 +124,45 @@ int getTensorTotalLength(const TfLiteTensor* tensor) {
     size *= TfLiteTensorDim(tensor, i);
   }
   return size;
+}
+
+
+TfLiteDelegate* getCoreMLDelegate() {
+#ifdef __APPLE__
+#if FAST_TFLITE_ENABLE_CORE_ML
+  TfLiteCoreMlDelegateOptions delegateOptions;
+  TfLiteDelegate* coreMlDelegate = TfLiteCoreMlDelegateCreate(&delegateOptions);
+  return coreMlDelegate;
+#else // FAST_TFLITE_ENABLE_CORE_ML
+  throw std::runtime_error("The CoreML Delegate (\"core-ml\") is not enabled! "
+                           "Set `$EnableCoreMLDelegate` to `true` in your Podfile, and rebuild.");
+#endif
+#else // __APPLE__
+  throw std::runtime_error("The CoreML Delegate (\"core-ml\") is only supported on Apple Platforms!");
+#endif
+}
+
+TfLiteDelegate* getMetalDelegate() {
+  throw std::runtime_error("Metal Delegate is not yet supported!");
+}
+
+TfLiteDelegate* getNNAPIDelegate() {
+#ifdef ANDROID
+  TfLiteNnapiDelegateOptions delegateOptions = TfLiteNnapiDelegateOptionsDefault();
+  TfLiteDelegate* nnapiDelegate = TfLiteNnapiDelegateCreate(&delegateOptions);
+  return nnapiDelegate;
+#else // ANDROID
+  throw std::runtime_error("The NNAPI Delegate (\"nnapi\") is only supported on Android!");
+#endif
+}
+
+TfLiteDelegate* getAndroidGPUDelegate() {
+#ifdef ANDROID
+  TfLiteGpuDelegateOptionsV2 delegateOptions = TfLiteGpuDelegateOptionsV2Default();
+  TfLiteDelegate* gpuDelegate = TfLiteGpuDelegateV2Create(&delegateOptions);
+#else // ANDROID
+  throw std::runtime_error("The Android GPU Delegate (\"android-gpu\") is only supported on Android!");
+#endif
+}
+
 }

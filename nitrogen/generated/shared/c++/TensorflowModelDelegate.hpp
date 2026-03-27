@@ -29,11 +29,10 @@ namespace margelo::nitro::tflite {
    * An enum which can be represented as a JavaScript union (TensorflowModelDelegate).
    */
   enum class TensorflowModelDelegate {
-    DEFAULT      SWIFT_NAME(default) = 0,
-    METAL      SWIFT_NAME(metal) = 1,
-    CORE_ML      SWIFT_NAME(coreMl) = 2,
-    NNAPI      SWIFT_NAME(nnapi) = 3,
-    ANDROID_GPU      SWIFT_NAME(androidGpu) = 4,
+    METAL      SWIFT_NAME(metal) = 0,
+    CORE_ML      SWIFT_NAME(coreMl) = 1,
+    NNAPI      SWIFT_NAME(nnapi) = 2,
+    ANDROID_GPU      SWIFT_NAME(androidGpu) = 3,
   } CLOSED_ENUM;
 
 } // namespace margelo::nitro::tflite
@@ -46,7 +45,6 @@ namespace margelo::nitro {
     static inline margelo::nitro::tflite::TensorflowModelDelegate fromJSI(jsi::Runtime& runtime, const jsi::Value& arg) {
       std::string unionValue = JSIConverter<std::string>::fromJSI(runtime, arg);
       switch (hashString(unionValue.c_str(), unionValue.size())) {
-        case hashString("default"): return margelo::nitro::tflite::TensorflowModelDelegate::DEFAULT;
         case hashString("metal"): return margelo::nitro::tflite::TensorflowModelDelegate::METAL;
         case hashString("core-ml"): return margelo::nitro::tflite::TensorflowModelDelegate::CORE_ML;
         case hashString("nnapi"): return margelo::nitro::tflite::TensorflowModelDelegate::NNAPI;
@@ -57,7 +55,6 @@ namespace margelo::nitro {
     }
     static inline jsi::Value toJSI(jsi::Runtime& runtime, margelo::nitro::tflite::TensorflowModelDelegate arg) {
       switch (arg) {
-        case margelo::nitro::tflite::TensorflowModelDelegate::DEFAULT: return JSIConverter<std::string>::toJSI(runtime, "default");
         case margelo::nitro::tflite::TensorflowModelDelegate::METAL: return JSIConverter<std::string>::toJSI(runtime, "metal");
         case margelo::nitro::tflite::TensorflowModelDelegate::CORE_ML: return JSIConverter<std::string>::toJSI(runtime, "core-ml");
         case margelo::nitro::tflite::TensorflowModelDelegate::NNAPI: return JSIConverter<std::string>::toJSI(runtime, "nnapi");
@@ -73,7 +70,6 @@ namespace margelo::nitro {
       }
       std::string unionValue = JSIConverter<std::string>::fromJSI(runtime, value);
       switch (hashString(unionValue.c_str(), unionValue.size())) {
-        case hashString("default"):
         case hashString("metal"):
         case hashString("core-ml"):
         case hashString("nnapi"):
