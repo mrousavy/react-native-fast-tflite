@@ -91,6 +91,8 @@ std::string dataTypeToString(TfLiteType dataType) {
 
 size_t getTFLTensorDataTypeSize(TfLiteType dataType) {
   switch (dataType) {
+    case kTfLiteBool:
+      return sizeof(bool);
     case kTfLiteFloat32:
       return sizeof(float32_t);
     case kTfLiteInt32:
@@ -111,8 +113,9 @@ size_t getTFLTensorDataTypeSize(TfLiteType dataType) {
       return sizeof(uint32_t);
     case kTfLiteUInt16:
       return sizeof(uint16_t);
+    default:
+      throw std::runtime_error("Tensor DataType \"" + dataTypeToString(dataType) + "\" is not supported!");
   }
-  throw std::runtime_error("TFLite: Unsupported output data type! " + dataTypeToString(dataType));
 }
 
 int getTensorTotalLength(const TfLiteTensor* tensor) {
@@ -120,7 +123,7 @@ int getTensorTotalLength(const TfLiteTensor* tensor) {
   if (dimensions < 1)
     return 0;
   int size = 1;
-  for (size_t i = 0; i < dimensions; i++) {
+  for (int32_t i = 0; i < dimensions; i++) {
     size *= TfLiteTensorDim(tensor, i);
   }
   return size;
