@@ -5,6 +5,13 @@ const pak = require('../package.json');
 const root = path.resolve(__dirname, '..');
 const modules = Object.keys({ ...pak.peerDependencies });
 
+/** Always resolve from the example app — required when React Native Harness wraps Metro (it clears blockList). */
+const RESOLVE_FROM_EXAMPLE = new Set([
+  'react',
+  'react-native',
+  'react-native-nitro-modules',
+]);
+
 /**
  * Metro configuration
  * https://reactnative.dev/docs/metro
@@ -24,6 +31,15 @@ const config = {
       acc[name] = path.join(__dirname, 'node_modules', name);
       return acc;
     }, {}),
+    resolveRequest(context, moduleName, platform) {
+      if (RESOLVE_FROM_EXAMPLE.has(moduleName)) {
+        return {
+          type: 'sourceFile',
+          filePath: require.resolve(moduleName, { paths: [__dirname] }),
+        };
+      }
+      return context.resolveRequest(context, moduleName, platform);
+    },
   },
 };
 

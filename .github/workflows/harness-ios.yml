@@ -1,0 +1,175 @@
+name: Harness iOS
+
+concurrency:
+  group: harness-ios-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      device_model:
+        description: "iOS Simulator device model"
+        required: false
+        default: "iPhone 17 Pro"
+        type: string
+      ios_version:
+        description: "iOS version"
+        required: false
+        default: "26.2"
+        type: string
+      xcode_version:
+        description: "Xcode version"
+        required: false
+        default: "26.2.0"
+        type: string
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/harness-ios.yml"
+      - "android/**"
+      - "cpp/**"
+      - "ios/**"
+      - "src/**"
+      - "nitrogen/**"
+      - "nitro.json"
+      - "*.podspec"
+      - "package.json"
+      - "react-native.config.js"
+      - "example/ios/**"
+      - "example/react-native.config.js"
+      - "example/metro.config.js"
+      - "example/package.json"
+      - "example/src/**"
+      - "example/__tests__/**"
+      - "example/rn-harness.config.mjs"
+      - "example/jest.harness.config.mjs"
+      - "**/Podfile.lock"
+      - "**/yarn.lock"
+      - "**/package-lock.json"
+      - "**/bun.lock"
+  pull_request:
+    paths:
+      - ".github/workflows/harness-ios.yml"
+      - "android/**"
+      - "cpp/**"
+      - "ios/**"
+      - "src/**"
+      - "nitrogen/**"
+      - "nitro.json"
+      - "*.podspec"
+      - "package.json"
+      - "react-native.config.js"
+      - "example/ios/**"
+      - "example/react-native.config.js"
+      - "example/metro.config.js"
+      - "example/package.json"
+      - "example/src/**"
+      - "example/__tests__/**"
+      - "example/rn-harness.config.mjs"
+      - "example/jest.harness.config.mjs"
+      - "**/Podfile.lock"
+      - "**/yarn.lock"
+      - "**/package-lock.json"
+      - "**/bun.lock"
+
+env:
+  DEVICE_MODEL: ${{ github.event.inputs.device_model || 'iPhone 17 Pro' }}
+  IOS_VERSION: ${{ github.event.inputs.ios_version || '26.2' }}
+  XCODE_VERSION: ${{ github.event.inputs.xcode_version || '26.2.0' }}
+  USE_CCACHE: 1
+  DEVELOPER_DIR: /Applications/Xcode_${{ github.event.inputs.xcode_version || '26.2.0' }}.app/Contents/Developer
+
+jobs:
+  harness_ios:
+    name: Harness iOS
+    runs-on: macOS-26
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install npm dependencies
+        run: bun install
+
+      - name: Install Ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          max-size: 1.5G
+          key: ${{ runner.os }}-ccache-nitrofetch-ios
+          create-symlink: true
+
+      - name: Setup ccache behavior
+        run: |
+          echo "CCACHE_SLOPPINESS=clang_index_store,file_stat_matches,include_file_ctime,include_file_mtime,ivfsoverlay,pch_defines,modules,system_headers,time_macros" >> $GITHUB_ENV
+          echo "CCACHE_FILECLONE=true" >> $GITHUB_ENV
+          echo "CCACHE_DEPEND=true" >> $GITHUB_ENV
+          echo "CCACHE_INODECACHE=true" >> $GITHUB_ENV
+
+      - name: Setup Ruby (bundle)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.0
+          bundler-cache: true
+          working-directory: example
+
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        run: sudo xcode-select -s "/Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer"
+
+      - name: Restore Pods cache
+        uses: actions/cache@v4
+        with:
+          path: example/ios/Pods
+          key: ${{ runner.os }}-pods-nitrofetch-${{ hashFiles('**/Podfile.lock', '**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-nitrofetch-
+
+      - name: Install Pods
+        working-directory: example
+        run: bundle exec pod install --project-directory=ios
+
+      - name: Restore DerivedData cache
+        uses: actions/cache@v4
+        with:
+          path: example/ios/build
+          key: ${{ runner.os }}-dd-nitrofetch-${{ hashFiles('**/Podfile.lock', '**/Gemfile.lock', '**/package.json', '**/bun.lock') }}-xcode${{ env.XCODE_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-dd-nitrofetch-
+
+      - name: Build iOS app
+        working-directory: example/ios
+        run: |
+          set -o pipefail
+          xcodebuild \
+            CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
+            -derivedDataPath build -UseModernBuildSystem=YES \
+            -workspace NitroFetchExample.xcworkspace \
+            -scheme NitroFetchExample \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=${{ env.DEVICE_MODEL }}' \
+            -showBuildTimingSummary \
+            ONLY_ACTIVE_ARCH=YES \
+            build \
+            CODE_SIGNING_ALLOWED=NO | xcbeautify --renderer github-actions
+
+      - name: Setup iOS Simulator
+        uses: futureware-tech/simulator-action@v5
+        with:
+          model: ${{ env.DEVICE_MODEL }}
+          os: iOS
+          os_version: ${{ env.IOS_VERSION }}
+          wait_for_boot: true
+          erase_before_boot: false
+
+      - name: Install app
+        run: |
+          xcrun simctl install booted example/ios/build/Build/Products/Debug-iphonesimulator/NitroFetchExample.app
+
+      - name: Run Harness E2E tests
+        working-directory: example
+        run: |
+          bun run test:harness --harnessRunner ios
