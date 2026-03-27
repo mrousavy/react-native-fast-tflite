@@ -90,10 +90,17 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: example/yarn.lock
 
-      - name: Install npm dependencies
-        run: yarn install
+      - name: Enable Yarn classic (matches packageManager)
+        run: corepack enable && corepack prepare yarn@1.22.19 --activate
+
+      - name: Install example dependencies
+        run: yarn install --frozen-lockfile
         working-directory: example
 
       - name: Install Ccache
@@ -168,9 +175,9 @@ jobs:
 
       - name: Install app
         run: |
-          xcrun simctl install booted example/ios/build/Build/Products/Debug-iphonesimulator/NitroFetchExample.app
+          xcrun simctl install booted example/ios/build/Build/Products/Debug-iphonesimulator/TfliteExample.app
 
       - name: Run Harness E2E tests
         working-directory: example
         run: |
-          bun run test:harness --harnessRunner ios
+          yarn test:harness --harnessRunner ios

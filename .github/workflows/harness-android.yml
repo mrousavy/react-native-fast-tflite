@@ -102,10 +102,17 @@ jobs:
           remove-codeql: true
           remove-docker-images: true
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: example/yarn.lock
 
-      - name: Install npm dependencies
-        run: yarn install --frozen-lockfile --cwd ..
+      - name: Enable Yarn classic (matches packageManager)
+        run: corepack enable && corepack prepare yarn@1.22.19 --activate
+
+      - name: Install example dependencies
+        run: yarn install --frozen-lockfile
         working-directory: example
 
       - name: Setup JDK 17
@@ -175,7 +182,7 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: |
             adb install -r "./android/app/build/outputs/apk/debug/app-debug.apk"
-            bun run test:harness --harnessRunner android
+            yarn test:harness --harnessRunner android
 
       - name: Stop Gradle Daemon
         working-directory: example/android
