@@ -93,7 +93,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
 
       - name: Install npm dependencies
-        run: yarn install --frozen-lockfile --cwd ..
+        run: yarn install
+        working-directory: example
 
       - name: Install Ccache
         uses: hendrikmuhs/ccache-action@v1.2

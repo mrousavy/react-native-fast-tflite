@@ -106,6 +106,7 @@ jobs:
 
       - name: Install npm dependencies
         run: yarn install --frozen-lockfile --cwd ..
+        working-directory: example
 
       - name: Setup JDK 17
         uses: actions/setup-java@v4
