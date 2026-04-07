@@ -57,7 +57,7 @@ std::vector<Tensor> HybridTfliteModel::getInputs() {
       shape.push_back(static_cast<double>(size));
     }
     tensors.push_back(Tensor(std::string(TfLiteTensorName(tensor)),
-                             dataTypeToString(TfLiteTensorType(tensor)), std::move(shape)));
+                             getTensorDataType(TfLiteTensorType(tensor)), std::move(shape)));
   }
   return tensors;
 }
@@ -79,7 +79,7 @@ std::vector<Tensor> HybridTfliteModel::getOutputs() {
       shape.push_back(static_cast<double>(size));
     }
     tensors.push_back(Tensor(std::string(TfLiteTensorName(tensor)),
-                             dataTypeToString(TfLiteTensorType(tensor)), std::move(shape)));
+                             getTensorDataType(TfLiteTensorType(tensor)), std::move(shape)));
   }
   return tensors;
 }
