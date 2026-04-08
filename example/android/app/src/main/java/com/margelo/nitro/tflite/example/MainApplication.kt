@@ -1,4 +1,4 @@
-package com.tfliteexamplenew
+package com.margelo.nitro.tflite.example
 
 import android.app.Application
 import com.facebook.react.PackageList
