@@ -36,13 +36,6 @@ add_library(${PACKAGE_NAME} SHARED
 # Add Nitrogen specs :)
 include(${CMAKE_SOURCE_DIR}/../nitrogen/generated/android/NitroTflite+autolinking.cmake)
 
-# Page size linker options
-target_link_options(${PACKAGE_NAME}
-    PRIVATE
-    "-Wl,-z,max-page-size=16384"
-    "-Wl,-z,common-page-size=16384"
-)
-
 # Set up local includes
 include_directories(
         "src/main/cpp"
