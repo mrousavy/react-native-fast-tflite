@@ -15,7 +15,7 @@ import {
       androidPlatform({
         name: 'android',
         device: androidEmulator('Pixel_8_API_35'), // Your Android emulator name
-        bundleId: 'com.tfliteexamplenew', // Your Android bundle ID
+        bundleId: 'com.margelo.nitro.tflite.example', // Your Android bundle ID
       }),
       applePlatform({
         name: 'ios',
