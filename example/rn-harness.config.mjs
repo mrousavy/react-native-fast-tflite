@@ -9,7 +9,7 @@ import {
   
   const config = {
     entryPoint: './index.js',
-    appRegistryComponentName: 'TfliteExample',
+    appRegistryComponentName: 'TFLiteExample',
   
     runners: [
       androidPlatform({
