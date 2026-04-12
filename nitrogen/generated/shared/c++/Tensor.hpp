@@ -28,9 +28,11 @@
 #error NitroModules cannot be found! Are you sure you installed NitroModules properly?
 #endif
 
-
+// Forward declaration of `TensorDataType` to properly resolve imports.
+namespace margelo::nitro::tflite { enum class TensorDataType; }
 
 #include <string>
+#include "TensorDataType.hpp"
 #include <vector>
 
 namespace margelo::nitro::tflite {
@@ -41,12 +43,12 @@ namespace margelo::nitro::tflite {
   struct Tensor final {
   public:
     std::string name     SWIFT_PRIVATE;
-    std::string dataType     SWIFT_PRIVATE;
+    TensorDataType dataType     SWIFT_PRIVATE;
     std::vector<double> shape     SWIFT_PRIVATE;
 
   public:
     Tensor() = default;
-    explicit Tensor(std::string name, std::string dataType, std::vector<double> shape): name(name), dataType(dataType), shape(shape) {}
+    explicit Tensor(std::string name, TensorDataType dataType, std::vector<double> shape): name(name), dataType(dataType), shape(shape) {}
 
   public:
     friend bool operator==(const Tensor& lhs, const Tensor& rhs) = default;
@@ -63,14 +65,14 @@ namespace margelo::nitro {
       jsi::Object obj = arg.asObject(runtime);
       return margelo::nitro::tflite::Tensor(
         JSIConverter<std::string>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "name"))),
-        JSIConverter<std::string>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "dataType"))),
+        JSIConverter<margelo::nitro::tflite::TensorDataType>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "dataType"))),
         JSIConverter<std::vector<double>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "shape")))
       );
     }
     static inline jsi::Value toJSI(jsi::Runtime& runtime, const margelo::nitro::tflite::Tensor& arg) {
       jsi::Object obj(runtime);
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "name"), JSIConverter<std::string>::toJSI(runtime, arg.name));
-      obj.setProperty(runtime, PropNameIDCache::get(runtime, "dataType"), JSIConverter<std::string>::toJSI(runtime, arg.dataType));
+      obj.setProperty(runtime, PropNameIDCache::get(runtime, "dataType"), JSIConverter<margelo::nitro::tflite::TensorDataType>::toJSI(runtime, arg.dataType));
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "shape"), JSIConverter<std::vector<double>>::toJSI(runtime, arg.shape));
       return obj;
     }
@@ -83,7 +85,7 @@ namespace margelo::nitro {
         return false;
       }
       if (!JSIConverter<std::string>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "name")))) return false;
-      if (!JSIConverter<std::string>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "dataType")))) return false;
+      if (!JSIConverter<margelo::nitro::tflite::TensorDataType>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "dataType")))) return false;
       if (!JSIConverter<std::vector<double>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "shape")))) return false;
       return true;
     }

@@ -43,50 +43,50 @@ std::string tfLiteStatusToString(TfLiteStatus status) {
   return "unknown";
 }
 
-std::string dataTypeToString(TfLiteType dataType) {
+TensorDataType getTensorDataType(TfLiteType dataType) {
   switch (dataType) {
     case kTfLiteFloat16:
-      return "float16";
+      return TensorDataType::FLOAT16;
     case kTfLiteFloat32:
-      return "float32";
+      return TensorDataType::FLOAT32;
     case kTfLiteFloat64:
-      return "float64";
+      return TensorDataType::FLOAT64;
     case kTfLiteBFloat16:
-      return "bfloat16";
+      return TensorDataType::BFLOAT16;
     case kTfLiteInt4:
-      return "int4";
+      return TensorDataType::INT4;
     case kTfLiteInt8:
-      return "int8";
+      return TensorDataType::INT8;
     case kTfLiteInt16:
-      return "int16";
+      return TensorDataType::INT16;
     case kTfLiteInt32:
-      return "int32";
+      return TensorDataType::INT32;
     case kTfLiteInt64:
-      return "int64";
+      return TensorDataType::INT64;
     case kTfLiteUInt8:
-      return "uint8";
+      return TensorDataType::UINT8;
     case kTfLiteUInt16:
-      return "uint16";
+      return TensorDataType::UINT16;
     case kTfLiteUInt32:
-      return "uint32";
+      return TensorDataType::UINT32;
     case kTfLiteUInt64:
-      return "uint64";
+      return TensorDataType::UINT64;
     case kTfLiteNoType:
-      return "none";
+      return TensorDataType::NONE;
     case kTfLiteString:
-      return "string";
+      return TensorDataType::STRING;
     case kTfLiteBool:
-      return "bool";
+      return TensorDataType::BOOL;
     case kTfLiteComplex64:
-      return "complex64";
+      return TensorDataType::COMPLEX64;
     case kTfLiteComplex128:
-      return "complex128";
+      return TensorDataType::COMPLEX128;
     case kTfLiteResource:
-      return "resource";
+      return TensorDataType::RESOURCE;
     case kTfLiteVariant:
-      return "variant";
+      return TensorDataType::VARIANT;
   }
-  return "invalid";
+  throw std::runtime_error("Unsupported TfLiteType: " + std::to_string(static_cast<int>(dataType)));
 }
 
 size_t getTFLTensorDataTypeSize(TfLiteType dataType) {
@@ -114,8 +114,8 @@ size_t getTFLTensorDataTypeSize(TfLiteType dataType) {
     case kTfLiteUInt16:
       return sizeof(uint16_t);
     default:
-      throw std::runtime_error("Tensor DataType \"" + dataTypeToString(dataType) +
-                               "\" is not supported!");
+      throw std::runtime_error("Tensor DataType " + std::to_string(static_cast<int>(dataType)) +
+                               " is not supported!");
   }
 }
 

@@ -39,7 +39,7 @@ export default function App(): React.ReactNode {
   // from https://www.kaggle.com/models/tensorflow/efficientdet/frameworks/tfLite
   const model = useTensorflowModel(
     require('../assets/efficientdet.tflite'),
-    Platform.OS === 'ios' ? ['core-ml', 'default'] : ['default'],
+    Platform.OS === 'ios' ? ['core-ml'] : [],
   );
   const actualModel = model.state === 'loaded' ? model.model : undefined;
   // Nitro HybridObjects use jsi::NativeState which is not directly accessible
