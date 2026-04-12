@@ -20,7 +20,7 @@ import {
       applePlatform({
         name: 'ios',
         device: appleSimulator('iPhone 17 Pro', '26.2'), // Your iOS simulator name and version
-        bundleId: 'org.reactjs.native.example.TfliteExample', // Your iOS bundle ID
+        bundleId: 'com.margelo.nitro.tflite.example', // Your iOS bundle ID
       }),
     ],
     defaultRunner: 'android',
