@@ -15,6 +15,10 @@ A high-performance [TensorFlow Lite](https://www.tensorflow.org/lite) library fo
 - 🖥️ Supports GPU-accelerated delegates (CoreML/Metal/OpenGL)
 - 📸 Easy [VisionCamera](https://github.com/mrousavy/react-native-vision-camera) integration
 
+## Migrating from v2
+
+If you are upgrading from v2, see the [Migration Guide](./MIGRATION_V2_TO_V3.md) for breaking changes and upgrade steps.
+
 ## Installation
 
 1. Add the npm packages:
