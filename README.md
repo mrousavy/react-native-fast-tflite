@@ -45,10 +45,10 @@ If you are upgrading from v2, see the [Migration Guide](./MIGRATION_V2_TO_V3.md)
 
    ```ts
    // Option A: Standalone Function
-   const model = await loadTensorflowModel(require('assets/my-model.tflite'))
+   const model = await loadTensorflowModel(require('assets/my-model.tflite'), [])
 
    // Option B: Hook in a Function Component
-   const plugin = useTensorflowModel(require('assets/my-model.tflite'))
+   const plugin = useTensorflowModel(require('assets/my-model.tflite'), [])
    ```
 
 4. Call the Model:
@@ -64,13 +64,14 @@ Models can be loaded from the React Native bundle via `require(..)`, or any URI/
 
 ```ts
 // Asset from React Native Bundle
-loadTensorflowModel(require('assets/my-model.tflite'))
+loadTensorflowModel(require('assets/my-model.tflite'), [])
 // File on the local filesystem
-loadTensorflowModel({ url: 'file:///var/mobile/.../my-model.tflite' })
+loadTensorflowModel({ url: 'file:///var/mobile/.../my-model.tflite' }, [])
 // Remote URL
-loadTensorflowModel({
-  url: 'https://tfhub.dev/google/lite-model/object_detection_v1.tflite',
-})
+loadTensorflowModel(
+  { url: 'https://tfhub.dev/google/lite-model/object_detection_v1.tflite' },
+  []
+)
 ```
 
 Loading a Model is asynchronous since buffers need to be allocated. Make sure to handle errors when loading.
@@ -102,7 +103,7 @@ Use [vision-camera-resize-plugin](https://github.com/mrousavy/vision-camera-resi
 ```tsx
 import { NitroModules } from 'react-native-nitro-modules'
 
-const objectDetection = useTensorflowModel(require('object_detection.tflite'))
+const objectDetection = useTensorflowModel(require('object_detection.tflite'), [])
 const model =
   objectDetection.state === 'loaded' ? objectDetection.model : undefined
 
