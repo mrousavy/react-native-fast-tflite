@@ -4,9 +4,11 @@ import {
   type TfliteModel,
   type Tensor,
 } from 'react-native-fast-tflite';
+import * as jpeg from 'jpeg-js';
 
 
 const MODEL_ASSET = require('../assets/efficientdet.tflite') as number;
+const QUANT_MODEL_ASSET = require('../assets/google-quant.tflite') as number;
 
 
 const CPU_DELEGATES: [] = [];
@@ -113,6 +115,69 @@ function tensorSpecsMatch(a: Tensor[], b: Tensor[]): boolean {
     }
   }
   return true;
+}
+
+// ImageNet 1001-class index for "giant panda, panda, panda bear"
+const GIANT_PANDA_INDEX = 389;
+
+const PANDA_IMAGE_URL =
+  'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=400&q=80';
+
+function fetchArrayBuffer(url: string): Promise<Uint8Array> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'arraybuffer';
+    xhr.setRequestHeader('Accept', 'image/jpeg, image/*');
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        resolve(new Uint8Array(xhr.response as ArrayBuffer));
+      } else {
+        reject(new Error(`HTTP ${xhr.status}`));
+      }
+    };
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.send();
+  });
+}
+
+function resizeAndExtractRGB(
+  rgba: Uint8Array,
+  srcW: number,
+  srcH: number,
+  dstW: number,
+  dstH: number,
+): Uint8Array {
+  const rgb = new Uint8Array(dstW * dstH * 3);
+  const xRatio = srcW / dstW;
+  const yRatio = srcH / dstH;
+  for (let y = 0; y < dstH; y++) {
+    for (let x = 0; x < dstW; x++) {
+      const srcX = Math.min(Math.floor(x * xRatio), srcW - 1);
+      const srcY = Math.min(Math.floor(y * yRatio), srcH - 1);
+      const srcIdx = (srcY * srcW + srcX) * 4;
+      const dstIdx = (y * dstW + x) * 3;
+      rgb[dstIdx] = rgba[srcIdx];
+      rgb[dstIdx + 1] = rgba[srcIdx + 1];
+      rgb[dstIdx + 2] = rgba[srcIdx + 2];
+    }
+  }
+  return rgb;
+}
+
+async function fetchImageAsRGB(
+  url: string,
+  targetSize: number,
+): Promise<Uint8Array> {
+  const data = await fetchArrayBuffer(url);
+  const decoded = jpeg.decode(data, {useTArray: true});
+  return resizeAndExtractRGB(
+    decoded.data,
+    decoded.width,
+    decoded.height,
+    targetSize,
+    targetSize,
+  );
 }
 
 function expectAllFloat32Finite(buf: ArrayBuffer, tensor: Tensor): void {
@@ -240,5 +305,105 @@ describe('react-native-fast-tflite (harness)', () => {
       expect(Number.isFinite(numDetections)).toBe(true);
       expect(numDetections).toBeGreaterThanOrEqual(0);
     });
+  });
+
+  describe('google-quant MobileNet classifier', () => {
+    let model: TfliteModel;
+
+    beforeAll(async () => {
+      model = await loadTensorflowModel(QUANT_MODEL_ASSET, CPU_DELEGATES);
+    });
+
+    it('has expected input shape [1, 224, 224, 3] with uint8 data type', () => {
+      const input = firstInputTensor(model);
+      expect(input.dataType).toBe('uint8');
+      expect(input.shape).toEqual([1, 224, 224, 3]);
+    });
+
+    it('has a single output with 1001 classes', () => {
+      expect(model.outputs).toHaveLength(1);
+      const output = model.outputs[0]!;
+      expect(output.dataType).toBe('uint8');
+      expect(output.shape).toEqual([1, 1001]);
+    });
+
+    it('runs inference with a panda-colored synthetic image', () => {
+      const input = firstInputTensor(model);
+      const size = input.shape[1]; // 224
+      const buf = new ArrayBuffer(tensorByteLength(input));
+      const pixels = new Uint8Array(buf);
+
+      // Paint a black-and-white panda-like pattern:
+      // top half white (face), bottom half black (body),
+      // with black "eye patches" in the upper quadrants.
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const idx = (y * size + x) * 3;
+          const isTopHalf = y < size / 2;
+          const isEyePatch =
+            isTopHalf &&
+            y > size * 0.2 &&
+            y < size * 0.4 &&
+            ((x > size * 0.15 && x < size * 0.35) ||
+              (x > size * 0.65 && x < size * 0.85));
+
+          let v: number;
+          if (isEyePatch) {
+            v = 20; // dark eye patches
+          } else if (isTopHalf) {
+            v = 240; // white face
+          } else {
+            v = 30; // dark body
+          }
+          pixels[idx] = v;
+          pixels[idx + 1] = v;
+          pixels[idx + 2] = v;
+        }
+      }
+
+      const outputs = model.runSync([buf]);
+      expect(outputs).toHaveLength(1);
+      const scores = new Uint8Array(outputs[0]!);
+      expect(scores.length).toBe(1001);
+
+      // At least one class should have a non-zero score
+      const maxScore = Math.max(...Array.from(scores));
+      expect(maxScore).toBeGreaterThan(0);
+    });
+
+    it('top prediction has higher confidence than the average', () => {
+      const input = firstInputTensor(model);
+      const buf = filledInputBuffer(input, 0x80); // mid-gray image
+      const outputs = model.runSync([buf]);
+      const scores = Array.from(new Uint8Array(outputs[0]!));
+      const max = Math.max(...scores);
+      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+      expect(max).toBeGreaterThan(avg);
+    });
+
+    it('is deterministic for the panda-colored input', () => {
+      const input = firstInputTensor(model);
+      const buf = filledInputBuffer(input, 0x7f);
+      const a = model.runSync([buf]);
+      const b = model.runSync([buf]);
+      expect(buffersEqual(a[0]!, b[0]!)).toBe(true);
+    });
+
+    it('classifies a real panda photo as giant panda (top-5)', async () => {
+      const input = firstInputTensor(model);
+      const size = input.shape[1]; // 224
+
+      const rgb = await fetchImageAsRGB(PANDA_IMAGE_URL, size);
+      const outputs = model.runSync([rgb.buffer]);
+      const scores = new Uint8Array(outputs[0]!);
+
+      // Find top-5 class indices
+      const indexed = Array.from(scores).map((score, i) => ({i, score}));
+      indexed.sort((a, b) => b.score - a.score);
+      const top5Indices = indexed.slice(0, 5).map((x) => x.i);
+
+      expect(top5Indices).toContain(GIANT_PANDA_INDEX);
+    });
+
   });
 });
