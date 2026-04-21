@@ -164,6 +164,7 @@ TfLiteDelegate* getAndroidGPUDelegate() {
 #ifdef ANDROID
   TfLiteGpuDelegateOptionsV2 delegateOptions = TfLiteGpuDelegateOptionsV2Default();
   TfLiteDelegate* gpuDelegate = TfLiteGpuDelegateV2Create(&delegateOptions);
+  return gpuDelegate;
 #else // ANDROID
   throw std::runtime_error(
       "The Android GPU Delegate (\"android-gpu\") is only supported on Android!");
