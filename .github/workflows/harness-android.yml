@@ -123,7 +123,7 @@ jobs:
           java-package: jdk
 
       - name: Restore Gradle cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.gradle/caches
@@ -147,7 +147,7 @@ jobs:
           ls /dev/kvm
 
       - name: AVD cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         id: avd-cache
         with:
           path: |
