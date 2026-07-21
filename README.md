@@ -94,69 +94,11 @@ From that we know we need a 192 x 192 input image with 3 bytes per pixel (RGB).
 
 #### Usage (VisionCamera)
 
-> [!NOTE]
-> The example below targets **VisionCamera v4**. A VisionCamera v5 integration exists but is currently part of a private project — [sponsor Marc Rousavy](https://github.com/sponsors/mrousavy) to get access.
-
 If you're using this model with a [VisionCamera](https://github.com/mrousavy/react-native-vision-camera) Frame Processor, you need to convert the Frame to the model's expected input size.
-Use [vision-camera-resize-plugin](https://github.com/mrousavy/vision-camera-resize-plugin) to do the conversion:
+Use [vision-camera-resizer](https://visioncamera.margelo.com/api/react-native-vision-camera-resizer) to do the conversion:
 
 ```tsx
-import { NitroModules } from 'react-native-nitro-modules'
-
-const objectDetection = useTensorflowModel(require('object_detection.tflite'), [])
-const model =
-  objectDetection.state === 'loaded' ? objectDetection.model : undefined
-
-// TfliteModel is a Nitro HybridObject (jsi::NativeState). VisionCamera v4's worklet
-// runtime cannot access jsi::NativeState directly — box it into a jsi::HostObject
-// before capture, then unbox() inside the worklet to run inference.
-// This will not be necessary in VisionCamera v5, which is itself a Nitro Module
-// and can access HybridObjects directly.
-const boxedModel = useMemo(
-  () => (model != null ? NitroModules.box(model) : undefined),
-  [model]
-)
-
-const { resize } = useResizePlugin()
-
-const frameProcessor = useFrameProcessor(
-  (frame) => {
-    'worklet'
-    if (boxedModel == null) return
-
-    const tflite = boxedModel.unbox()
-
-    // 1. Resize 4k Frame to 192x192x3 using vision-camera-resize-plugin
-    const resized = resize(frame, {
-      scale: {
-        width: 192,
-        height: 192,
-      },
-      pixelFormat: 'rgb',
-      dataType: 'uint8',
-    })
-
-    // 2. Extract the exact slice of the underlying ArrayBuffer
-    //    (TypedArrays may have a non-zero byteOffset into a shared buffer)
-    const inputBuffer = resized.buffer.slice(
-      resized.byteOffset,
-      resized.byteOffset + resized.byteLength
-    )
-
-    // 3. Run model with given input buffer synchronously
-    const outputs = tflite.runSync([inputBuffer])
-
-    // 4. Interpret outputs accordingly
-    const detection_boxes = new Float32Array(outputs[0]!)
-    const detection_classes = new Float32Array(outputs[1]!)
-    const detection_scores = new Float32Array(outputs[2]!)
-    const num_detections = new Float32Array(outputs[3]!)
-    console.log(`Detected ${num_detections[0]} objects!`)
-  },
-  [boxedModel]
-)
-
-return <Camera frameProcessor={frameProcessor} {...otherProps} />
+V5 example here
 ```
 
 ### Using GPU Delegates
