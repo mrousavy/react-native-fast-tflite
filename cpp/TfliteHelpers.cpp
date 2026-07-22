@@ -133,7 +133,15 @@ int getTensorTotalLength(const TfLiteTensor* tensor) {
 TfLiteDelegate* getCoreMLDelegate() {
 #ifdef __APPLE__
 #if FAST_TFLITE_ENABLE_CORE_ML
-  TfLiteCoreMlDelegateOptions delegateOptions;
+  // MUST be zero-initialized: TfLiteCoreMlDelegateOptions is a plain C struct
+  // and there is no ...OptionsDefault() helper. Without `= {}` the fields
+  // (enabled_devices, coreml_version, max_delegated_partitions,
+  // min_nodes_per_partition) are stack garbage that poisons the delegate's
+  // graph partitioning — EXC_BAD_ACCESS inside the first
+  // TfLiteInterpreterInvoke on device/OS combos whose stack layout produces
+  // harmful values. Zero values are the documented defaults (ANE-only
+  // devices, newest CoreML version, unlimited partitions).
+  TfLiteCoreMlDelegateOptions delegateOptions = {};
   TfLiteDelegate* coreMlDelegate = TfLiteCoreMlDelegateCreate(&delegateOptions);
   return coreMlDelegate;
 #else // FAST_TFLITE_ENABLE_CORE_ML
