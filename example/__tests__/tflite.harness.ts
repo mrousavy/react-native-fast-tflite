@@ -69,6 +69,11 @@ function filledInputBuffer(input: Tensor, byte: number): ArrayBuffer {
   return buf;
 }
 
+/** Output buffers are pre-allocated per tensor and reused, so snapshot before re-running. */
+function copyOf(buffer: ArrayBuffer): ArrayBuffer {
+  return new Uint8Array(new Uint8Array(buffer)).buffer as ArrayBuffer;
+}
+
 function buffersEqual(a: ArrayBuffer, b: ArrayBuffer): boolean {
   if (a.byteLength !== b.byteLength) {
     return false;
@@ -405,5 +410,55 @@ describe('react-native-fast-tflite (harness)', () => {
       expect(top5Indices).toContain(GIANT_PANDA_INDEX);
     });
 
+    it('runSync rejects an input buffer that is too small', () => {
+      const input = firstInputTensor(model);
+      const tooSmall = new ArrayBuffer(tensorByteLength(input) - 1);
+      expect(() => model.runSync([tooSmall])).toThrow(
+        /does not match input tensor/i,
+      );
+    });
+
+    it('runSync rejects an input buffer that is too large', () => {
+      const input = firstInputTensor(model);
+      const tooLarge = new ArrayBuffer(tensorByteLength(input) + 1);
+      expect(() => model.runSync([tooLarge])).toThrow(
+        /does not match input tensor/i,
+      );
+    });
+
+    // Regression guard: a wrong-sized buffer used to be dropped silently, so
+    // inference ran on whatever was left in the tensor from the previous call
+    // and returned plausible-looking (but stale) scores instead of throwing.
+    it('does not silently run inference on the previous input when the buffer size is wrong', () => {
+      const input = firstInputTensor(model);
+      const byteLength = tensorByteLength(input);
+
+      // Prime the input tensor with a known image and keep a copy of its scores.
+      const primed = copyOf(model.runSync([filledInputBuffer(input, 0x10)])[0]!);
+
+      // A visibly different image, but one byte short.
+      const wrongSized = new Uint8Array(byteLength - 1).fill(0xf0)
+        .buffer as ArrayBuffer;
+
+      let threw = false;
+      let reusedStaleInput = false;
+      try {
+        const outputs = model.runSync([wrongSized]);
+        reusedStaleInput = buffersEqual(copyOf(outputs[0]!), primed);
+      } catch {
+        threw = true;
+      }
+
+      expect(reusedStaleInput).toBe(false);
+      expect(threw).toBe(true);
+
+      // The rejection must be specific to the size mismatch: a correctly sized
+      // buffer with the same content still runs and reaches the tensor, so the
+      // scores differ from the primed ones.
+      const correctlySized = filledInputBuffer(input, 0xf0);
+      const after = copyOf(model.runSync([correctlySized])[0]!);
+      expect(after.byteLength).toBe(tensorByteLength(model.outputs[0]!));
+      expect(buffersEqual(after, primed)).toBe(false);
+    });
   });
 });
