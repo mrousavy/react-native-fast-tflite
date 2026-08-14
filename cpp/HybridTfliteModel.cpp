@@ -95,7 +95,17 @@ void HybridTfliteModel::copyInputBuffers(const std::vector<std::shared_ptr<Array
   for (int32_t i = 0; i < inputCount; i++) {
     TfLiteTensor* tensor = TfLiteInterpreterGetInputTensor(_interpreter, i);
     const std::shared_ptr<ArrayBuffer>& buffer = input[i];
-    TfLiteTensorCopyFromBuffer(tensor, buffer->data(), buffer->size());
+    TfLiteStatus status = TfLiteTensorCopyFromBuffer(tensor, buffer->data(), buffer->size());
+    if (status != kTfLiteOk) [[unlikely]] {
+      // TfLiteTensorCopyFromBuffer requires input_data_size == TfLiteTensorByteSize(tensor).
+      // On mismatch it leaves the tensor untouched, so without this check inference would
+      // silently run on the previous (or zero-initialized) contents of the tensor.
+      throw std::runtime_error("TFLite: Input buffer " + std::to_string(i) + " size (" +
+                               std::to_string(buffer->size()) + ") does not match input tensor \"" +
+                               std::string(TfLiteTensorName(tensor)) + "\" expected size (" +
+                               std::to_string(TfLiteTensorByteSize(tensor)) +
+                               ")! Status: " + tfLiteStatusToString(status));
+    }
   }
 }
 
