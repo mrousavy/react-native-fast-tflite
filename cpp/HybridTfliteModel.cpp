@@ -17,11 +17,13 @@ namespace margelo::nitro::tflite {
 
 HybridTfliteModel::HybridTfliteModel(TfLiteInterpreter* interpreter,
                                      std::shared_ptr<ArrayBuffer> modelData,
-                                     std::vector<TensorflowModelDelegate> delegates)
+                                     std::vector<TensorflowModelDelegate> delegates,
+                                     std::vector<std::function<void()>> delegateDeleters)
     : HybridObject(TAG), _interpreter(interpreter), _delegates(std::move(delegates)),
-      _modelData(modelData) {
+      _modelData(modelData), _delegateDeleters(std::move(delegateDeleters)) {
   TfLiteStatus status = TfLiteInterpreterAllocateTensors(_interpreter);
   if (status != kTfLiteOk) {
+    releaseNativeResources();
     throw std::runtime_error(
         "TFLite: Failed to allocate memory for input/output tensors! Status: " +
         tfLiteStatusToString(status));
@@ -29,11 +31,37 @@ HybridTfliteModel::HybridTfliteModel(TfLiteInterpreter* interpreter,
 }
 
 HybridTfliteModel::~HybridTfliteModel() {
+  // No lock: the destructor only runs once the last shared_ptr dropped, so no
+  // other thread can be inside a method. If dispose() already ran, all
+  // pointers are null and this is a no-op.
+  releaseNativeResources();
+}
+
+void HybridTfliteModel::releaseNativeResources() {
   if (_interpreter != nullptr) {
     TfLiteInterpreterDelete(_interpreter);
     _interpreter = nullptr;
   }
-  // _modelData (shared_ptr<ArrayBuffer>) is automatically freed
+  // Delegates must outlive the interpreter — delete them second.
+  for (auto& deleter : _delegateDeleters) {
+    deleter();
+  }
+  _delegateDeleters.clear();
+  // Model bytes must outlive the interpreter — drop our reference last.
+  // (JS-side references to output buffers keep their own shared_ptrs alive.)
+  _modelData = nullptr;
+  _outputBuffers.clear();
+}
+
+void HybridTfliteModel::dispose() {
+  // The lock waits out an in-flight inference on another thread — freeing
+  // the interpreter under a running TfLiteInterpreterInvoke would be a
+  // native crash.
+  std::lock_guard<std::mutex> lock(_lifecycleMutex);
+  if (_disposed.exchange(true, std::memory_order_acq_rel)) {
+    return;
+  }
+  releaseNativeResources();
 }
 
 std::vector<TensorflowModelDelegate> HybridTfliteModel::getDelegates() {
@@ -41,6 +69,8 @@ std::vector<TensorflowModelDelegate> HybridTfliteModel::getDelegates() {
 }
 
 std::vector<Tensor> HybridTfliteModel::getInputs() {
+  std::lock_guard<std::mutex> lock(_lifecycleMutex);
+  throwIfDisposed();
   int count = TfLiteInterpreterGetInputTensorCount(_interpreter);
   std::vector<Tensor> tensors;
   tensors.reserve(count);
@@ -63,6 +93,8 @@ std::vector<Tensor> HybridTfliteModel::getInputs() {
 }
 
 std::vector<Tensor> HybridTfliteModel::getOutputs() {
+  std::lock_guard<std::mutex> lock(_lifecycleMutex);
+  throwIfDisposed();
   int count = TfLiteInterpreterGetOutputTensorCount(_interpreter);
   std::vector<Tensor> tensors;
   tensors.reserve(count);
@@ -156,6 +188,10 @@ void HybridTfliteModel::invoke() {
 
 std::vector<std::shared_ptr<ArrayBuffer>>
 HybridTfliteModel::runSync(const std::vector<std::shared_ptr<ArrayBuffer>>& input) {
+  // Held for the whole inference so dispose() can never free the interpreter
+  // mid-invoke. The disposed-throw is a catchable JS error on any runtime.
+  std::lock_guard<std::mutex> lock(_lifecycleMutex);
+  throwIfDisposed();
   copyInputBuffers(input);
   invoke();
   return copyOutputBuffers();
@@ -163,12 +199,20 @@ HybridTfliteModel::runSync(const std::vector<std::shared_ptr<ArrayBuffer>>& inpu
 
 std::shared_ptr<Promise<std::vector<std::shared_ptr<ArrayBuffer>>>>
 HybridTfliteModel::run(const std::vector<std::shared_ptr<ArrayBuffer>>& input) {
-  // Copy input buffers on caller (JS) thread first — input ArrayBuffers are
-  // non-owning JS buffers that may be GC'd if we access them async.
-  copyInputBuffers(input);
+  {
+    // Copy input buffers on caller (JS) thread first — input ArrayBuffers are
+    // non-owning JS buffers that may be GC'd if we access them async.
+    std::lock_guard<std::mutex> lock(_lifecycleMutex);
+    throwIfDisposed();
+    copyInputBuffers(input);
+  }
   std::shared_ptr<HybridTfliteModel> sharedThis = shared_cast<HybridTfliteModel>();
   return Promise<std::vector<std::shared_ptr<ArrayBuffer>>>::async(
       [sharedThis]() -> std::vector<std::shared_ptr<ArrayBuffer>> {
+        // Re-acquire on the async thread: dispose() may have landed between
+        // the input copy above and this lambda running.
+        std::lock_guard<std::mutex> lock(sharedThis->_lifecycleMutex);
+        sharedThis->throwIfDisposed();
         sharedThis->invoke();
         return sharedThis->copyOutputBuffers();
       });
