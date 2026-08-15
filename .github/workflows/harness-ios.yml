@@ -90,7 +90,7 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: yarn
