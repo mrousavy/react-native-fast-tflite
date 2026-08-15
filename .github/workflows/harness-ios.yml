@@ -85,7 +85,7 @@ jobs:
     name: Harness iOS
     runs-on: macOS-26
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
           submodules: recursive
