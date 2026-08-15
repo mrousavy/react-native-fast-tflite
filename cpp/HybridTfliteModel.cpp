@@ -17,9 +17,10 @@ namespace margelo::nitro::tflite {
 
 HybridTfliteModel::HybridTfliteModel(TfLiteInterpreter* interpreter,
                                      std::shared_ptr<ArrayBuffer> modelData,
-                                     std::vector<TensorflowModelDelegate> delegates)
+                                     std::vector<TensorflowModelDelegate> delegates,
+                                     std::vector<std::function<void()>> delegateDeleters)
     : HybridObject(TAG), _interpreter(interpreter), _delegates(std::move(delegates)),
-      _modelData(modelData) {
+      _modelData(modelData), _delegateDeleters(std::move(delegateDeleters)) {
   TfLiteStatus status = TfLiteInterpreterAllocateTensors(_interpreter);
   if (status != kTfLiteOk) {
     throw std::runtime_error(
@@ -33,6 +34,11 @@ HybridTfliteModel::~HybridTfliteModel() {
     TfLiteInterpreterDelete(_interpreter);
     _interpreter = nullptr;
   }
+  // Delegates must outlive the interpreter — delete them second.
+  for (auto& deleter : _delegateDeleters) {
+    deleter();
+  }
+  _delegateDeleters.clear();
   // _modelData (shared_ptr<ArrayBuffer>) is automatically freed
 }
 

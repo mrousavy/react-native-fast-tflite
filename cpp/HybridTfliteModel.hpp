@@ -1,9 +1,11 @@
 #pragma once
 
 #include "HybridTfliteModelSpec.hpp"
+#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #if defined(ANDROID)
 #include <tflite/c/c_api.h>
@@ -18,7 +20,8 @@ namespace margelo::nitro::tflite {
 class HybridTfliteModel : public HybridTfliteModelSpec {
 public:
   explicit HybridTfliteModel(TfLiteInterpreter* interpreter, std::shared_ptr<ArrayBuffer> modelData,
-                             std::vector<TensorflowModelDelegate> delegates);
+                             std::vector<TensorflowModelDelegate> delegates,
+                             std::vector<std::function<void()>> delegateDeleters);
   ~HybridTfliteModel();
 
   // Properties (from HybridTfliteModelSpec)
@@ -42,6 +45,10 @@ private:
   TfLiteInterpreter* _interpreter = nullptr;
   std::vector<TensorflowModelDelegate> _delegates;
   std::shared_ptr<ArrayBuffer> _modelData;
+  // Free the TFLite delegates (GPU/CoreML/NNAPI) — the interpreter does not
+  // own them, so without these every model destruction leaks the delegate's
+  // compiled kernels / driver contexts.
+  std::vector<std::function<void()>> _delegateDeleters;
   std::unordered_map<std::string, std::shared_ptr<ArrayBuffer>> _outputBuffers;
 };
 
